@@ -74,6 +74,18 @@ export function Dashboard() {
     );
   };
 
+  const handleTopicClick = (topicName: string) => {
+    const topic = topics.find((t) => t.name === topicName);
+    if (topic) {
+      if (topic.subject_id !== selectedSubject) {
+        setSelectedSubject(topic.subject_id);
+      }
+      if (!selectedTopics.includes(topic.id)) {
+        setSelectedTopics((prev) => [...prev, topic.id]);
+      }
+    }
+  };
+
   const filteredResources = resources.filter((resource) => {
     if (selectedSubject) {
       const subject = subjects.find((s) => s.id === selectedSubject);
@@ -211,7 +223,7 @@ export function Dashboard() {
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">Recently Added</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {recentlyAddedResources.map((resource) => (
-                      <ResourceCard key={resource.id} resource={resource} />
+                      <ResourceCard key={resource.id} resource={resource} onTopicClick={handleTopicClick} />
                     ))}
                   </div>
                 </div>
@@ -228,7 +240,7 @@ export function Dashboard() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredResources.map((resource) => (
-                  <ResourceCard key={resource.id} resource={resource} />
+                  <ResourceCard key={resource.id} resource={resource} onTopicClick={handleTopicClick} />
                 ))}
               </div>
 

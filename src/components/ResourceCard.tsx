@@ -3,6 +3,7 @@ import { Video, FileText, Presentation, Beaker, Wrench, Star, ExternalLink } fro
 
 type ResourceCardProps = {
   resource: Resource;
+  onTopicClick?: (topicName: string) => void;
 };
 
 const typeIcons: Record<string, any> = {
@@ -15,11 +16,11 @@ const typeIcons: Record<string, any> = {
   tool: Wrench,
 };
 
-export function ResourceCard({ resource }: ResourceCardProps) {
+export function ResourceCard({ resource, onTopicClick }: ResourceCardProps) {
   const Icon = typeIcons[resource.type] || FileText;
 
   return (
-    <div className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-5 border border-gray-200">
+    <div className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-5 border border-gray-200 min-w-[300px]">
       <div className="flex items-start gap-3 mb-3">
         <div className="bg-blue-50 p-2 rounded-lg">
           <Icon size={24} className="text-blue-600" />
@@ -52,12 +53,13 @@ export function ResourceCard({ resource }: ResourceCardProps) {
       {resource.topic_names && resource.topic_names.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-3">
           {resource.topic_names.slice(0, 3).map((topic, idx) => (
-            <span
+            <button
               key={idx}
-              className="inline-block px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded"
+              onClick={() => onTopicClick?.(topic)}
+              className="inline-block px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded hover:bg-blue-100 transition-colors cursor-pointer"
             >
               {topic}
-            </span>
+            </button>
           ))}
           {resource.topic_names.length > 3 && (
             <span className="text-xs text-gray-500 px-2 py-1">
