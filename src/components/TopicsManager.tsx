@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { Plus, Edit, Trash2, ChevronUp, ChevronDown, Save, X } from 'lucide-react';
 
@@ -29,11 +29,31 @@ export function TopicsManager() {
         loadSubjects();
     }, []);
 
+    const loadTopics = useCallback(async () => {
+        if (!selectedSubjectId) return;
+
+        setLoading(true);
+        try {
+            const { data, error } = await supabase
+                .from('topics')
+                .select('*')
+                .eq('subject_id', selectedSubjectId)
+                .order('order_index');
+
+            if (error) throw error;
+            setTopics(data || []);
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    }, [selectedSubjectId]);
+
     useEffect(() => {
         if (selectedSubjectId) {
             loadTopics();
         }
-    }, [selectedSubjectId]);
+    }, [selectedSubjectId, loadTopics]);
 
     const loadSubjects = async () => {
         try {
@@ -47,26 +67,6 @@ export function TopicsManager() {
             if (data && data.length > 0 && !selectedSubjectId) {
                 setSelectedSubjectId(data[0].id);
             }
-        } catch (err: any) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const loadTopics = async () => {
-        if (!selectedSubjectId) return;
-
-        setLoading(true);
-        try {
-            const { data, error } = await supabase
-                .from('topics')
-                .select('*')
-                .eq('subject_id', selectedSubjectId)
-                .order('order_index');
-
-            if (error) throw error;
-            setTopics(data || []);
         } catch (err: any) {
             setError(err.message);
         } finally {
