@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Plus, Edit, Trash2, ChevronUp, ChevronDown, Save, X } from 'lucide-react';
+import { ConfirmationModal } from './ConfirmationModal';
 
 type Subject = {
     id: string;
@@ -17,6 +18,7 @@ export function SubjectsManager() {
     const [isAdding, setIsAdding] = useState(false);
     const [formData, setFormData] = useState({ name: '', slug: '' });
     const [error, setError] = useState('');
+    const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
 
     useEffect(() => {
         loadSubjects();
@@ -112,7 +114,13 @@ export function SubjectsManager() {
     };
 
     const handleDelete = async (id: string, name: string) => {
-        if (!confirm(`Czy na pewno chcesz usunąć przedmiot "${name}"?`)) return;
+        setDeleteConfirm({ id, name });
+    };
+
+    const confirmDelete = async () => {
+        if (!deleteConfirm) return;
+        const { id, name } = deleteConfirm;
+        setDeleteConfirm(null);
         setError('');
 
         try {
@@ -346,6 +354,17 @@ export function SubjectsManager() {
                     </tbody>
                 </table>
             </div>
+
+            <ConfirmationModal
+                isOpen={!!deleteConfirm}
+                title="Potwierdź usunięcie"
+                message={deleteConfirm ? `Czy na pewno chcesz usunąć przedmiot "${deleteConfirm.name}"?` : ''}
+                confirmText="Usuń"
+                cancelText="Anuluj"
+                onConfirm={confirmDelete}
+                onCancel={() => setDeleteConfirm(null)}
+                variant="danger"
+            />
         </div>
     );
 }
