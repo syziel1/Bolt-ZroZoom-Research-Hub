@@ -150,20 +150,47 @@ export function SubjectsManager() {
         const subject1 = subjects[index];
         const subject2 = subjects[swapIndex];
 
+        const originalOrder1 = subject1.order_index;
+        const originalOrder2 = subject2.order_index;
+
         try {
-            await supabase
+            // First update
+            const { error: error1 } = await supabase
                 .from('subjects')
-                .update({ order_index: subject2.order_index })
+                .update({ order_index: originalOrder2 })
                 .eq('id', subject1.id);
 
-            await supabase
+            if (error1) {
+                throw new Error(`Nie udało się zaktualizować kolejności: ${error1.message}`);
+            }
+
+            // Second update
+            const { error: error2 } = await supabase
                 .from('subjects')
-                .update({ order_index: subject1.order_index })
+                .update({ order_index: originalOrder1 })
                 .eq('id', subject2.id);
 
+            if (error2) {
+                // Rollback first update if second fails
+                const { error: rollbackError } = await supabase
+                    .from('subjects')
+                    .update({ order_index: originalOrder1 })
+                    .eq('id', subject1.id);
+
+                if (rollbackError) {
+                    throw new Error(
+                        `Błąd podczas zmiany kolejności: ${error2.message}. ` +
+                        `Próba cofnięcia zmian również nie powiodła się: ${rollbackError.message}. ` +
+                        `Odśwież stronę, aby zobaczyć aktualny stan.`
+                    );
+                }
+                throw new Error(`Nie udało się zaktualizować kolejności: ${error2.message}`);
+            }
+
             loadSubjects();
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Wystąpił nieznany błąd');
+            loadSubjects(); // Reload to reflect actual database state
         }
     };
 
