@@ -208,10 +208,13 @@ export function TopicsManager() {
 
             if (error2) {
                 // Rollback step 1
-                await supabase
+                const { error: rollbackError } = await supabase
                     .from('topics')
                     .update({ order_index: originalOrder1 })
                     .eq('id', topic1.id);
+                if (rollbackError) {
+                    throw new Error(`Update failed: ${error2.message}. Rollback also failed: ${rollbackError.message}`);
+                }
                 throw error2;
             }
 
@@ -223,15 +226,20 @@ export function TopicsManager() {
 
             if (error3) {
                 // Rollback step 2
-                await supabase
+                const { error: rollbackError1 } = await supabase
                     .from('topics')
                     .update({ order_index: originalOrder2 })
                     .eq('id', topic2.id);
                 // Rollback step 1
-                await supabase
+                const { error: rollbackError2 } = await supabase
                     .from('topics')
                     .update({ order_index: originalOrder1 })
                     .eq('id', topic1.id);
+                
+                const rollbackErrors = [rollbackError1, rollbackError2].filter(Boolean);
+                if (rollbackErrors.length > 0) {
+                    throw new Error(`Update failed: ${error3.message}. Rollback also failed: ${rollbackErrors.map(e => e?.message).join(', ')}`);
+                }
                 throw error3;
             }
 
