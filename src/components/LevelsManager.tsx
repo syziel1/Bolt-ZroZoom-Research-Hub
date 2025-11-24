@@ -150,15 +150,15 @@ export function LevelsManager() {
         const level2 = levels[swapIndex];
 
         try {
-            await supabase
-                .from('levels')
-                .update({ order_index: level2.order_index })
-                .eq('id', level1.id);
+            // Use RPC function for atomic swap to prevent race conditions
+            const { error } = await supabase.rpc('swap_levels_order', {
+                level1_id: level1.id,
+                level1_new_order: level2.order_index,
+                level2_id: level2.id,
+                level2_new_order: level1.order_index
+            });
 
-            await supabase
-                .from('levels')
-                .update({ order_index: level1.order_index })
-                .eq('id', level2.id);
+            if (error) throw error;
 
             loadLevels();
         } catch (err: any) {

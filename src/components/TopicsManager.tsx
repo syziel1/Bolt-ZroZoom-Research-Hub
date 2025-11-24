@@ -188,15 +188,15 @@ export function TopicsManager() {
         const topic2 = topics[swapIndex];
 
         try {
-            await supabase
-                .from('topics')
-                .update({ order_index: topic2.order_index })
-                .eq('id', topic1.id);
+            // Use RPC function for atomic swap to prevent race conditions
+            const { error } = await supabase.rpc('swap_topics_order', {
+                topic1_id: topic1.id,
+                topic1_new_order: topic2.order_index,
+                topic2_id: topic2.id,
+                topic2_new_order: topic1.order_index
+            });
 
-            await supabase
-                .from('topics')
-                .update({ order_index: topic1.order_index })
-                .eq('id', topic2.id);
+            if (error) throw error;
 
             loadTopics();
         } catch (err: any) {

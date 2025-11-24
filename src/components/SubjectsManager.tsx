@@ -151,15 +151,15 @@ export function SubjectsManager() {
         const subject2 = subjects[swapIndex];
 
         try {
-            await supabase
-                .from('subjects')
-                .update({ order_index: subject2.order_index })
-                .eq('id', subject1.id);
+            // Use RPC function for atomic swap to prevent race conditions
+            const { error } = await supabase.rpc('swap_subjects_order', {
+                subject1_id: subject1.id,
+                subject1_new_order: subject2.order_index,
+                subject2_id: subject2.id,
+                subject2_new_order: subject1.order_index
+            });
 
-            await supabase
-                .from('subjects')
-                .update({ order_index: subject1.order_index })
-                .eq('id', subject2.id);
+            if (error) throw error;
 
             loadSubjects();
         } catch (err: any) {
