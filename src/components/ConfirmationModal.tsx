@@ -121,7 +121,7 @@ export function ConfirmationModal({
                     {/* Modal content */}
                     <div className="bg-white px-4 pb-4 pt-5 sm:p-6">
                         <div className="sm:flex sm:items-start">
-                            {/* Icon */}
+                            {/* Icon - larger centered on mobile, smaller left-aligned on desktop */}
                             <div className={`mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gray-100 sm:mx-0 sm:h-10 sm:w-10 ${styles.icon}`}>
                                 <AlertTriangle size={24} aria-hidden="true" />
                             </div>
@@ -144,7 +144,7 @@ export function ConfirmationModal({
                     </div>
 
                     {/* Actions */}
-                    <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 gap-2">
+                    <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                         <button
                             ref={confirmButtonRef}
                             type="button"
