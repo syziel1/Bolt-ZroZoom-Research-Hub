@@ -187,20 +187,38 @@ export function TopicsManager() {
         const topic1 = topics[index];
         const topic2 = topics[swapIndex];
 
+        // Manual rollback logic
         try {
-            await supabase
+            // First update
+            const { error: error1 } = await supabase
                 .from('topics')
                 .update({ order_index: topic2.order_index })
                 .eq('id', topic1.id);
 
-            await supabase
+            if (error1) {
+                setError(`Nie udało się przesunąć tematu: ${error1.message}`);
+                return;
+            }
+
+            // Second update
+            const { error: error2 } = await supabase
                 .from('topics')
                 .update({ order_index: topic1.order_index })
                 .eq('id', topic2.id);
 
+            if (error2) {
+                // Rollback first update
+                await supabase
+                    .from('topics')
+                    .update({ order_index: topic1.order_index })
+                    .eq('id', topic1.id);
+                setError(`Nie udało się przesunąć tematu: ${error2.message}. Zmiany zostały cofnięte.`);
+                return;
+            }
+
             loadTopics();
         } catch (err: any) {
-            setError(err.message);
+            setError(`Wystąpił błąd podczas przesuwania tematu: ${err.message}`);
         }
     };
 
