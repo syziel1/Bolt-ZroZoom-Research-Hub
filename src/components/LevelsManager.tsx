@@ -62,7 +62,7 @@ export function LevelsManager() {
 
         try {
             const slug = formData.slug ? generateSlug(formData.slug) : generateSlug(formData.name);
-            const maxOrder = Math.max(...levels.map(l => l.order_index), 0);
+            const maxOrder = Math.max(...levels.map(l => l.order_index), -1);
 
             const { error } = await supabase
                 .from('levels')
