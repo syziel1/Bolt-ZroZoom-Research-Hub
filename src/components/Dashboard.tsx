@@ -169,24 +169,24 @@ export function Dashboard() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900">ZroZoom Research Hub</h1>
               <p className="text-sm text-gray-600 mt-1">
-                Discover and share educational resources
+                Odkrywaj i dziel się zasobami edukacyjnymi
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">Welcome, {userNick}</span>
+              <span className="text-sm text-gray-600">Witaj, {userNick}</span>
               <button
                 onClick={() => setIsModalOpen(true)}
                 className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
               >
                 <Plus size={20} />
-                Add Resource
+                Dodaj zasób
               </button>
               <button
                 onClick={handleSignOut}
                 className="text-gray-600 hover:text-gray-900 flex items-center gap-2"
               >
                 <LogOut size={20} />
-                Sign Out
+                Wyloguj się
               </button>
             </div>
           </div>
@@ -204,7 +204,7 @@ export function Dashboard() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-3xl font-bold text-gray-900">{stats.totalResources}</p>
-                      <p className="text-sm text-gray-600 mt-1">Total Resources</p>
+                      <p className="text-sm text-gray-600 mt-1">Wszystkie zasoby</p>
                     </div>
                     <Library className="text-blue-500" size={32} />
                   </div>
@@ -214,7 +214,7 @@ export function Dashboard() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-3xl font-bold text-gray-900">{stats.totalSubjects}</p>
-                      <p className="text-sm text-gray-600 mt-1">Subjects</p>
+                      <p className="text-sm text-gray-600 mt-1">Przedmioty</p>
                     </div>
                     <BookOpen className="text-blue-500" size={32} />
                   </div>
@@ -224,7 +224,7 @@ export function Dashboard() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-3xl font-bold text-gray-900">{stats.totalTopics}</p>
-                      <p className="text-sm text-gray-600 mt-1">Topics</p>
+                      <p className="text-sm text-gray-600 mt-1">Tematy</p>
                     </div>
                     <Hash className="text-blue-500" size={32} />
                   </div>
@@ -233,7 +233,7 @@ export function Dashboard() {
 
               {!hasActiveFilters && recentlyAddedResources.length > 0 && (
                 <div className="mb-8">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Recently Added</h2>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Ostatnio dodane</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {recentlyAddedResources.map((resource) => (
                       <ResourceCard
@@ -249,10 +249,10 @@ export function Dashboard() {
 
               <div className="mb-4">
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                  {hasActiveFilters ? 'Filtered Results' : 'All Resources'}
+                  {hasActiveFilters ? 'Wyniki filtrowania' : 'Wszystkie zasoby'}
                 </h2>
                 <p className="text-sm text-gray-600">
-                  Showing {filteredResources.length} of {resources.length} resources
+                  Wyświetlanie {filteredResources.length} z {resources.length} zasobów
                 </p>
               </div>
 
@@ -269,7 +269,7 @@ export function Dashboard() {
 
               {filteredResources.length === 0 && (
                 <div className="text-center py-12 text-gray-500">
-                  No resources found matching your filters
+                  Nie znaleziono zasobów pasujących do filtrów
                 </div>
               )}
             </>

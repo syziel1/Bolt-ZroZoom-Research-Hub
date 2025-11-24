@@ -114,7 +114,7 @@ export function AddResourceModal({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">Add New Resource</h2>
+          <h2 className="text-xl font-bold text-gray-900">Dodaj nowy zasób</h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
@@ -126,7 +126,7 @@ export function AddResourceModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-              Title *
+              Tytuł *
             </label>
             <input
               id="title"
@@ -154,7 +154,7 @@ export function AddResourceModal({
 
           <div>
             <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
-              Type *
+              Typ *
             </label>
             <select
               id="type"
@@ -163,19 +163,19 @@ export function AddResourceModal({
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="article">Article</option>
-              <option value="video">Video</option>
+              <option value="article">Artykuł</option>
+              <option value="video">Wideo</option>
               <option value="pdf">PDF</option>
-              <option value="presentation">Presentation</option>
+              <option value="presentation">Prezentacja</option>
               <option value="quiz">Quiz</option>
-              <option value="simulation">Simulation</option>
-              <option value="tool">Tool</option>
+              <option value="simulation">Symulacja</option>
+              <option value="tool">Narzędzie</option>
             </select>
           </div>
 
           <div>
             <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
-              Subject *
+              Przedmiot *
             </label>
             <select
               id="subject"
@@ -187,7 +187,7 @@ export function AddResourceModal({
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">Select subject</option>
+              <option value="">Wybierz przedmiot</option>
               {subjects.map((subject) => (
                 <option key={subject.subject_id} value={subject.subject_id}>
                   {subject.subject_name}
@@ -199,7 +199,7 @@ export function AddResourceModal({
           {subjectId && filteredTopics.length > 0 && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Topics (optional)
+                Tematy (opcjonalnie)
               </label>
               <div className="border border-gray-300 rounded-md p-3 max-h-40 overflow-y-auto space-y-2">
                 {filteredTopics.map((topic) => (
@@ -228,7 +228,7 @@ export function AddResourceModal({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Levels (optional)
+              Poziomy (opcjonalnie)
             </label>
             <div className="border border-gray-300 rounded-md p-3 max-h-40 overflow-y-auto space-y-2">
               {levels.map((level) => (
@@ -293,7 +293,7 @@ export function AddResourceModal({
 
           <div>
             <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-              Description (optional)
+              Opis (opcjonalnie)
             </label>
             <textarea
               id="description"
@@ -316,14 +316,14 @@ export function AddResourceModal({
               disabled={loading}
               className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400"
             >
-              {loading ? 'Adding...' : 'Add Resource'}
+              {loading ? 'Dodawanie...' : 'Dodaj zasób'}
             </button>
             <button
               type="button"
               onClick={onClose}
               className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
             >
-              Cancel
+              Anuluj
             </button>
           </div>
         </form>

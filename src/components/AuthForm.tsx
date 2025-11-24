@@ -62,7 +62,7 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
 
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">ZroZoom Research Hub</h1>
-          <p className="text-gray-600 mt-2">Educational Resources Platform</p>
+          <p className="text-gray-600 mt-2">Platforma zasobów edukacyjnych</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -83,7 +83,7 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
           {!isLogin && (
             <div>
               <label htmlFor="nick" className="block text-sm font-medium text-gray-700 mb-1">
-                Nickname (optional)
+                Pseudonim (opcjonalnie)
               </label>
               <input
                 id="nick"
@@ -97,7 +97,7 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              Password
+              Hasło
             </label>
             <input
               id="password"
@@ -122,16 +122,16 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
             className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center gap-2"
           >
             {loading ? (
-              'Loading...'
+              'Ładowanie...'
             ) : isLogin ? (
               <>
                 <LogIn size={20} />
-                Sign In
+                Zaloguj się
               </>
             ) : (
               <>
                 <UserPlus size={20} />
-                Sign Up
+                Zarejestruj się
               </>
             )}
           </button>
@@ -141,7 +141,7 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
             onClick={() => setIsLogin(!isLogin)}
             className="w-full text-blue-600 hover:text-blue-800 text-sm"
           >
-            {isLogin ? "Don't have an account? Sign Up" : 'Already have an account? Sign In'}
+            {isLogin ? "Nie masz konta? Zarejestruj się" : 'Masz już konto? Zaloguj się'}
           </button>
         </form>
       </div>

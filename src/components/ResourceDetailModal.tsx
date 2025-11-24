@@ -180,7 +180,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
   };
 
   const handleDeleteComment = async (commentId: string) => {
-    if (!confirm('Are you sure you want to delete this comment?')) return;
+    if (!confirm('Czy na pewno chcesz usunąć ten komentarz?')) return;
 
     const { error } = await supabase
       .from('comments')
@@ -193,7 +193,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
   };
 
   const handleDeleteResource = async () => {
-    if (!resource || !confirm('Are you sure you want to delete this resource?')) return;
+    if (!resource || !confirm('Czy na pewno chcesz usunąć ten zasób?')) return;
 
     const { error } = await supabase
       .from('resources')
@@ -219,7 +219,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-900">Resource Details</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Szczegóły zasobu</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600"
@@ -244,7 +244,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm"
               >
-                Open Resource
+                Otwórz zasób
                 <ExternalLink size={14} />
               </a>
             </div>
@@ -265,7 +265,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
 
           {resource.description && (
             <div className="mb-6">
-              <h4 className="font-semibold text-gray-900 mb-2">Description</h4>
+              <h4 className="font-semibold text-gray-900 mb-2">Opis</h4>
               <p className="text-gray-700">{resource.description}</p>
             </div>
           )}
@@ -299,14 +299,14 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
             <div className="flex items-center justify-between mb-4">
               <h4 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                 <Star className="text-yellow-500 fill-yellow-500" size={20} />
-                Ratings ({ratings.length})
+                Oceny ({ratings.length})
               </h4>
               {!userHasRated && (
                 <button
                   onClick={() => setShowRatingForm(!showRatingForm)}
                   className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                 >
-                  {showRatingForm ? 'Cancel' : 'Add Rating'}
+                  {showRatingForm ? 'Anuluj' : 'Dodaj ocenę'}
                 </button>
               )}
             </div>
@@ -316,7 +316,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Usefulness: {ratingData.usefulness}
+                      Przydatność: {ratingData.usefulness}
                     </label>
                     <input
                       type="range"
@@ -329,7 +329,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Correctness: {ratingData.correctness}
+                      Poprawność: {ratingData.correctness}
                     </label>
                     <input
                       type="range"
@@ -342,7 +342,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Difficulty Match: {ratingData.difficulty}
+                      Dopasowanie trudności: {ratingData.difficulty}
                     </label>
                     <input
                       type="range"
@@ -358,14 +358,14 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                     disabled={submitting}
                     className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
                   >
-                    {submitting ? 'Submitting...' : 'Submit Rating'}
+                    {submitting ? 'Wysyłanie...' : 'Wyślij ocenę'}
                   </button>
                 </div>
               </div>
             )}
 
             {userHasRated && !showRatingForm && (
-              <p className="text-sm text-gray-600 mb-4">You have already rated this resource.</p>
+              <p className="text-sm text-gray-600 mb-4">Już oceniłeś ten zasób.</p>
             )}
 
             <div className="space-y-3">
@@ -378,16 +378,16 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                     </span>
                   </div>
                   <div className="flex gap-4 text-sm text-gray-700">
-                    <span>Usefulness: {rating.rating_usefulness}/5</span>
-                    <span>Correctness: {rating.rating_correctness}/5</span>
+                    <span>Przydatność: {rating.rating_usefulness}/5</span>
+                    <span>Poprawność: {rating.rating_correctness}/5</span>
                     {rating.difficulty_match && (
-                      <span>Difficulty: {rating.difficulty_match}/5</span>
+                      <span>Trudność: {rating.difficulty_match}/5</span>
                     )}
                   </div>
                 </div>
               ))}
               {ratings.length === 0 && (
-                <p className="text-sm text-gray-500">No ratings yet. Be the first to rate!</p>
+                <p className="text-sm text-gray-500">Brak ocen. Bądź pierwszy!</p>
               )}
             </div>
           </div>
@@ -396,13 +396,13 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
             <div className="flex items-center justify-between mb-4">
               <h4 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                 <MessageSquare size={20} />
-                Comments ({comments.length})
+                Komentarze ({comments.length})
               </h4>
               <button
                 onClick={() => setShowCommentForm(!showCommentForm)}
                 className="text-blue-600 hover:text-blue-800 text-sm font-medium"
               >
-                {showCommentForm ? 'Cancel' : 'Add Comment'}
+                {showCommentForm ? 'Anuluj' : 'Dodaj komentarz'}
               </button>
             </div>
 
@@ -411,7 +411,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                 <textarea
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
-                  placeholder="Share your thoughts..."
+                  placeholder="Podziel się swoimi przemyśleniami..."
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
                   rows={3}
                 />
@@ -420,7 +420,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                   disabled={submitting || !commentText.trim()}
                   className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
                 >
-                  {submitting ? 'Posting...' : 'Post Comment'}
+                  {submitting ? 'Publikowanie...' : 'Opublikuj komentarz'}
                 </button>
               </div>
             )}
@@ -448,7 +448,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                 </div>
               ))}
               {comments.length === 0 && (
-                <p className="text-sm text-gray-500">No comments yet. Start the conversation!</p>
+                <p className="text-sm text-gray-500">Brak komentarzy. Rozpocznij rozmowę!</p>
               )}
             </div>
           </div>

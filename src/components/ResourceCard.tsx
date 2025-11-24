@@ -95,7 +95,7 @@ export function ResourceCard({ resource, onTopicClick, onCardClick }: ResourceCa
           ))}
           {resource.topic_names.length > 3 && (
             <span className="text-xs text-gray-500 px-2 py-1">
-              +{resource.topic_names.length - 3} more
+              +{resource.topic_names.length - 3} więcej
             </span>
           )}
         </div>
@@ -117,7 +117,7 @@ export function ResourceCard({ resource, onTopicClick, onCardClick }: ResourceCa
           )}
         </div>
         <div className="text-xs text-gray-500 truncate max-w-[120px]">
-          by {resource.contributor_nick}
+          przez {resource.contributor_nick}
         </div>
         <a
           href={resource.url}
@@ -126,7 +126,7 @@ export function ResourceCard({ resource, onTopicClick, onCardClick }: ResourceCa
           onClick={handleLinkClick}
           className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm ml-auto"
         >
-          Open
+          Otwórz
           <ExternalLink size={14} />
         </a>
       </div>

@@ -35,30 +35,28 @@ export function Sidebar({
   return (
     <div className="w-80 bg-white border-r border-gray-200 h-screen overflow-y-auto">
       <div className="p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Filters</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Filtry</h2>
 
         <div className="mb-6">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">Subject</h3>
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">Przedmiot</h3>
           <div className="space-y-2">
             <button
               onClick={() => onSubjectChange(null)}
-              className={`w-full text-left px-3 py-2 rounded-md text-sm ${
-                selectedSubject === null
+              className={`w-full text-left px-3 py-2 rounded-md text-sm ${selectedSubject === null
                   ? 'bg-blue-50 text-blue-700 font-medium'
                   : 'text-gray-700 hover:bg-gray-50'
-              }`}
+                }`}
             >
-              All Subjects
+              Wszystkie przedmioty
             </button>
             {subjects.map((subject) => (
               <button
                 key={subject.subject_id}
                 onClick={() => onSubjectChange(subject.subject_id)}
-                className={`w-full text-left px-3 py-2 rounded-md text-sm ${
-                  selectedSubject === subject.subject_id
+                className={`w-full text-left px-3 py-2 rounded-md text-sm ${selectedSubject === subject.subject_id
                     ? 'bg-blue-50 text-blue-700 font-medium'
                     : 'text-gray-700 hover:bg-gray-50'
-                }`}
+                  }`}
               >
                 <div className="flex items-center justify-between">
                   <span>{subject.subject_name}</span>
@@ -75,7 +73,7 @@ export function Sidebar({
               onClick={() => setTopicsExpanded(!topicsExpanded)}
               className="flex items-center justify-between w-full text-sm font-semibold text-gray-700 mb-3"
             >
-              <span>Topics</span>
+              <span>Tematy</span>
               {topicsExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
             </button>
             {topicsExpanded && (
@@ -104,7 +102,7 @@ export function Sidebar({
             onClick={() => setLevelsExpanded(!levelsExpanded)}
             className="flex items-center justify-between w-full text-sm font-semibold text-gray-700 mb-3"
           >
-            <span>Levels</span>
+            <span>Poziomy</span>
             {levelsExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
           </button>
           {levelsExpanded && (
