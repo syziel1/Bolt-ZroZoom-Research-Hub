@@ -59,7 +59,13 @@ export function LevelsManager() {
             setError('Nazwa jest wymagana');
             return;
         }
-
+        // Validate custom slug if provided
+        if (formData.slug) {
+            if (!/^[a-z0-9-]+$/.test(formData.slug)) {
+                setError('Slug może zawierać tylko małe litery, cyfry i myślniki');
+                return;
+            }
+        }
         try {
             const slug = formData.slug ? generateSlug(formData.slug) : generateSlug(formData.name);
             const maxOrder = Math.max(...levels.map(l => l.order_index), -1);
@@ -114,27 +120,41 @@ export function LevelsManager() {
         if (!confirm(`Czy na pewno chcesz usunąć poziom "${name}"?`)) return;
         setError('');
 
+        // First, check if level has resources
         try {
-            // Check if level has resources
-            const { count } = await supabase
+            const { count, error: countError } = await supabase
                 .from('resource_levels')
                 .select('*', { count: 'exact', head: true })
                 .eq('level_id', id);
+
+            if (countError) {
+                setError(`Błąd podczas sprawdzania zasobów przypisanych do poziomu "${name}": ${countError.message}`);
+                return;
+            }
 
             if (count && count > 0) {
                 setError(`Nie można usunąć poziomu "${name}" - ma przypisane zasoby (${count})`);
                 return;
             }
+        } catch (err: any) {
+            setError(`Błąd podczas sprawdzania zasobów przypisanych do poziomu "${name}": ${err.message}`);
+            return;
+        }
 
+        // Then, try to delete the level
+        try {
             const { error } = await supabase
                 .from('levels')
                 .delete()
                 .eq('id', id);
 
-            if (error) throw error;
+            if (error) {
+                setError(`Błąd podczas usuwania poziomu "${name}": ${error.message}`);
+                return;
+            }
             loadLevels();
         } catch (err: any) {
-            setError(err.message);
+            setError(`Błąd podczas usuwania poziomu "${name}": ${err.message}`);
         }
     };
 
@@ -150,19 +170,30 @@ export function LevelsManager() {
         const level2 = levels[swapIndex];
 
         try {
-            await supabase
+            // First update
+            const { error: error1 } = await supabase
                 .from('levels')
                 .update({ order_index: level2.order_index })
                 .eq('id', level1.id);
+            if (error1) throw error1;
 
-            await supabase
+            // Second update
+            const { error: error2 } = await supabase
                 .from('levels')
                 .update({ order_index: level1.order_index })
                 .eq('id', level2.id);
+            if (error2) {
+                // Attempt rollback of first update
+                await supabase
+                    .from('levels')
+                    .update({ order_index: level1.order_index })
+                    .eq('id', level1.id);
+                throw error2;
+            }
 
             loadLevels();
         } catch (err: any) {
-            setError(err.message);
+            setError(err.message || 'Wystąpił błąd podczas zmiany kolejności poziomów.');
         }
     };
 
