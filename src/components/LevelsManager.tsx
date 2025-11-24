@@ -170,10 +170,14 @@ export function LevelsManager() {
 
             if (error2) {
                 // Rollback first update if second fails
-                await supabase
-                    .from('levels')
-                    .update({ order_index: originalOrder1 })
-                    .eq('id', level1.id);
+                try {
+                    await supabase
+                        .from('levels')
+                        .update({ order_index: originalOrder1 })
+                        .eq('id', level1.id);
+                } catch (rollbackErr) {
+                    console.error('Rollback failed:', rollbackErr);
+                }
                 throw error2;
             }
 

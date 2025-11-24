@@ -208,10 +208,14 @@ export function TopicsManager() {
 
             if (error2) {
                 // Rollback first update if second fails
-                await supabase
-                    .from('topics')
-                    .update({ order_index: originalOrder1 })
-                    .eq('id', topic1.id);
+                try {
+                    await supabase
+                        .from('topics')
+                        .update({ order_index: originalOrder1 })
+                        .eq('id', topic1.id);
+                } catch (rollbackErr) {
+                    console.error('Rollback failed:', rollbackErr);
+                }
                 throw error2;
             }
 
