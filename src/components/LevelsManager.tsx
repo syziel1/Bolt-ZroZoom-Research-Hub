@@ -59,7 +59,13 @@ export function LevelsManager() {
             setError('Nazwa jest wymagana');
             return;
         }
-
+        // Validate custom slug if provided
+        if (formData.slug) {
+            if (!/^[a-z0-9-]+$/.test(formData.slug)) {
+                setError('Slug może zawierać tylko małe litery, cyfry i myślniki');
+                return;
+            }
+        }
         try {
             const slug = formData.slug ? generateSlug(formData.slug) : generateSlug(formData.name);
             const maxOrder = Math.max(...levels.map(l => l.order_index), -1);
