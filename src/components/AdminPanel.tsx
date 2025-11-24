@@ -6,7 +6,15 @@ import { Settings, BookOpen, Tag, BarChart3 } from 'lucide-react';
 
 type Tab = 'subjects' | 'topics' | 'levels';
 
-export function AdminPanel() {
+type AdminPanelProps = {
+    userRole: string;
+    requireAdmin: boolean;
+};
+
+export function AdminPanel({ userRole, requireAdmin }: AdminPanelProps) {
+    if (requireAdmin && userRole !== 'admin') {
+        return <div className="p-8 text-center text-red-600">Brak uprawnień administratora.</div>;
+    }
     const [activeTab, setActiveTab] = useState<Tab>('subjects');
 
     const tabs = [

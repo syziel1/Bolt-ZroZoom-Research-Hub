@@ -179,7 +179,7 @@ export function Dashboard() {
             </div>
           </div>
         </div>
-        <AdminPanel userRole={userRole} requireAdmin={requireAdmin} />
+        <AdminPanel userRole={userRole} requireAdmin={true} />
       </div>
     );
   }
