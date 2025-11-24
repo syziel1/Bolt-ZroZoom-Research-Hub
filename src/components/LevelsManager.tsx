@@ -54,13 +54,14 @@ export function LevelsManager() {
     };
 
     const handleAdd = async () => {
+        setError('');
         if (!formData.name.trim()) {
             setError('Nazwa jest wymagana');
             return;
         }
 
         try {
-            const slug = formData.slug || generateSlug(formData.name);
+            const slug = formData.slug ? generateSlug(formData.slug) : generateSlug(formData.name);
             const maxOrder = Math.max(...levels.map(l => l.order_index), 0);
 
             const { error } = await supabase
@@ -82,13 +83,14 @@ export function LevelsManager() {
     };
 
     const handleEdit = async (id: string) => {
+        setError('');
         if (!formData.name.trim()) {
             setError('Nazwa jest wymagana');
             return;
         }
 
         try {
-            const slug = formData.slug || generateSlug(formData.name);
+            const slug = formData.slug ? generateSlug(formData.slug) : generateSlug(formData.name);
 
             const { error } = await supabase
                 .from('levels')
@@ -110,6 +112,7 @@ export function LevelsManager() {
 
     const handleDelete = async (id: string, name: string) => {
         if (!confirm(`Czy na pewno chcesz usunąć poziom "${name}"?`)) return;
+        setError('');
 
         try {
             // Check if level has resources
@@ -136,6 +139,7 @@ export function LevelsManager() {
     };
 
     const handleMove = async (id: string, direction: 'up' | 'down') => {
+        setError('');
         const index = levels.findIndex(l => l.id === id);
         if (index === -1) return;
         if (direction === 'up' && index === 0) return;

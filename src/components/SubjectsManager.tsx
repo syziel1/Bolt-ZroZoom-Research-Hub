@@ -55,13 +55,14 @@ export function SubjectsManager() {
     };
 
     const handleAdd = async () => {
+        setError('');
         if (!formData.name.trim()) {
             setError('Nazwa jest wymagana');
             return;
         }
 
         try {
-            const slug = formData.slug || generateSlug(formData.name);
+            const slug = formData.slug ? generateSlug(formData.slug) : generateSlug(formData.name);
             const maxOrder = Math.max(...subjects.map(s => s.order_index), 0);
 
             const { error } = await supabase
@@ -83,13 +84,14 @@ export function SubjectsManager() {
     };
 
     const handleEdit = async (id: string) => {
+        setError('');
         if (!formData.name.trim()) {
             setError('Nazwa jest wymagana');
             return;
         }
 
         try {
-            const slug = formData.slug || generateSlug(formData.name);
+            const slug = formData.slug ? generateSlug(formData.slug) : generateSlug(formData.name);
 
             const { error } = await supabase
                 .from('subjects')
@@ -111,6 +113,7 @@ export function SubjectsManager() {
 
     const handleDelete = async (id: string, name: string) => {
         if (!confirm(`Czy na pewno chcesz usunąć przedmiot "${name}"?`)) return;
+        setError('');
 
         try {
             // Check if subject has resources
@@ -137,6 +140,7 @@ export function SubjectsManager() {
     };
 
     const handleMove = async (id: string, direction: 'up' | 'down') => {
+        setError('');
         const index = subjects.findIndex(s => s.id === id);
         if (index === -1) return;
         if (direction === 'up' && index === 0) return;

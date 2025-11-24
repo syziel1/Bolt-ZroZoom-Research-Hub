@@ -90,13 +90,14 @@ export function TopicsManager() {
     };
 
     const handleAdd = async () => {
+        setError('');
         if (!formData.name.trim()) {
             setError('Nazwa jest wymagana');
             return;
         }
 
         try {
-            const slug = formData.slug || generateSlug(formData.name);
+            const slug = formData.slug ? generateSlug(formData.slug) : generateSlug(formData.name);
             const maxOrder = Math.max(...topics.map(t => t.order_index), 0);
 
             const { error } = await supabase
@@ -119,13 +120,14 @@ export function TopicsManager() {
     };
 
     const handleEdit = async (id: string) => {
+        setError('');
         if (!formData.name.trim()) {
             setError('Nazwa jest wymagana');
             return;
         }
 
         try {
-            const slug = formData.slug || generateSlug(formData.name);
+            const slug = formData.slug ? generateSlug(formData.slug) : generateSlug(formData.name);
 
             const { error } = await supabase
                 .from('topics')
@@ -148,6 +150,7 @@ export function TopicsManager() {
 
     const handleDelete = async (id: string, name: string) => {
         if (!confirm(`Czy na pewno chcesz usunąć temat "${name}"?`)) return;
+        setError('');
 
         try {
             // Check if topic has resources
@@ -174,6 +177,7 @@ export function TopicsManager() {
     };
 
     const handleMove = async (id: string, direction: 'up' | 'down') => {
+        setError('');
         const index = topics.findIndex(t => t.id === id);
         if (index === -1) return;
         if (direction === 'up' && index === 0) return;
