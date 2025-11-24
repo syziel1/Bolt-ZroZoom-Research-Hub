@@ -131,6 +131,7 @@ export function SubjectsManager() {
 
             if (count && count > 0) {
                 setError(`Nie można usunąć przedmiotu "${name}" - ma przypisane zasoby (${count})`);
+                setDeleteConfirm(null);
                 return;
             }
 
@@ -140,10 +141,10 @@ export function SubjectsManager() {
                 .eq('id', id);
 
             if (error) throw error;
+            setDeleteConfirm(null);
             loadSubjects();
         } catch (err: any) {
             setError(err.message);
-        } finally {
             setDeleteConfirm(null);
         }
     };

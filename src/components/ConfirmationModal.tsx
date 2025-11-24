@@ -70,7 +70,6 @@ export function ConfirmationModal({
 
     const handleConfirm = () => {
         onConfirm();
-        onClose();
     };
 
     return (

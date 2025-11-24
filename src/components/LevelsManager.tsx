@@ -130,6 +130,7 @@ export function LevelsManager() {
 
             if (count && count > 0) {
                 setError(`Nie można usunąć poziomu "${name}" - ma przypisane zasoby (${count})`);
+                setDeleteConfirm(null);
                 return;
             }
 
@@ -139,10 +140,10 @@ export function LevelsManager() {
                 .eq('id', id);
 
             if (error) throw error;
+            setDeleteConfirm(null);
             loadLevels();
         } catch (err: any) {
             setError(err.message);
-        } finally {
             setDeleteConfirm(null);
         }
     };

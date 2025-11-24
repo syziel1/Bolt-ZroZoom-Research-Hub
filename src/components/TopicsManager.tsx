@@ -168,6 +168,7 @@ export function TopicsManager() {
 
             if (count && count > 0) {
                 setError(`Nie można usunąć tematu "${name}" - ma przypisane zasoby (${count})`);
+                setDeleteConfirm(null);
                 return;
             }
 
@@ -177,10 +178,10 @@ export function TopicsManager() {
                 .eq('id', id);
 
             if (error) throw error;
+            setDeleteConfirm(null);
             loadTopics();
         } catch (err: any) {
             setError(err.message);
-        } finally {
             setDeleteConfirm(null);
         }
     };
