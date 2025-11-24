@@ -311,7 +311,7 @@ export function LevelsManager() {
                                             <button
                                                 onClick={() => handleEdit(level.id)}
                                                 className="text-green-600 hover:text-green-900"
-                                                aria-label="Zapisz"
+                                                aria-label="Zapisz zmiany"
                                             >
                                                 <Save size={16} />
                                             </button>
