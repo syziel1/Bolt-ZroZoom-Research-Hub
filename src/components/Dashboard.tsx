@@ -3,6 +3,7 @@ import { supabase, Resource, Subject, Topic, Level } from '../lib/supabase';
 import { Sidebar } from './Sidebar';
 import { ResourceCard } from './ResourceCard';
 import { AddResourceModal } from './AddResourceModal';
+import { ResourceDetailModal } from './ResourceDetailModal';
 import { Plus, LogOut, Loader, Library, BookOpen, Hash } from 'lucide-react';
 
 export function Dashboard() {
@@ -15,6 +16,8 @@ export function Dashboard() {
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
   const [userNick, setUserNick] = useState('');
 
   useEffect(() => {
@@ -84,6 +87,16 @@ export function Dashboard() {
         setSelectedTopics((prev) => [...prev, topic.id]);
       }
     }
+  };
+
+  const handleCardClick = (resource: Resource) => {
+    setSelectedResource(resource);
+    setIsDetailModalOpen(true);
+  };
+
+  const handleCloseDetailModal = () => {
+    setIsDetailModalOpen(false);
+    setSelectedResource(null);
   };
 
   const filteredResources = resources.filter((resource) => {
@@ -223,7 +236,12 @@ export function Dashboard() {
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">Recently Added</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {recentlyAddedResources.map((resource) => (
-                      <ResourceCard key={resource.id} resource={resource} onTopicClick={handleTopicClick} />
+                      <ResourceCard
+                        key={resource.id}
+                        resource={resource}
+                        onTopicClick={handleTopicClick}
+                        onCardClick={handleCardClick}
+                      />
                     ))}
                   </div>
                 </div>
@@ -240,7 +258,12 @@ export function Dashboard() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredResources.map((resource) => (
-                  <ResourceCard key={resource.id} resource={resource} onTopicClick={handleTopicClick} />
+                  <ResourceCard
+                    key={resource.id}
+                    resource={resource}
+                    onTopicClick={handleTopicClick}
+                    onCardClick={handleCardClick}
+                  />
                 ))}
               </div>
 
@@ -261,6 +284,13 @@ export function Dashboard() {
         subjects={subjects}
         topics={topics}
         levels={levels}
+      />
+
+      <ResourceDetailModal
+        isOpen={isDetailModalOpen}
+        onClose={handleCloseDetailModal}
+        resource={selectedResource}
+        onResourceUpdated={loadData}
       />
     </div>
   );

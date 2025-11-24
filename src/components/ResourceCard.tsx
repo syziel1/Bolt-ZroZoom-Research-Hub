@@ -4,6 +4,7 @@ import { Video, FileText, Presentation, Beaker, Wrench, Star, ExternalLink } fro
 type ResourceCardProps = {
   resource: Resource;
   onTopicClick?: (topicName: string) => void;
+  onCardClick?: (resource: Resource) => void;
 };
 
 const typeIcons: Record<string, any> = {
@@ -16,11 +17,23 @@ const typeIcons: Record<string, any> = {
   tool: Wrench,
 };
 
-export function ResourceCard({ resource, onTopicClick }: ResourceCardProps) {
+export function ResourceCard({ resource, onTopicClick, onCardClick }: ResourceCardProps) {
   const Icon = typeIcons[resource.type] || FileText;
 
+  const handleTopicClick = (e: React.MouseEvent, topicName: string) => {
+    e.stopPropagation();
+    onTopicClick?.(topicName);
+  };
+
+  const handleLinkClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-5 border border-gray-200 min-w-[300px]">
+    <div
+      onClick={() => onCardClick?.(resource)}
+      className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-5 border border-gray-200 min-w-[300px] cursor-pointer"
+    >
       <div className="flex items-start gap-3 mb-3">
         <div className="bg-blue-50 p-2 rounded-lg">
           <Icon size={24} className="text-blue-600" />
@@ -55,7 +68,7 @@ export function ResourceCard({ resource, onTopicClick }: ResourceCardProps) {
           {resource.topic_names.slice(0, 3).map((topic, idx) => (
             <button
               key={idx}
-              onClick={() => onTopicClick?.(topic)}
+              onClick={(e) => handleTopicClick(e, topic)}
               className="inline-block px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded hover:bg-blue-100 transition-colors cursor-pointer"
             >
               {topic}
@@ -81,6 +94,7 @@ export function ResourceCard({ resource, onTopicClick }: ResourceCardProps) {
           href={resource.url}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={handleLinkClick}
           className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm"
         >
           Open
