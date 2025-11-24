@@ -51,7 +51,7 @@ export function ResourceCard({ resource, onTopicClick, onCardClick }: ResourceCa
   return (
     <div
       onClick={() => onCardClick?.(resource)}
-      className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-5 border border-gray-200 min-w-[300px] cursor-pointer"
+      className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6 border border-gray-200 min-w-[300px] cursor-pointer"
     >
       <div className="flex items-start gap-3 mb-3">
         <div className="bg-blue-50 p-2 rounded-lg">
@@ -66,12 +66,12 @@ export function ResourceCard({ resource, onTopicClick, onCardClick }: ResourceCa
       </div>
 
       {resource.description && (
-        <p className="text-sm text-gray-700 mb-3 line-clamp-2">
+        <p className="text-sm text-gray-700 mb-4 line-clamp-2">
           {resource.description}
         </p>
       )}
 
-      <div className="flex flex-wrap gap-2 mb-3">
+      <div className="flex flex-wrap gap-2 mb-4">
         {resource.level_names?.map((level, idx) => (
           <span
             key={idx}
@@ -83,7 +83,7 @@ export function ResourceCard({ resource, onTopicClick, onCardClick }: ResourceCa
       </div>
 
       {resource.topic_names && resource.topic_names.length > 0 && (
-        <div className="flex flex-wrap gap-1 mb-3">
+        <div className="flex flex-wrap gap-2 mb-4">
           {resource.topic_names.slice(0, 3).map((topic, idx) => (
             <button
               key={idx}
@@ -101,7 +101,7 @@ export function ResourceCard({ resource, onTopicClick, onCardClick }: ResourceCa
         </div>
       )}
 
-      <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+      <div className="flex flex-wrap items-center gap-3 pt-4 mt-4 border-t border-gray-100">
         <div className="flex items-center gap-1 text-sm">
           <Star
             size={16}
@@ -116,7 +116,7 @@ export function ResourceCard({ resource, onTopicClick, onCardClick }: ResourceCa
             <span className="text-xs text-gray-500">Brak ocen</span>
           )}
         </div>
-        <div className="text-xs text-gray-500">
+        <div className="text-xs text-gray-500 truncate max-w-[120px]">
           by {resource.contributor_nick}
         </div>
         <a
@@ -124,7 +124,7 @@ export function ResourceCard({ resource, onTopicClick, onCardClick }: ResourceCa
           target="_blank"
           rel="noopener noreferrer"
           onClick={handleLinkClick}
-          className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm"
+          className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm ml-auto"
         >
           Open
           <ExternalLink size={14} />
