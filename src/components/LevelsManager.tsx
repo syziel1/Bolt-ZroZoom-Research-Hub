@@ -156,19 +156,30 @@ export function LevelsManager() {
         const level2 = levels[swapIndex];
 
         try {
-            await supabase
+            // First update
+            const { error: error1 } = await supabase
                 .from('levels')
                 .update({ order_index: level2.order_index })
                 .eq('id', level1.id);
+            if (error1) throw error1;
 
-            await supabase
+            // Second update
+            const { error: error2 } = await supabase
                 .from('levels')
                 .update({ order_index: level1.order_index })
                 .eq('id', level2.id);
+            if (error2) {
+                // Attempt rollback of first update
+                await supabase
+                    .from('levels')
+                    .update({ order_index: level1.order_index })
+                    .eq('id', level1.id);
+                throw error2;
+            }
 
             loadLevels();
         } catch (err: any) {
-            setError(err.message);
+            setError(err.message || 'Wystąpił błąd podczas zmiany kolejności poziomów.');
         }
     };
 
