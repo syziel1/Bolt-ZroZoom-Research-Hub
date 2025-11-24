@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { LogIn, UserPlus } from 'lucide-react';
+import { LogIn, UserPlus, ArrowLeft } from 'lucide-react';
 
 type AuthFormProps = {
   onSuccess: () => void;
+  onBack?: () => void;
 };
 
-export function AuthForm({ onSuccess }: AuthFormProps) {
+export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -49,6 +50,16 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
+          >
+            <ArrowLeft size={20} />
+            Powrót do strony głównej
+          </button>
+        )}
+
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">ZroZoom Research Hub</h1>
           <p className="text-gray-600 mt-2">Educational Resources Platform</p>
