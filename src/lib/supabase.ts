@@ -21,6 +21,7 @@ export type Resource = {
   avg_rating: number;
   topic_names: string[];
   level_names: string[];
+  created_at?: string;
 };
 
 export type Subject = {
