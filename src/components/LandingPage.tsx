@@ -148,17 +148,20 @@ export function LandingPage({ onNavigateToAuth }: LandingPageProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {subjects.map((subject) => (
               <div
-                key={subject.id}
+                key={subject.subject_id}
                 className="bg-white p-6 rounded-lg shadow hover:shadow-xl transition-all hover:scale-105 border border-gray-200 cursor-pointer group"
               >
                 <div className="flex items-center gap-4">
                   <div className="bg-blue-50 p-3 rounded-lg group-hover:bg-blue-100 transition-colors">
                     <BookOpen size={32} className="text-blue-600" />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <h3 className="text-xl font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-                      {subject.name}
+                      {subject.subject_name}
                     </h3>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {subject.resources_count} {subject.resources_count === 1 ? 'zasób' : 'zasobów'}
+                    </p>
                   </div>
                 </div>
               </div>

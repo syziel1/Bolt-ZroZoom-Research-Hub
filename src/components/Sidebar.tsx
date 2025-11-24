@@ -52,15 +52,18 @@ export function Sidebar({
             </button>
             {subjects.map((subject) => (
               <button
-                key={subject.id}
-                onClick={() => onSubjectChange(subject.id)}
+                key={subject.subject_id}
+                onClick={() => onSubjectChange(subject.subject_id)}
                 className={`w-full text-left px-3 py-2 rounded-md text-sm ${
-                  selectedSubject === subject.id
+                  selectedSubject === subject.subject_id
                     ? 'bg-blue-50 text-blue-700 font-medium'
                     : 'text-gray-700 hover:bg-gray-50'
                 }`}
               >
-                {subject.name}
+                <div className="flex items-center justify-between">
+                  <span>{subject.subject_name}</span>
+                  <span className="text-xs text-gray-500">({subject.resources_count})</span>
+                </div>
               </button>
             ))}
           </div>

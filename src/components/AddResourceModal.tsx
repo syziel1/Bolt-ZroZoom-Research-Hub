@@ -183,8 +183,8 @@ export function AddResourceModal({
             >
               <option value="">Select subject</option>
               {subjects.map((subject) => (
-                <option key={subject.id} value={subject.id}>
-                  {subject.name}
+                <option key={subject.subject_id} value={subject.subject_id}>
+                  {subject.subject_name}
                 </option>
               ))}
             </select>

@@ -101,8 +101,8 @@ export function Dashboard() {
 
   const filteredResources = resources.filter((resource) => {
     if (selectedSubject) {
-      const subject = subjects.find((s) => s.id === selectedSubject);
-      if (subject && resource.subject_slug !== subject.slug) {
+      const subject = subjects.find((s) => s.subject_id === selectedSubject);
+      if (subject && resource.subject_slug !== subject.subject_slug) {
         return false;
       }
     }

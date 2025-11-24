@@ -29,9 +29,11 @@ export type Resource = {
 };
 
 export type Subject = {
-  id: string;
-  name: string;
-  slug: string;
+  subject_id: string;
+  subject_name: string;
+  subject_slug: string;
+  order_index: number;
+  resources_count: number;
 };
 
 export type Topic = {
