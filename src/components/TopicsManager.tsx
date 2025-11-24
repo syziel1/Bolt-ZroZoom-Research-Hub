@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Plus, Edit, Trash2, ChevronUp, ChevronDown, Save, X } from 'lucide-react';
+import { ConfirmationModal } from './ConfirmationModal';
 
 type Topic = {
     id: string;
@@ -24,6 +25,7 @@ export function TopicsManager() {
     const [isAdding, setIsAdding] = useState(false);
     const [formData, setFormData] = useState({ name: '', slug: '', subject_id: '' });
     const [error, setError] = useState('');
+    const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
 
     useEffect(() => {
         loadSubjects();
@@ -148,8 +150,15 @@ export function TopicsManager() {
         }
     };
 
-    const handleDelete = async (id: string, name: string) => {
-        if (!confirm(`Czy na pewno chcesz usunąć temat "${name}"?`)) return;
+    const handleDeleteClick = (id: string, name: string) => {
+        setDeleteConfirm({ id, name });
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!deleteConfirm) return;
+        
+        const { id, name } = deleteConfirm;
+        setDeleteConfirm(null);
         setError('');
 
         try {
@@ -391,7 +400,7 @@ export function TopicsManager() {
                                                         <Edit size={16} />
                                                     </button>
                                                     <button
-                                                        onClick={() => handleDelete(topic.id, topic.name)}
+                                                        onClick={() => handleDeleteClick(topic.id, topic.name)}
                                                         className="text-red-600 hover:text-red-900"
                                                     >
                                                         <Trash2 size={16} />
@@ -406,6 +415,17 @@ export function TopicsManager() {
                     </table>
                 </div>
             )}
+
+            <ConfirmationModal
+                isOpen={deleteConfirm !== null}
+                title="Usuń temat"
+                message={deleteConfirm ? `Czy na pewno chcesz usunąć temat "${deleteConfirm.name}"?` : ''}
+                confirmLabel="Usuń"
+                cancelLabel="Anuluj"
+                onConfirm={handleDeleteConfirm}
+                onCancel={() => setDeleteConfirm(null)}
+                variant="danger"
+            />
         </div>
     );
 }
