@@ -187,20 +187,39 @@ export function TopicsManager() {
         const topic1 = topics[index];
         const topic2 = topics[swapIndex];
 
+        // Store original values for potential rollback
+        const originalOrder1 = topic1.order_index;
+        const originalOrder2 = topic2.order_index;
+
         try {
-            await supabase
+            // First update
+            const { error: error1 } = await supabase
                 .from('topics')
-                .update({ order_index: topic2.order_index })
+                .update({ order_index: originalOrder2 })
                 .eq('id', topic1.id);
 
-            await supabase
+            if (error1) throw error1;
+
+            // Second update
+            const { error: error2 } = await supabase
                 .from('topics')
-                .update({ order_index: topic1.order_index })
+                .update({ order_index: originalOrder1 })
                 .eq('id', topic2.id);
+
+            if (error2) {
+                // Rollback first update if second fails
+                await supabase
+                    .from('topics')
+                    .update({ order_index: originalOrder1 })
+                    .eq('id', topic1.id);
+                throw error2;
+            }
 
             loadTopics();
         } catch (err: any) {
             setError(err.message);
+            // Reload to ensure UI reflects actual database state
+            loadTopics();
         }
     };
 

@@ -149,20 +149,39 @@ export function LevelsManager() {
         const level1 = levels[index];
         const level2 = levels[swapIndex];
 
+        // Store original values for potential rollback
+        const originalOrder1 = level1.order_index;
+        const originalOrder2 = level2.order_index;
+
         try {
-            await supabase
+            // First update
+            const { error: error1 } = await supabase
                 .from('levels')
-                .update({ order_index: level2.order_index })
+                .update({ order_index: originalOrder2 })
                 .eq('id', level1.id);
 
-            await supabase
+            if (error1) throw error1;
+
+            // Second update
+            const { error: error2 } = await supabase
                 .from('levels')
-                .update({ order_index: level1.order_index })
+                .update({ order_index: originalOrder1 })
                 .eq('id', level2.id);
+
+            if (error2) {
+                // Rollback first update if second fails
+                await supabase
+                    .from('levels')
+                    .update({ order_index: originalOrder1 })
+                    .eq('id', level1.id);
+                throw error2;
+            }
 
             loadLevels();
         } catch (err: any) {
             setError(err.message);
+            // Reload to ensure UI reflects actual database state
+            loadLevels();
         }
     };
 
