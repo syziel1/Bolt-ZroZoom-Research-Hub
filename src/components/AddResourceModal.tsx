@@ -26,6 +26,8 @@ export function AddResourceModal({
   const [subjectId, setSubjectId] = useState('');
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
+  const [language, setLanguage] = useState('pl');
+  const [aiGenerated, setAiGenerated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -40,6 +42,8 @@ export function AddResourceModal({
       setSubjectId('');
       setSelectedTopics([]);
       setSelectedLevels([]);
+      setLanguage('pl');
+      setAiGenerated(false);
       setError('');
     }
   }, [isOpen]);
@@ -65,6 +69,8 @@ export function AddResourceModal({
           subject_id: subjectId,
           contributor_id: user.id,
           author: user.user_metadata?.nick || user.email?.split('@')[0] || 'Anonymous',
+          language,
+          ai_generated: aiGenerated,
         })
         .select()
         .single();
@@ -246,6 +252,43 @@ export function AddResourceModal({
                 </label>
               ))}
             </div>
+          </div>
+
+          <div>
+            <label htmlFor="language" className="block text-sm font-medium text-gray-700 mb-1">
+              Język *
+            </label>
+            <select
+              id="language"
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="pl">Polski</option>
+              <option value="en">English</option>
+              <option value="de">Deutsch</option>
+              <option value="fr">Français</option>
+              <option value="es">Español</option>
+              <option value="other">Inny</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={aiGenerated}
+                onChange={(e) => setAiGenerated(e.target.checked)}
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="text-sm font-medium text-gray-700">
+                Treść wygenerowana przez AI
+              </span>
+            </label>
+            <p className="text-xs text-gray-500 mt-1 ml-6">
+              Zaznacz, jeśli zasób został stworzony lub znacząco wspomagany przez sztuczną inteligencję
+            </p>
           </div>
 
           <div>
