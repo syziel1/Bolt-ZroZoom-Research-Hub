@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase, Resource, Subject } from '../lib/supabase';
 import { ResourceCard } from './ResourceCard';
-import { BookOpen, Library, Layers, TrendingUp, Users, Award, ArrowRight } from 'lucide-react';
+import { BookOpen, Library, Layers, TrendingUp, Award, ArrowRight } from 'lucide-react';
 
 type LandingPageProps = {
   onNavigateToAuth: () => void;

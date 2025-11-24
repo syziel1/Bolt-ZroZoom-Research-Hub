@@ -20,6 +20,25 @@ const typeIcons: Record<string, any> = {
 export function ResourceCard({ resource, onTopicClick, onCardClick }: ResourceCardProps) {
   const Icon = typeIcons[resource.type] || FileText;
 
+  const calculateOverallRating = (): number | null => {
+    const { avg_usefulness, avg_correctness } = resource;
+    if (avg_usefulness !== null && avg_correctness !== null) {
+      return (avg_usefulness + avg_correctness) / 2;
+    }
+    return avg_usefulness ?? avg_correctness ?? null;
+  };
+
+  const overallRating = calculateOverallRating();
+  const hasRatings = resource.ratings_count > 0;
+
+  const getRatingColor = (rating: number | null): string => {
+    if (rating === null) return 'text-gray-400';
+    if (rating >= 4.5) return 'text-yellow-500';
+    if (rating >= 3.5) return 'text-yellow-400';
+    if (rating >= 2.5) return 'text-orange-400';
+    return 'text-red-400';
+  };
+
   const handleTopicClick = (e: React.MouseEvent, topicName: string) => {
     e.stopPropagation();
     onTopicClick?.(topicName);
@@ -83,9 +102,19 @@ export function ResourceCard({ resource, onTopicClick, onCardClick }: ResourceCa
       )}
 
       <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-        <div className="flex items-center gap-1 text-sm text-gray-600">
-          <Star size={16} className="text-yellow-500 fill-yellow-500" />
-          <span>{resource.avg_rating?.toFixed(1) || 'N/A'}</span>
+        <div className="flex items-center gap-1 text-sm">
+          <Star
+            size={16}
+            className={`${getRatingColor(overallRating)} ${hasRatings ? 'fill-current' : ''}`}
+          />
+          {hasRatings ? (
+            <div className="flex items-center gap-1">
+              <span className="font-medium text-gray-900">{overallRating?.toFixed(1)}</span>
+              <span className="text-xs text-gray-500">({resource.ratings_count})</span>
+            </div>
+          ) : (
+            <span className="text-xs text-gray-500">Brak ocen</span>
+          )}
         </div>
         <div className="text-xs text-gray-500">
           by {resource.contributor_nick}

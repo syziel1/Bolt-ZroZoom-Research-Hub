@@ -18,7 +18,11 @@ export type Resource = {
   subject_name: string;
   subject_slug: string;
   contributor_nick: string;
-  avg_rating: number;
+  avg_usefulness: number | null;
+  avg_correctness: number | null;
+  avg_difficulty: number | null;
+  ratings_count: number;
+  comments_count: number;
   topic_names: string[];
   level_names: string[];
   created_at?: string;
