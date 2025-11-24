@@ -56,7 +56,7 @@ function App() {
   }
 
   if (view === 'auth') {
-    return <AuthForm onSuccess={() => {}} onBack={handleBackToLanding} />;
+    return <AuthForm onSuccess={() => { }} onBack={handleBackToLanding} />;
   }
 
   return <LandingPage onNavigateToAuth={handleNavigateToAuth} />;

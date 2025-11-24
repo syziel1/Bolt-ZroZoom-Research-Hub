@@ -4,7 +4,8 @@ import { Sidebar } from './Sidebar';
 import { ResourceCard } from './ResourceCard';
 import { AddResourceModal } from './AddResourceModal';
 import { ResourceDetailModal } from './ResourceDetailModal';
-import { Plus, LogOut, Loader, Library, BookOpen, Hash } from 'lucide-react';
+import { AdminPanel } from './AdminPanel';
+import { Plus, LogOut, Loader, Library, BookOpen, Hash, Settings, Menu } from 'lucide-react';
 
 export function Dashboard() {
   const [resources, setResources] = useState<Resource[]>([]);
@@ -19,6 +20,9 @@ export function Dashboard() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
   const [userNick, setUserNick] = useState('');
+  const [userRole, setUserRole] = useState('');
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -32,10 +36,11 @@ export function Dashboard() {
     if (user) {
       const { data: profile } = await supabase
         .from('profiles')
-        .select('nick')
+        .select('nick, role')
         .eq('id', user.id)
         .single();
       setUserNick(profile?.nick || user.email?.split('@')[0] || 'User');
+      setUserRole(profile?.role || '');
     }
   };
 
@@ -148,6 +153,41 @@ export function Dashboard() {
   }, [resources]);
 
   const hasActiveFilters = selectedSubject !== null || selectedTopics.length > 0 || selectedLevels.length > 0;
+  const isAdmin = userRole === 'admin';
+
+  if (showAdminPanel && isAdmin) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="bg-white border-b border-gray-200 px-4 md:px-8 py-4">
+          <div className="flex items-center justify-between max-w-7xl mx-auto">
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900">ZroZoom Research Hub</h1>
+            <div className="flex items-center gap-2 md:gap-4">
+              <button
+                onClick={() => setShowAdminPanel(false)}
+                className="text-blue-600 hover:text-blue-800 flex items-center gap-2 text-sm md:text-base"
+              >
+                <span className="hidden md:inline">Powrót do Dashboard</span>
+                <span className="md:hidden">Powrót</span>
+              </button>
+              <button
+                onClick={handleSignOut}
+                className="text-gray-600 hover:text-gray-900 flex items-center gap-2 text-sm md:text-base"
+              >
+                <LogOut size={20} />
+                <span className="hidden md:inline">Wyloguj się</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <AdminPanel userRole={userRole} requireAdmin={true} />
+      </div>
+    );
+  }
+  // SECURITY NOTE:
+  // Ensure that Supabase Row Level Security (RLS) policies are enabled and configured
+  // for the 'subjects', 'topics', and 'levels' tables so that only users with the 'admin'
+  // role can perform insert, update, or delete operations. Client-side checks alone are
+  // insufficient for security.
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -161,45 +201,67 @@ export function Dashboard() {
         onSubjectChange={setSelectedSubject}
         onTopicToggle={handleTopicToggle}
         onLevelToggle={handleLevelToggle}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
       />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="bg-white border-b border-gray-200 px-8 py-4">
+        <header className="bg-white border-b border-gray-200 px-4 md:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">ZroZoom Research Hub</h1>
-              <p className="text-sm text-gray-600 mt-1">
-                Odkrywaj i dziel się zasobami edukacyjnymi
-              </p>
+            <div className="flex items-center">
+              <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="md:hidden mr-4 text-gray-600 hover:text-gray-900"
+              >
+                <Menu size={24} />
+              </button>
+              <div>
+                <h1 className="text-xl md:text-2xl font-bold text-gray-900">ZroZoom Research Hub</h1>
+                <p className="text-xs md:text-sm text-gray-600 mt-1 hidden sm:block">
+                  Odkrywaj i dziel się zasobami edukacyjnymi
+                </p>
+              </div>
             </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">Witaj, {userNick}</span>
+            <div className="flex items-center gap-2 md:gap-4">
+              <span className="text-sm text-gray-600 hidden md:inline">Witaj, {userNick}</span>
+              {isAdmin && (
+                <button
+                  onClick={() => setShowAdminPanel(true)}
+                  className="bg-purple-600 text-white px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-purple-700 flex items-center gap-2"
+                  title="Panel Administracyjny"
+                >
+                  <Settings size={20} />
+                  <span className="hidden lg:inline">Panel Admina</span>
+                </button>
+              )}
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
+                className="bg-blue-600 text-white px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
+                title="Dodaj zasób"
               >
                 <Plus size={20} />
-                Dodaj zasób
+                <span className="hidden sm:inline">Dodaj zasób</span>
               </button>
               <button
                 onClick={handleSignOut}
                 className="text-gray-600 hover:text-gray-900 flex items-center gap-2"
+                title="Wyloguj się"
               >
                 <LogOut size={20} />
-                Wyloguj się
+                <span className="hidden lg:inline">Wyloguj się</span>
               </button>
             </div>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-8">
+        <main className="flex-1 overflow-y-auto p-4 md:p-8">
           {loading ? (
             <div className="flex items-center justify-center h-64">
               <Loader className="animate-spin text-blue-600" size={48} />
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
                 <div className="bg-white rounded-lg shadow-sm p-6 border-l-4 border-blue-500">
                   <div className="flex items-center justify-between">
                     <div>
@@ -234,7 +296,7 @@ export function Dashboard() {
               {!hasActiveFilters && recentlyAddedResources.length > 0 && (
                 <div className="mb-8">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">Ostatnio dodane</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                     {recentlyAddedResources.map((resource) => (
                       <ResourceCard
                         key={resource.id}
@@ -256,7 +318,7 @@ export function Dashboard() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {filteredResources.map((resource) => (
                   <ResourceCard
                     key={resource.id}
