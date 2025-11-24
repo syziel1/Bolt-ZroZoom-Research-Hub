@@ -63,7 +63,7 @@ export function SubjectsManager() {
 
         try {
             const slug = formData.slug ? generateSlug(formData.slug) : generateSlug(formData.name);
-            const maxOrder = Math.max(...subjects.map(s => s.order_index), 0);
+            const maxOrder = Math.max(...subjects.map(s => s.order_index), -1);
 
             const { error } = await supabase
                 .from('subjects')
