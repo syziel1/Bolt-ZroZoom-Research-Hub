@@ -269,6 +269,7 @@ export function SubjectsManager() {
                                             onClick={() => handleMove(subject.id, 'up')}
                                             disabled={index === 0}
                                             className="p-1 text-gray-600 hover:text-gray-900 disabled:opacity-30"
+                                            aria-label="Przesuń w górę"
                                         >
                                             <ChevronUp size={16} />
                                         </button>
@@ -276,6 +277,7 @@ export function SubjectsManager() {
                                             onClick={() => handleMove(subject.id, 'down')}
                                             disabled={index === subjects.length - 1}
                                             className="p-1 text-gray-600 hover:text-gray-900 disabled:opacity-30"
+                                            aria-label="Przesuń w dół"
                                         >
                                             <ChevronDown size={16} />
                                         </button>
@@ -314,12 +316,14 @@ export function SubjectsManager() {
                                             <button
                                                 onClick={() => handleEdit(subject.id)}
                                                 className="text-green-600 hover:text-green-900"
+                                                aria-label="Zapisz zmiany"
                                             >
                                                 <Save size={16} />
                                             </button>
                                             <button
                                                 onClick={cancelEdit}
                                                 className="text-gray-600 hover:text-gray-900"
+                                                aria-label="Anuluj edycję"
                                             >
                                                 <X size={16} />
                                             </button>
@@ -329,12 +333,14 @@ export function SubjectsManager() {
                                             <button
                                                 onClick={() => startEdit(subject)}
                                                 className="text-blue-600 hover:text-blue-900"
+                                                aria-label="Edytuj przedmiot"
                                             >
                                                 <Edit size={16} />
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(subject.id, subject.name)}
                                                 className="text-red-600 hover:text-red-900"
+                                                aria-label="Usuń przedmiot"
                                             >
                                                 <Trash2 size={16} />
                                             </button>
