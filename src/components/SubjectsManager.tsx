@@ -150,20 +150,58 @@ export function SubjectsManager() {
         const subject1 = subjects[index];
         const subject2 = subjects[swapIndex];
 
+        const originalOrder1 = subject1.order_index;
+        const originalOrder2 = subject2.order_index;
+
         try {
-            await supabase
+            // Use a temporary order_index to avoid race condition
+            // Step 1: Set subject1 to a temporary negative value
+            const { error: error1 } = await supabase
                 .from('subjects')
-                .update({ order_index: subject2.order_index })
+                .update({ order_index: -1 })
                 .eq('id', subject1.id);
 
-            await supabase
+            if (error1) throw error1;
+
+            // Step 2: Set subject2 to subject1's original order
+            const { error: error2 } = await supabase
                 .from('subjects')
-                .update({ order_index: subject1.order_index })
+                .update({ order_index: originalOrder1 })
                 .eq('id', subject2.id);
+
+            if (error2) {
+                // Rollback step 1
+                await supabase
+                    .from('subjects')
+                    .update({ order_index: originalOrder1 })
+                    .eq('id', subject1.id);
+                throw error2;
+            }
+
+            // Step 3: Set subject1 to subject2's original order
+            const { error: error3 } = await supabase
+                .from('subjects')
+                .update({ order_index: originalOrder2 })
+                .eq('id', subject1.id);
+
+            if (error3) {
+                // Rollback step 2
+                await supabase
+                    .from('subjects')
+                    .update({ order_index: originalOrder2 })
+                    .eq('id', subject2.id);
+                // Rollback step 1
+                await supabase
+                    .from('subjects')
+                    .update({ order_index: originalOrder1 })
+                    .eq('id', subject1.id);
+                throw error3;
+            }
 
             loadSubjects();
         } catch (err: any) {
             setError(err.message);
+            loadSubjects(); // Reload to get consistent state
         }
     };
 

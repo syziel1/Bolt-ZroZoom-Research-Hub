@@ -187,20 +187,58 @@ export function TopicsManager() {
         const topic1 = topics[index];
         const topic2 = topics[swapIndex];
 
+        const originalOrder1 = topic1.order_index;
+        const originalOrder2 = topic2.order_index;
+
         try {
-            await supabase
+            // Use a temporary order_index to avoid race condition
+            // Step 1: Set topic1 to a temporary negative value
+            const { error: error1 } = await supabase
                 .from('topics')
-                .update({ order_index: topic2.order_index })
+                .update({ order_index: -1 })
                 .eq('id', topic1.id);
 
-            await supabase
+            if (error1) throw error1;
+
+            // Step 2: Set topic2 to topic1's original order
+            const { error: error2 } = await supabase
                 .from('topics')
-                .update({ order_index: topic1.order_index })
+                .update({ order_index: originalOrder1 })
                 .eq('id', topic2.id);
+
+            if (error2) {
+                // Rollback step 1
+                await supabase
+                    .from('topics')
+                    .update({ order_index: originalOrder1 })
+                    .eq('id', topic1.id);
+                throw error2;
+            }
+
+            // Step 3: Set topic1 to topic2's original order
+            const { error: error3 } = await supabase
+                .from('topics')
+                .update({ order_index: originalOrder2 })
+                .eq('id', topic1.id);
+
+            if (error3) {
+                // Rollback step 2
+                await supabase
+                    .from('topics')
+                    .update({ order_index: originalOrder2 })
+                    .eq('id', topic2.id);
+                // Rollback step 1
+                await supabase
+                    .from('topics')
+                    .update({ order_index: originalOrder1 })
+                    .eq('id', topic1.id);
+                throw error3;
+            }
 
             loadTopics();
         } catch (err: any) {
             setError(err.message);
+            loadTopics(); // Reload to get consistent state
         }
     };
 
