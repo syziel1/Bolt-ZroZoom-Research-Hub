@@ -181,7 +181,7 @@ export function SubjectsManager() {
                     throw new Error(
                         `Błąd podczas zmiany kolejności: ${error2.message}. ` +
                         `Próba cofnięcia zmian również nie powiodła się: ${rollbackError.message}. ` +
-                        `Odśwież stronę, aby zobaczyć aktualny stan.`
+                        `Dane zostały odświeżone - sprawdź aktualny stan.`
                     );
                 }
                 throw new Error(`Nie udało się zaktualizować kolejności: ${error2.message}`);
