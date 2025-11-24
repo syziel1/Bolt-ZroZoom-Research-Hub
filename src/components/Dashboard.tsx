@@ -4,7 +4,8 @@ import { Sidebar } from './Sidebar';
 import { ResourceCard } from './ResourceCard';
 import { AddResourceModal } from './AddResourceModal';
 import { ResourceDetailModal } from './ResourceDetailModal';
-import { Plus, LogOut, Loader, Library, BookOpen, Hash } from 'lucide-react';
+import { AdminPanel } from './AdminPanel';
+import { Plus, LogOut, Loader, Library, BookOpen, Hash, Settings } from 'lucide-react';
 
 export function Dashboard() {
   const [resources, setResources] = useState<Resource[]>([]);
@@ -19,6 +20,8 @@ export function Dashboard() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
   const [userNick, setUserNick] = useState('');
+  const [userRole, setUserRole] = useState('');
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -32,10 +35,11 @@ export function Dashboard() {
     if (user) {
       const { data: profile } = await supabase
         .from('profiles')
-        .select('nick')
+        .select('nick, role')
         .eq('id', user.id)
         .single();
       setUserNick(profile?.nick || user.email?.split('@')[0] || 'User');
+      setUserRole(profile?.role || '');
     }
   };
 
@@ -148,6 +152,35 @@ export function Dashboard() {
   }, [resources]);
 
   const hasActiveFilters = selectedSubject !== null || selectedTopics.length > 0 || selectedLevels.length > 0;
+  const isAdmin = userRole === 'admin';
+
+  if (showAdminPanel && isAdmin) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="bg-white border-b border-gray-200 px-8 py-4">
+          <div className="flex items-center justify-between max-w-7xl mx-auto">
+            <h1 className="text-2xl font-bold text-gray-900">ZroZoom Research Hub</h1>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setShowAdminPanel(false)}
+                className="text-blue-600 hover:text-blue-800 flex items-center gap-2"
+              >
+                Powrót do Dashboard
+              </button>
+              <button
+                onClick={handleSignOut}
+                className="text-gray-600 hover:text-gray-900 flex items-center gap-2"
+              >
+                <LogOut size={20} />
+                Wyloguj się
+              </button>
+            </div>
+          </div>
+        </div>
+        <AdminPanel />
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -174,6 +207,15 @@ export function Dashboard() {
             </div>
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-600">Witaj, {userNick}</span>
+              {isAdmin && (
+                <button
+                  onClick={() => setShowAdminPanel(true)}
+                  className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 flex items-center gap-2"
+                >
+                  <Settings size={20} />
+                  Panel Administracyjny
+                </button>
+              )}
               <button
                 onClick={() => setIsModalOpen(true)}
                 className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
