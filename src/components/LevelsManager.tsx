@@ -120,27 +120,41 @@ export function LevelsManager() {
         if (!confirm(`Czy na pewno chcesz usunąć poziom "${name}"?`)) return;
         setError('');
 
+        // First, check if level has resources
         try {
-            // Check if level has resources
-            const { count } = await supabase
+            const { count, error: countError } = await supabase
                 .from('resource_levels')
                 .select('*', { count: 'exact', head: true })
                 .eq('level_id', id);
+
+            if (countError) {
+                setError(`Błąd podczas sprawdzania zasobów przypisanych do poziomu "${name}": ${countError.message}`);
+                return;
+            }
 
             if (count && count > 0) {
                 setError(`Nie można usunąć poziomu "${name}" - ma przypisane zasoby (${count})`);
                 return;
             }
+        } catch (err: any) {
+            setError(`Błąd podczas sprawdzania zasobów przypisanych do poziomu "${name}": ${err.message}`);
+            return;
+        }
 
+        // Then, try to delete the level
+        try {
             const { error } = await supabase
                 .from('levels')
                 .delete()
                 .eq('id', id);
 
-            if (error) throw error;
+            if (error) {
+                setError(`Błąd podczas usuwania poziomu "${name}": ${error.message}`);
+                return;
+            }
             loadLevels();
         } catch (err: any) {
-            setError(err.message);
+            setError(`Błąd podczas usuwania poziomu "${name}": ${err.message}`);
         }
     };
 
