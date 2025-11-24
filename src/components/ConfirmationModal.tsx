@@ -30,7 +30,7 @@ export function ConfirmationModal({
     useEffect(() => {
         if (!isOpen) return;
 
-        // Focus the confirm button when modal opens
+        // Focus the cancel button when modal opens (safer default for destructive actions)
         const timeoutId = setTimeout(() => {
             cancelButtonRef.current?.focus();
         }, 0);
