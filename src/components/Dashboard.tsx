@@ -183,6 +183,11 @@ export function Dashboard() {
       </div>
     );
   }
+  // SECURITY NOTE:
+  // Ensure that Supabase Row Level Security (RLS) policies are enabled and configured
+  // for the 'subjects', 'topics', and 'levels' tables so that only users with the 'admin'
+  // role can perform insert, update, or delete operations. Client-side checks alone are
+  // insufficient for security.
 
   return (
     <div className="flex h-screen bg-gray-50">
