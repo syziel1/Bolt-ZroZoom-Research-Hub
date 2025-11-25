@@ -156,8 +156,8 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
               <button
                 type="button"
                 onClick={() => {
-                  setEmail('test@zrozoomai.pl');
-                  setPassword('123TesT456');
+                  setEmail(import.meta.env.VITE_TEST_EMAIL || '');
+                  setPassword(import.meta.env.VITE_TEST_PASSWORD || '');
                 }}
                 className="w-full bg-yellow-100 text-yellow-800 py-2 px-4 rounded border border-yellow-300 hover:bg-yellow-200 text-sm font-medium transition-colors"
               >
