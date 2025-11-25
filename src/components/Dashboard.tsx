@@ -14,7 +14,7 @@ type DashboardProps = {
   onBackToLanding?: () => void;
 };
 
-export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLanding }: DashboardProps = {}) {
+export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLanding }: DashboardProps) {
   const [resources, setResources] = useState<Resource[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [levels, setLevels] = useState<Level[]>([]);
@@ -391,7 +391,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
           onClose={() => setIsModalOpen(false)}
           onSuccess={loadData}
           subjects={subjects}
-          topics={topics}
+          topics={topicNodes}
           levels={levels}
         />
       )}

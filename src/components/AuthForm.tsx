@@ -148,6 +148,24 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
             {isLogin ? "Nie masz konta? Zarejestruj się" : 'Masz już konto? Zaloguj się'}
           </button>
 
+          {/**
+           * Developer Shortcut Panel
+           * 
+           * This section is only visible in development mode (import.meta.env.DEV).
+           * It provides a quick way to auto-fill login credentials for testing purposes.
+           * 
+           * Environment Variables (optional):
+           * - VITE_TEST_EMAIL: Email address for test user (default: 'test@zrozoomai.pl')
+           * - VITE_TEST_PASSWORD: Password for test user (default: '123TesT456')
+           * 
+           * To configure custom test credentials, add these to your .env file:
+           * ```
+           * VITE_TEST_EMAIL=your-test-email@example.com
+           * VITE_TEST_PASSWORD=your-test-password
+           * ```
+           * 
+           * Note: This feature is automatically removed in production builds.
+           */}
           {import.meta.env.DEV && (
             <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
               <div className="text-xs font-bold text-yellow-800 uppercase mb-2">
