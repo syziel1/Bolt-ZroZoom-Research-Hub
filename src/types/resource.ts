@@ -1,0 +1,19 @@
+export type Resource = {
+  id: string;
+  title: string;
+  url: string;
+  type: string;
+  description: string;
+  subject_name: string;
+  subject_slug: string;
+  contributor_nick: string;
+  avg_usefulness: number | null;
+  avg_correctness: number | null;
+  avg_difficulty: number | null;
+  ratings_count: number;
+  comments_count: number;
+  topic_names: string[];
+  level_names: string[];
+  thumbnail_path: string | null;
+  created_at?: string;
+};
