@@ -1,5 +1,6 @@
 import { Resource } from '../lib/supabase';
-import { Video, FileText, Presentation, Beaker, Wrench, Star, ExternalLink } from 'lucide-react';
+import { getThumbnailUrl } from '../lib/storage';
+import { Video, FileText, Presentation, Beaker, Wrench, Star, ExternalLink, ImageIcon } from 'lucide-react';
 
 type ResourceCardProps = {
   resource: Resource;
@@ -19,6 +20,7 @@ const typeIcons: Record<string, any> = {
 
 export function ResourceCard({ resource, onTopicClick, onCardClick }: ResourceCardProps) {
   const Icon = typeIcons[resource.type] || FileText;
+  const thumbnailUrl = getThumbnailUrl(resource.thumbnail_path);
 
   const calculateOverallRating = (): number | null => {
     const { avg_usefulness, avg_correctness } = resource;
@@ -53,15 +55,28 @@ export function ResourceCard({ resource, onTopicClick, onCardClick }: ResourceCa
       onClick={() => onCardClick?.(resource)}
       className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6 border border-gray-200 cursor-pointer flex flex-col h-full"
     >
-      <div className="flex items-start gap-3 mb-3">
-        <div className="bg-blue-50 p-2 rounded-lg">
-          <Icon size={24} className="text-blue-600" />
+      <div className="flex items-start gap-4 mb-4">
+        <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">
+          {thumbnailUrl ? (
+            <img src={thumbnailUrl} alt="Miniatura zasobu" className="w-full h-full object-cover" />
+          ) : (
+            <div className="h-full w-full flex items-center justify-center text-gray-400 bg-gradient-to-br from-gray-50 to-gray-100">
+              <ImageIcon size={32} />
+            </div>
+          )}
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">
-            {resource.title}
-          </h3>
-          <p className="text-sm text-gray-600">{resource.subject_name}</p>
+          <div className="flex items-start gap-2">
+            <div className="bg-blue-50 p-2 rounded-lg">
+              <Icon size={20} className="text-blue-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">
+                {resource.title}
+              </h3>
+              <p className="text-sm text-gray-600">{resource.subject_name}</p>
+            </div>
+          </div>
         </div>
       </div>
 

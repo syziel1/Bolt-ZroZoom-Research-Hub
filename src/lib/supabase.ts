@@ -8,26 +8,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const SUPABASE_URL = supabaseUrl;
 
-export type Resource = {
-  id: string;
-  title: string;
-  url: string;
-  type: string;
-  description: string;
-  contributor_id?: string;
-  subject_name: string;
-  subject_slug: string;
-  contributor_nick: string;
-  avg_usefulness: number | null;
-  avg_correctness: number | null;
-  avg_difficulty: number | null;
-  ratings_count: number;
-  comments_count: number;
-  topic_names: string[];
-  level_names: string[];
-  created_at?: string;
-};
+export type { Resource } from '../types/resource';
 
 export type Subject = {
   subject_id: string;
