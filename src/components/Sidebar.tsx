@@ -16,6 +16,7 @@ type SidebarProps = {
   isOpen: boolean;
   onClose: () => void;
   isLoading?: boolean;
+  error?: string | null;
 };
 
 export function Sidebar({
@@ -31,6 +32,7 @@ export function Sidebar({
   isOpen,
   onClose,
   isLoading = false,
+  error = null,
 }: SidebarProps) {
   const [topicsExpanded, setTopicsExpanded] = useState(true);
   const [levelsExpanded, setLevelsExpanded] = useState(true);
@@ -113,6 +115,8 @@ export function Sidebar({
                 <div className="pl-1">
                   {isLoading ? (
                     <div className="text-sm text-gray-500 px-2 py-1">Ładowanie tematów...</div>
+                  ) : error ? (
+                    <div className="text-sm text-red-500 px-2 py-1">Nie udało się załadować tematów</div>
                   ) : (
                     <TopicTree
                       nodes={topicNodes}
