@@ -156,7 +156,7 @@ export function TopicsManager() {
 
     const handleDeleteConfirm = async () => {
         if (!deleteConfirm) return;
-        
+
         const { id, name } = deleteConfirm;
         setDeleteConfirm(null);
         setError('');
@@ -196,38 +196,23 @@ export function TopicsManager() {
         const topic1 = topics[index];
         const topic2 = topics[swapIndex];
 
-        // Manual rollback logic
         try {
-            // First update
-            const { error: error1 } = await supabase
-                .from('topics')
-                .update({ order_index: topic2.order_index })
-                .eq('id', topic1.id);
+            // Use atomic RPC function to swap order indices
+            const { error } = await supabase.rpc('swap_topics_order', {
+                topic1_id: topic1.id,
+                topic2_id: topic2.id
+            });
 
-            if (error1) {
-                setError(`Nie udało się przesunąć tematu: ${error1.message}`);
+            if (error) {
+                setError(`Nie udało się przesunąć tematu: ${error.message}`);
                 return;
             }
 
-            // Second update
-            const { error: error2 } = await supabase
-                .from('topics')
-                .update({ order_index: topic1.order_index })
-                .eq('id', topic2.id);
-
-            if (error2) {
-                // Rollback first update
-                await supabase
-                    .from('topics')
-                    .update({ order_index: topic1.order_index })
-                    .eq('id', topic1.id);
-                setError(`Nie udało się przesunąć tematu: ${error2.message}. Zmiany zostały cofnięte.`);
-                return;
-            }
-
+            // Reload topics to reflect the change
             loadTopics();
         } catch (err: any) {
             setError(`Wystąpił błąd podczas przesuwania tematu: ${err.message}`);
+            loadTopics(); // Reload to ensure UI is in sync with database
         }
     };
 

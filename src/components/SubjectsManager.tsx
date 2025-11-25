@@ -126,7 +126,7 @@ export function SubjectsManager() {
 
     const handleDeleteConfirm = async () => {
         if (!deleteConfirm) return;
-        
+
         const { id, name } = deleteConfirm;
         setDeleteConfirm(null);
         setError('');
@@ -175,19 +175,22 @@ export function SubjectsManager() {
         const subject2 = subjects[swapIndex];
 
         try {
-            await supabase
-                .from('subjects')
-                .update({ order_index: subject2.order_index })
-                .eq('id', subject1.id);
+            // Use atomic RPC function to swap order indices
+            const { error } = await supabase.rpc('swap_subjects_order', {
+                subject1_id: subject1.id,
+                subject2_id: subject2.id
+            });
 
-            await supabase
-                .from('subjects')
-                .update({ order_index: subject1.order_index })
-                .eq('id', subject2.id);
+            if (error) {
+                setError(`Nie udało się przesunąć przedmiotu: ${error.message}`);
+                return;
+            }
 
+            // Reload subjects to reflect the change
             loadSubjects();
         } catch (err: any) {
             setError(err.message);
+            loadSubjects(); // Reload to ensure UI is in sync with database
         }
     };
 
