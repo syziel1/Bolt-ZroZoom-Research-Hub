@@ -14,7 +14,7 @@ type DashboardProps = {
   onBackToLanding?: () => void;
 };
 
-export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLanding }: DashboardProps = {}) {
+export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLanding }: DashboardProps) {
   const [resources, setResources] = useState<Resource[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [levels, setLevels] = useState<Level[]>([]);
@@ -233,7 +233,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
               {isGuestMode ? (
                 <>
                   <button
-                    onClick={onBackToLanding}
+                    onClick={onBackToLanding ? () => onBackToLanding() : undefined}
                     className="text-gray-600 hover:text-gray-900 flex items-center gap-2"
                     title="Powrót do strony głównej"
                   >
@@ -241,7 +241,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
                     <span className="hidden lg:inline">Powrót</span>
                   </button>
                   <button
-                    onClick={onNavigateToAuth}
+                    onClick={onNavigateToAuth ? () => onNavigateToAuth() : undefined}
                     className="bg-blue-600 text-white px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
                   >
                     <span>Zaloguj się</span>
@@ -293,7 +293,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
                   </p>
                 </div>
                 <button
-                  onClick={onNavigateToAuth}
+                  onClick={onNavigateToAuth ? () => onNavigateToAuth() : undefined}
                   className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm whitespace-nowrap"
                 >
                   Zaloguj się
