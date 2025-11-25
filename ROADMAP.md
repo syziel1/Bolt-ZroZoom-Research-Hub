@@ -20,7 +20,7 @@ Ten dokument opisuje plany rozwoju platformy ZroZoom Research Hub. Cele podzielo
 
 🔵 **Faza 3: Skalowalność i AI (Q2 2026)**
 **Cel:** Obsługa tysięcy zasobów i inteligentne wsparcie.
-- [ ] **Server‑Side Pagination:** Przejście z filtrowania w przeglądarce na paginację w Supabase (gdy przekroczymy 1000 zasobów).
+- [ ] **Server-Side Pagination:** Przejście z filtrowania w przeglądarce na paginację w Supabase (gdy przekroczymy 1000 zasobów).
 - [ ] **Wyszukiwanie Pełnotekstowe:** Wdrożenie Supabase Full Text Search (szukanie w opisach i tytułach).
 - [ ] **AI Recommendations:** Sugerowanie materiałów na podstawie historii przeglądania („Obejrzałeś to wideo, sprawdź ten quiz”).
 - [ ] **Automatyczna Klasyfikacja:** AI analizujące treść linku i sugerujące Przedmiot/Temat przy dodawaniu.
