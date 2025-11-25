@@ -1,8 +1,11 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-import { generateSlug } from '../lib/utils';
-import { Plus, Edit, Trash2, ChevronUp, ChevronDown, Save, X } from 'lucide-react';
+import { Plus, Save, X } from 'lucide-react';
 import { ConfirmationModal } from './ConfirmationModal';
+import { useEntityManager } from '../hooks/useEntityManager';
+import { useOrderManagement } from '../hooks/useOrderManagement';
+import { EntityFormFields } from './shared/EntityFormFields';
+import { EntityTable } from './shared/EntityTable';
+import { OrderButtons } from './shared/OrderButtons';
+import { ActionButtons } from './shared/ActionButtons';
 
 type Subject = {
     id: string;
@@ -13,184 +16,43 @@ type Subject = {
 };
 
 export function SubjectsManager() {
-    const [subjects, setSubjects] = useState<Subject[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [editingId, setEditingId] = useState<string | null>(null);
-    const [isAdding, setIsAdding] = useState(false);
-    const [formData, setFormData] = useState({ name: '', slug: '' });
-    const [error, setError] = useState('');
-    const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
+    const {
+        entities: subjects,
+        loading,
+        error,
+        setError,
+        formData,
+        setFormData,
+        editingId,
+        isAdding,
+        setIsAdding,
+        deleteConfirm,
+        setDeleteConfirm,
+        handleAdd,
+        handleEdit,
+        handleDeleteClick,
+        handleDeleteConfirm,
+        startEdit,
+        cancelEdit,
+        loadEntities,
+    } = useEntityManager<Subject>({
+        tableName: 'subjects',
+        dependencyCheck: {
+            table: 'resources',
+            column: 'subject_id',
+            errorMessage: (name, count) => `Nie można usunąć przedmiotu "${name}" - ma przypisane zasoby (${count})`,
+        },
+        slugValidation: true,
+    });
 
-    useEffect(() => {
-        loadSubjects();
-    }, []);
-
-    const loadSubjects = async () => {
-        setLoading(true);
-        try {
-            const { data, error } = await supabase
-                .from('subjects')
-                .select('*')
-                .order('order_index');
-
-            if (error) throw error;
-            setSubjects(data || []);
-        } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'An unknown error occurred');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleAdd = async () => {
-        setError('');
-        if (!formData.name.trim()) {
-            setError('Nazwa jest wymagana');
-            return;
-        }
-
-        // Validate custom slug if provided
-        if (formData.slug) {
-            if (!/^[a-z0-9-]+$/.test(formData.slug)) {
-                setError('Slug może zawierać tylko małe litery, cyfry i myślniki');
-                return;
-            }
-        }
-        try {
-            const slug = formData.slug ? generateSlug(formData.slug) : generateSlug(formData.name);
-            const maxOrder = Math.max(...subjects.map(s => s.order_index), -1);
-
-            const { error } = await supabase
-                .from('subjects')
-                .insert({
-                    name: formData.name.trim(),
-                    slug,
-                    order_index: maxOrder + 1
-                });
-
-            if (error) throw error;
-
-            setFormData({ name: '', slug: '' });
-            setIsAdding(false);
-            loadSubjects();
-        } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'An unknown error occurred');
-        }
-    };
-
-    const handleEdit = async (id: string) => {
-        setError('');
-        if (!formData.name.trim()) {
-            setError('Nazwa jest wymagana');
-            return;
-        }
-
-        try {
-            const slug = formData.slug ? generateSlug(formData.slug) : generateSlug(formData.name);
-
-            const { error } = await supabase
-                .from('subjects')
-                .update({
-                    name: formData.name.trim(),
-                    slug
-                })
-                .eq('id', id);
-
-            if (error) throw error;
-
-            setEditingId(null);
-            setFormData({ name: '', slug: '' });
-            loadSubjects();
-        } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'An unknown error occurred');
-        }
-    };
-
-    const handleDeleteClick = (id: string, name: string) => {
-        setDeleteConfirm({ id, name });
-    };
-
-    const handleDeleteConfirm = async () => {
-        if (!deleteConfirm) return;
-
-        const { id, name } = deleteConfirm;
-        setDeleteConfirm(null);
-        setError('');
-
-        try {
-            // Check if subject has resources
-            const { count, error: countError } = await supabase
-                .from('resources')
-                .select('*', { count: 'exact', head: true })
-                .eq('subject_id', id);
-
-            if (countError) {
-                setError(`Błąd sprawdzania powiązanych zasobów: ${countError.message}`);
-                return;
-            }
-
-            if (count && count > 0) {
-                setError(`Nie można usunąć przedmiotu "${name}" - ma przypisane zasoby (${count})`);
-                return;
-            }
-
-            const { error: deleteError } = await supabase
-                .from('subjects')
-                .delete()
-                .eq('id', id);
-
-            if (deleteError) {
-                setError(`Błąd usuwania przedmiotu: ${deleteError.message}`);
-                return;
-            }
-            loadSubjects();
-        } catch (err: unknown) {
-            setError(`Nieoczekiwany błąd: ${err instanceof Error ? err.message : 'Nieznany błąd'}`);
-        }
-    };
-
-    const handleMove = async (id: string, direction: 'up' | 'down') => {
-        setError('');
-        const index = subjects.findIndex(s => s.id === id);
-        if (index === -1) return;
-        if (direction === 'up' && index === 0) return;
-        if (direction === 'down' && index === subjects.length - 1) return;
-
-        const swapIndex = direction === 'up' ? index - 1 : index + 1;
-        const subject1 = subjects[index];
-        const subject2 = subjects[swapIndex];
-
-        try {
-            // Use atomic RPC function to swap order indices
-            const { error } = await supabase.rpc('swap_subjects_order', {
-                subject1_id: subject1.id,
-                subject2_id: subject2.id
-            });
-
-            if (error) {
-                setError(`Nie udało się przesunąć przedmiotu: ${error.message}`);
-                return;
-            }
-
-            // Reload subjects to reflect the change
-            loadSubjects();
-        } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'An unknown error occurred');
-            loadSubjects(); // Reload to ensure UI is in sync with database
-        }
-    };
-
-    const startEdit = (subject: Subject) => {
-        setEditingId(subject.id);
-        setFormData({ name: subject.name, slug: subject.slug });
-        setIsAdding(false);
-    };
-
-    const cancelEdit = () => {
-        setEditingId(null);
-        setIsAdding(false);
-        setFormData({ name: '', slug: '' });
-    };
+    const { handleMove } = useOrderManagement<Subject>({
+        rpcFunctionName: 'swap_subjects_order',
+        idParam1Name: 'subject1_id',
+        idParam2Name: 'subject2_id',
+        entities: subjects,
+        onError: setError,
+        onReload: loadEntities,
+    });
 
     if (loading) {
         return <div className="text-center py-8">Ładowanie...</div>;
@@ -219,146 +81,99 @@ export function SubjectsManager() {
             {isAdding && (
                 <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                     <h3 className="font-semibold mb-3">Nowy Przedmiot</h3>
-                    <div className="space-y-3">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Nazwa *</label>
-                            <input
-                                type="text"
-                                value={formData.name}
-                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                placeholder="np. Matematyka"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Slug (opcjonalnie - wygeneruje się automatycznie)
-                            </label>
-                            <input
-                                type="text"
-                                value={formData.slug}
-                                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                placeholder="np. matematyka"
-                            />
-                        </div>
-                        <div className="flex gap-2">
-                            <button
-                                onClick={handleAdd}
-                                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center gap-2"
-                            >
-                                <Save size={16} />
-                                Zapisz
-                            </button>
-                            <button
-                                onClick={cancelEdit}
-                                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 flex items-center gap-2"
-                            >
-                                <X size={16} />
-                                Anuluj
-                            </button>
-                        </div>
+                    <EntityFormFields
+                        formData={formData}
+                        onChange={setFormData}
+                        namePlaceholder="np. Matematyka"
+                        slugPlaceholder="np. matematyka"
+                    />
+                    <div className="flex gap-2 mt-3">
+                        <button
+                            onClick={handleAdd}
+                            className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center gap-2"
+                        >
+                            <Save size={16} />
+                            Zapisz
+                        </button>
+                        <button
+                            onClick={cancelEdit}
+                            className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 flex items-center gap-2"
+                        >
+                            <X size={16} />
+                            Anuluj
+                        </button>
                     </div>
                 </div>
             )}
 
-            <div className="bg-white rounded-lg shadow overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kolejność</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nazwa</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Slug</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Zasoby</th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Akcje</th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                        {subjects.map((subject, index) => (
-                            <tr key={subject.id}>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="flex gap-1">
-                                        <button
-                                            onClick={() => handleMove(subject.id, 'up')}
-                                            disabled={index === 0}
-                                            className="p-1 text-gray-600 hover:text-gray-900 disabled:opacity-30"
-                                        >
-                                            <ChevronUp size={16} />
-                                        </button>
-                                        <button
-                                            onClick={() => handleMove(subject.id, 'down')}
-                                            disabled={index === subjects.length - 1}
-                                            className="p-1 text-gray-600 hover:text-gray-900 disabled:opacity-30"
-                                        >
-                                            <ChevronDown size={16} />
-                                        </button>
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4">
-                                    {editingId === subject.id ? (
-                                        <input
-                                            type="text"
-                                            value={formData.name}
-                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                            className="w-full px-2 py-1 border border-gray-300 rounded"
-                                        />
-                                    ) : (
-                                        <span className="text-sm font-medium text-gray-900">{subject.name}</span>
-                                    )}
-                                </td>
-                                <td className="px-6 py-4">
-                                    {editingId === subject.id ? (
-                                        <input
-                                            type="text"
-                                            value={formData.slug}
-                                            onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                                            className="w-full px-2 py-1 border border-gray-300 rounded"
-                                        />
-                                    ) : (
-                                        <span className="text-sm text-gray-500">{subject.slug}</span>
-                                    )}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {subject.resources_count || 0}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    {editingId === subject.id ? (
-                                        <div className="flex gap-2 justify-end">
-                                            <button
-                                                onClick={() => handleEdit(subject.id)}
-                                                className="text-green-600 hover:text-green-900"
-                                            >
-                                                <Save size={16} />
-                                            </button>
-                                            <button
-                                                onClick={cancelEdit}
-                                                className="text-gray-600 hover:text-gray-900"
-                                            >
-                                                <X size={16} />
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <div className="flex gap-2 justify-end">
-                                            <button
-                                                onClick={() => startEdit(subject)}
-                                                className="text-blue-600 hover:text-blue-900"
-                                            >
-                                                <Edit size={16} />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDeleteClick(subject.id, subject.name)}
-                                                className="text-red-600 hover:text-red-900"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </div>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+            <EntityTable
+                entities={subjects}
+                columns={[
+                    {
+                        key: 'name',
+                        label: 'Nazwa',
+                        render: (entity, isEditing, formData, onFormChange) =>
+                            isEditing ? (
+                                <input
+                                    type="text"
+                                    value={formData.name}
+                                    onChange={(e) => onFormChange({ ...formData, name: e.target.value })}
+                                    className="w-full px-2 py-1 border border-gray-300 rounded"
+                                />
+                            ) : (
+                                <span className="text-sm font-medium text-gray-900">{entity.name}</span>
+                            ),
+                    },
+                    {
+                        key: 'slug',
+                        label: 'Slug',
+                        render: (entity, isEditing, formData, onFormChange) =>
+                            isEditing ? (
+                                <input
+                                    type="text"
+                                    value={formData.slug}
+                                    onChange={(e) => onFormChange({ ...formData, slug: e.target.value })}
+                                    className="w-full px-2 py-1 border border-gray-300 rounded"
+                                />
+                            ) : (
+                                <span className="text-sm text-gray-500">{entity.slug}</span>
+                            ),
+                    },
+                    {
+                        key: 'resources_count',
+                        label: 'Zasoby',
+                        className: 'whitespace-nowrap',
+                        render: (entity) => (
+                            <span className="text-sm text-gray-500">
+                                {(entity as Subject).resources_count || 0}
+                            </span>
+                        ),
+                    },
+                ]}
+                editingId={editingId}
+                formData={formData}
+                onFormChange={setFormData}
+                renderOrderButtons={(subject, index) => (
+                    <OrderButtons
+                        onMoveUp={() => handleMove(subject.id, 'up')}
+                        onMoveDown={() => handleMove(subject.id, 'down')}
+                        canMoveUp={index > 0}
+                        canMoveDown={index < subjects.length - 1}
+                    />
+                )}
+                renderActionButtons={(subject) => (
+                    <ActionButtons
+                        mode={editingId === subject.id ? 'edit' : 'view'}
+                        onEdit={() => startEdit(subject)}
+                        onDelete={() => handleDeleteClick(subject.id, subject.name)}
+                        onSave={() => handleEdit(subject.id)}
+                        onCancel={cancelEdit}
+                        editLabel="Edytuj przedmiot"
+                        deleteLabel="Usuń przedmiot"
+                    />
+                )}
+                emptyMessage="Brak przedmiotów"
+            />
 
             <ConfirmationModal
                 isOpen={deleteConfirm !== null}
