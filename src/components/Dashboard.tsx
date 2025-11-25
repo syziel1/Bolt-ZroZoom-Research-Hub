@@ -343,7 +343,6 @@ export function Dashboard() {
         onClose={() => setIsModalOpen(false)}
         onSuccess={loadData}
         subjects={subjects}
-        topics={[]} // Topics are not loaded globally anymore
         levels={levels}
       />
 

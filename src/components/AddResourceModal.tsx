@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
-import { supabase, Subject, Topic, Level } from '../lib/supabase';
-import { X } from 'lucide-react';
+import { supabase, Subject, Level } from '../lib/supabase';
+import { useTopics } from '../hooks/useTopics';
+import { X, Loader } from 'lucide-react';
 
 type AddResourceModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
   subjects: Subject[];
-  topics: Topic[];
   levels: Level[];
 };
 
@@ -16,7 +16,6 @@ export function AddResourceModal({
   onClose,
   onSuccess,
   subjects,
-  topics,
   levels,
 }: AddResourceModalProps) {
   const [title, setTitle] = useState('');
@@ -31,7 +30,22 @@ export function AddResourceModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const filteredTopics = subjectId ? topics.filter((t) => t.subject_id === subjectId) : [];
+  // Use the useTopics hook to fetch topics when a subject is selected
+  const { topics: topicNodes, loading: topicsLoading } = useTopics(subjectId || null);
+
+  // Flatten the topic tree for selection
+  const flattenTopics = (nodes: typeof topicNodes): { id: string; name: string }[] => {
+    const result: { id: string; name: string }[] = [];
+    for (const node of nodes) {
+      result.push({ id: node.id, name: node.name });
+      if (node.children && node.children.length > 0) {
+        result.push(...flattenTopics(node.children));
+      }
+    }
+    return result;
+  };
+
+  const availableTopics = flattenTopics(topicNodes);
 
   useEffect(() => {
     if (!isOpen) {
@@ -196,32 +210,41 @@ export function AddResourceModal({
             </select>
           </div>
 
-          {subjectId && filteredTopics.length > 0 && (
+          {subjectId && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Tematy (opcjonalnie)
               </label>
               <div className="border border-gray-300 rounded-md p-3 max-h-40 overflow-y-auto space-y-2">
-                {filteredTopics.map((topic) => (
-                  <label
-                    key={topic.id}
-                    className="flex items-center gap-2 cursor-pointer"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedTopics.includes(topic.id)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedTopics([...selectedTopics, topic.id]);
-                        } else {
-                          setSelectedTopics(selectedTopics.filter((id) => id !== topic.id));
-                        }
-                      }}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="text-sm text-gray-700">{topic.name}</span>
-                  </label>
-                ))}
+                {topicsLoading ? (
+                  <div className="flex items-center justify-center py-2">
+                    <Loader className="animate-spin text-blue-600" size={20} />
+                    <span className="ml-2 text-sm text-gray-500">Ładowanie tematów...</span>
+                  </div>
+                ) : availableTopics.length > 0 ? (
+                  availableTopics.map((topic) => (
+                    <label
+                      key={topic.id}
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedTopics.includes(topic.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedTopics([...selectedTopics, topic.id]);
+                          } else {
+                            setSelectedTopics(selectedTopics.filter((id) => id !== topic.id));
+                          }
+                        }}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-gray-700">{topic.name}</span>
+                    </label>
+                  ))
+                ) : (
+                  <span className="text-sm text-gray-500">Brak dostępnych tematów dla tego przedmiotu</span>
+                )}
               </div>
             </div>
           )}
