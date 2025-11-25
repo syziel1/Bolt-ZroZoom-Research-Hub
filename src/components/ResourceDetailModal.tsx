@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase, Resource } from '../lib/supabase';
 import { X, Star, MessageSquare, Edit, Trash2, ExternalLink, Video, FileText, Presentation, Beaker, Wrench } from 'lucide-react';
+import { ConfirmationModal } from './ConfirmationModal';
 
 type ResourceDetailModalProps = {
   isOpen: boolean;
@@ -52,6 +53,8 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
   const [commentText, setCommentText] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [userHasRated, setUserHasRated] = useState(false);
+  const [deleteCommentConfirm, setDeleteCommentConfirm] = useState<string | null>(null);
+  const [deleteResourceConfirm, setDeleteResourceConfirm] = useState(false);
 
   useEffect(() => {
     if (isOpen && resource) {
@@ -182,27 +185,37 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     setSubmitting(false);
   };
 
-  const handleDeleteComment = async (commentId: string) => {
-    if (!confirm('Czy na pewno chcesz usunąć ten komentarz?')) return;
+  const handleDeleteCommentClick = (commentId: string) => {
+    setDeleteCommentConfirm(commentId);
+  };
+
+  const handleDeleteCommentConfirm = async () => {
+    if (!deleteCommentConfirm) return;
 
     const { error } = await supabase
       .from('comments')
       .delete()
-      .eq('id', commentId);
+      .eq('id', deleteCommentConfirm);
 
+    setDeleteCommentConfirm(null);
     if (!error) {
       loadComments();
     }
   };
 
-  const handleDeleteResource = async () => {
-    if (!resource || !confirm('Czy na pewno chcesz usunąć ten zasób?')) return;
+  const handleDeleteResourceClick = () => {
+    setDeleteResourceConfirm(true);
+  };
+
+  const handleDeleteResourceConfirm = async () => {
+    if (!resource) return;
 
     const { error } = await supabase
       .from('resources')
       .delete()
       .eq('id', resource.id);
 
+    setDeleteResourceConfirm(false);
     if (!error) {
       onResourceUpdated();
       onClose();
@@ -257,7 +270,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                   <Edit size={20} />
                 </button>
                 <button
-                  onClick={handleDeleteResource}
+                  onClick={handleDeleteResourceClick}
                   className="text-red-600 hover:text-red-800 p-2"
                 >
                   <Trash2 size={20} />
@@ -441,7 +454,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                       </span>
                       {(comment.author_id === currentUserId || currentUserRole === 'admin') && (
                         <button
-                          onClick={() => handleDeleteComment(comment.id)}
+                          onClick={() => handleDeleteCommentClick(comment.id)}
                           className="text-red-600 hover:text-red-800"
                         >
                           <Trash2 size={14} />
@@ -459,6 +472,28 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
           </div>
         </div>
       </div>
+
+      <ConfirmationModal
+        isOpen={deleteCommentConfirm !== null}
+        title="Usuń komentarz"
+        message="Czy na pewno chcesz usunąć ten komentarz?"
+        confirmLabel="Usuń"
+        cancelLabel="Anuluj"
+        onConfirm={handleDeleteCommentConfirm}
+        onCancel={() => setDeleteCommentConfirm(null)}
+        variant="danger"
+      />
+
+      <ConfirmationModal
+        isOpen={deleteResourceConfirm}
+        title="Usuń zasób"
+        message="Czy na pewno chcesz usunąć ten zasób?"
+        confirmLabel="Usuń"
+        cancelLabel="Anuluj"
+        onConfirm={handleDeleteResourceConfirm}
+        onCancel={() => setDeleteResourceConfirm(false)}
+        variant="danger"
+      />
     </div>
   );
 }
