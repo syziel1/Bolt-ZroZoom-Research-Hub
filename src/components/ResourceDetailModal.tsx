@@ -222,10 +222,10 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     }
   };
 
-  const canEdit = resource && currentUserId && (
-    resource.contributor_nick === currentUserRole ||
-    currentUserRole === 'admin'
-  );
+  const canEdit =
+    !!resource &&
+    !!currentUserId &&
+    (resource.contributor_id === currentUserId || currentUserRole === 'admin');
 
   if (!isOpen || !resource) return null;
 

@@ -15,6 +15,7 @@ export type Resource = {
   url: string;
   type: string;
   description: string;
+  contributor_id?: string;
   subject_name: string;
   subject_slug: string;
   contributor_nick: string;
@@ -41,6 +42,12 @@ export type Topic = {
   subject_id: string;
   name: string;
   slug: string;
+  parent_topic_id: string | null;
+  order_index: number | null;
+};
+
+export type TopicNode = Topic & {
+  children: TopicNode[];
 };
 
 export type Level = {

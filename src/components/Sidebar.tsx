@@ -1,10 +1,11 @@
-import { Subject, Topic, Level } from '../lib/supabase';
+import { Subject, Level, TopicNode } from '../lib/supabase';
 import { ChevronDown, ChevronRight, X } from 'lucide-react';
 import { useState } from 'react';
+import { TopicTree } from './TopicTree';
 
 type SidebarProps = {
   subjects: Subject[];
-  topics: Topic[];
+  topicNodes: TopicNode[];
   levels: Level[];
   selectedSubject: string | null;
   selectedTopics: string[];
@@ -14,11 +15,12 @@ type SidebarProps = {
   onLevelToggle: (levelId: string) => void;
   isOpen: boolean;
   onClose: () => void;
+  isLoading?: boolean;
 };
 
 export function Sidebar({
   subjects,
-  topics,
+  topicNodes,
   levels,
   selectedSubject,
   selectedTopics,
@@ -28,13 +30,12 @@ export function Sidebar({
   onLevelToggle,
   isOpen,
   onClose,
+  isLoading = false,
 }: SidebarProps) {
   const [topicsExpanded, setTopicsExpanded] = useState(true);
   const [levelsExpanded, setLevelsExpanded] = useState(true);
 
-  const filteredTopics = selectedSubject
-    ? topics.filter((t) => t.subject_id === selectedSubject)
-    : [];
+  // filteredTopics logic removed as it's handled by useTopics in parent
 
   return (
     <>
@@ -99,7 +100,7 @@ export function Sidebar({
             </div>
           </div>
 
-          {selectedSubject && filteredTopics.length > 0 && (
+          {selectedSubject && (
             <div className="mb-6">
               <button
                 onClick={() => setTopicsExpanded(!topicsExpanded)}
@@ -109,21 +110,16 @@ export function Sidebar({
                 {topicsExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
               </button>
               {topicsExpanded && (
-                <div className="space-y-2">
-                  {filteredTopics.map((topic) => (
-                    <label
-                      key={topic.id}
-                      className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-50 cursor-pointer"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedTopics.includes(topic.id)}
-                        onChange={() => onTopicToggle(topic.id)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-gray-700">{topic.name}</span>
-                    </label>
-                  ))}
+                <div className="pl-1">
+                  {isLoading ? (
+                    <div className="text-sm text-gray-500 px-2 py-1">Ładowanie tematów...</div>
+                  ) : (
+                    <TopicTree
+                      nodes={topicNodes}
+                      selectedTopics={selectedTopics}
+                      onTopicToggle={onTopicToggle}
+                    />
+                  )}
                 </div>
               )}
             </div>
