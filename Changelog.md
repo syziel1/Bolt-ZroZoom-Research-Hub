@@ -17,7 +17,7 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 - Topic Tree: hierarchical display of topics in the sidebar.
 - Developer Shortcut: quick login button in dev mode.
 
-### Changed
+**Changed**
 - Application routing: default view is now Landing Page instead of login form.
 - `ResourceDetailModal`: added role-based access (edit only for author or admin).
 
