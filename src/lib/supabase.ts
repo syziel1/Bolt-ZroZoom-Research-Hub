@@ -45,9 +45,7 @@ export type Topic = {
   order_index: number | null;
 };
 
-export type TopicRow = Topic;
-
-export type TopicNode = TopicRow & {
+export type TopicNode = Topic & {
   children: TopicNode[];
 };
 
