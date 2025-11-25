@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase, Resource, Subject } from '../lib/supabase';
 import { ResourceCard } from './ResourceCard';
-import { BookOpen, Library, Layers, TrendingUp, Award, ArrowRight, Sparkles } from 'lucide-react';
+import { Navigation } from './Navigation';
+import { BookOpen, Library, Layers, TrendingUp, Award, Sparkles } from 'lucide-react';
 
 type LandingPageProps = {
   onNavigateToAuth: () => void;
@@ -106,7 +107,8 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
 
   return (
     <div className="min-h-screen bg-white">
-      <section className="relative min-h-screen bg-gradient-to-br from-violet-600 via-purple-600 to-violet-700 flex items-center justify-center px-4 py-20 overflow-hidden">
+      <Navigation onNavigateToAuth={onNavigateToAuth} onScrollToResources={scrollToResources} />
+      <section className="relative min-h-screen bg-gradient-to-br from-violet-600 via-purple-600 to-violet-700 flex items-center justify-center px-4 pt-32 pb-20 overflow-hidden">
         <div className="max-w-6xl w-full text-center relative z-10">
           <div className="mb-8">
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6 animate-fade-in-up" style={{animationDelay: '0.1s', opacity: 0}}>
@@ -122,26 +124,10 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
             <p className="text-2xl md:text-3xl lg:text-4xl text-violet-100 mb-6 max-w-3xl mx-auto animate-fade-in-up" style={{animationDelay: '0.4s', opacity: 0}}>
               ZroZoom AI Hub
             </p>
-            <p className="text-lg md:text-xl text-violet-50 mb-12 max-w-2xl mx-auto animate-fade-in-up" style={{animationDelay: '0.5s', opacity: 0}}>
+            <p className="text-lg md:text-xl text-violet-50 max-w-2xl mx-auto animate-fade-in-up" style={{animationDelay: '0.5s', opacity: 0}}>
               Odkryj tysiące materiałów edukacyjnych, pogrupowanych według przedmiotów i poziomów.
               Ucz się efektywniej z zaufanymi zasobami wybranymi przez społeczność.
             </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-fade-in-up" style={{animationDelay: '0.6s', opacity: 0}}>
-            <button
-              onClick={onNavigateToAuth}
-              className="bg-white text-violet-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-violet-50 transition-all hover:scale-105 shadow-lg flex items-center gap-2 w-full sm:w-auto justify-center"
-            >
-              Zaloguj się
-              <ArrowRight size={20} />
-            </button>
-            <button
-              onClick={scrollToResources}
-              className="bg-transparent text-white px-8 py-4 rounded-lg text-lg font-semibold border-2 border-white hover:bg-white/10 transition-all hover:scale-105 w-full sm:w-auto"
-            >
-              Przeglądaj zasoby
-            </button>
           </div>
         </div>
         <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 120" preserveAspectRatio="none" style={{height: '120px'}}>
