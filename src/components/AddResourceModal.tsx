@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { supabase, Subject, Topic, Level } from '../lib/supabase';
 import { X } from 'lucide-react';
+import { ResourceForm } from './ResourceForm';
+import { uploadThumbnail } from '../lib/storage';
 
 type AddResourceModalProps = {
   isOpen: boolean;
@@ -28,10 +30,12 @@ export function AddResourceModal({
   const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
   const [language, setLanguage] = useState('pl');
   const [aiGenerated, setAiGenerated] = useState(false);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+  const [thumbnailUploading, setThumbnailUploading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  const filteredTopics = subjectId ? topics.filter((t) => t.subject_id === subjectId) : [];
+  const [statusMessage, setStatusMessage] = useState('');
 
   useEffect(() => {
     if (!isOpen) {
@@ -44,14 +48,31 @@ export function AddResourceModal({
       setSelectedLevels([]);
       setLanguage('pl');
       setAiGenerated(false);
+      setThumbnailFile(null);
+      setThumbnailPreview(null);
+      setThumbnailUploading(false);
       setError('');
+      setStatusMessage('');
     }
   }, [isOpen]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleTopicToggle = (topicId: string, checked: boolean) => {
+    setSelectedTopics((prev) =>
+      checked ? [...prev, topicId] : prev.filter((id) => id !== topicId)
+    );
+  };
+
+  const handleLevelToggle = (levelId: string, checked: boolean) => {
+    setSelectedLevels((prev) =>
+      checked ? [...prev, levelId] : prev.filter((id) => id !== levelId)
+    );
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setStatusMessage('');
 
     try {
       const {
@@ -99,12 +120,20 @@ export function AddResourceModal({
         if (levelsError) throw levelsError;
       }
 
+      if (thumbnailFile) {
+        setThumbnailUploading(true);
+        await uploadThumbnail(resource.id, thumbnailFile);
+        setStatusMessage('Miniatura została zapisana.');
+      }
+
+      setStatusMessage((prev) => prev || 'Zasób dodany pomyślnie!');
       onSuccess();
       onClose();
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'Nie udało się dodać zasobu.');
     } finally {
       setLoading(false);
+      setThumbnailUploading(false);
     }
   };
 
@@ -122,211 +151,50 @@ export function AddResourceModal({
             <X size={24} />
           </button>
         </div>
-
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-              Tytuł *
-            </label>
-            <input
-              id="title"
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="url" className="block text-sm font-medium text-gray-700 mb-1">
-              URL *
-            </label>
-            <input
-              id="url"
-              type="url"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
-              Typ *
-            </label>
-            <select
-              id="type"
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="article">Artykuł</option>
-              <option value="video">Wideo</option>
-              <option value="pdf">PDF</option>
-              <option value="presentation">Prezentacja</option>
-              <option value="quiz">Quiz</option>
-              <option value="simulation">Symulacja</option>
-              <option value="tool">Narzędzie</option>
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
-              Przedmiot *
-            </label>
-            <select
-              id="subject"
-              value={subjectId}
-              onChange={(e) => {
-                setSubjectId(e.target.value);
-                setSelectedTopics([]);
-              }}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Wybierz przedmiot</option>
-              {subjects.map((subject) => (
-                <option key={subject.subject_id} value={subject.subject_id}>
-                  {subject.subject_name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {subjectId && filteredTopics.length > 0 && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Tematy (opcjonalnie)
-              </label>
-              <div className="border border-gray-300 rounded-md p-3 max-h-40 overflow-y-auto space-y-2">
-                {filteredTopics.map((topic) => (
-                  <label
-                    key={topic.id}
-                    className="flex items-center gap-2 cursor-pointer"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedTopics.includes(topic.id)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedTopics([...selectedTopics, topic.id]);
-                        } else {
-                          setSelectedTopics(selectedTopics.filter((id) => id !== topic.id));
-                        }
-                      }}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="text-sm text-gray-700">{topic.name}</span>
-                  </label>
-                ))}
-              </div>
+        <div className="p-6 space-y-4">
+          {statusMessage && (
+            <div className="bg-green-50 border border-green-200 text-green-800 text-sm px-4 py-3 rounded-md">
+              {statusMessage}
             </div>
           )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Poziomy (opcjonalnie)
-            </label>
-            <div className="border border-gray-300 rounded-md p-3 max-h-40 overflow-y-auto space-y-2">
-              {levels.map((level) => (
-                <label
-                  key={level.id}
-                  className="flex items-center gap-2 cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedLevels.includes(level.id)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelectedLevels([...selectedLevels, level.id]);
-                      } else {
-                        setSelectedLevels(selectedLevels.filter((id) => id !== level.id));
-                      }
-                    }}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="text-sm text-gray-700">{level.name}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="language" className="block text-sm font-medium text-gray-700 mb-1">
-              Język *
-            </label>
-            <select
-              id="language"
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="pl">Polski</option>
-              <option value="en">English</option>
-              <option value="de">Deutsch</option>
-              <option value="fr">Français</option>
-              <option value="es">Español</option>
-              <option value="other">Inny</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={aiGenerated}
-                onChange={(e) => setAiGenerated(e.target.checked)}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="text-sm font-medium text-gray-700">
-                Treść wygenerowana przez AI
-              </span>
-            </label>
-            <p className="text-xs text-gray-500 mt-1 ml-6">
-              Zaznacz, jeśli zasób został stworzony lub znacząco wspomagany przez sztuczną inteligencję
-            </p>
-          </div>
-
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-              Opis (opcjonalnie)
-            </label>
-            <textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {error && (
-            <div className="text-red-600 text-sm bg-red-50 p-3 rounded-md">
-              {error}
-            </div>
-          )}
-
-          <div className="flex gap-3 pt-4">
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400"
-            >
-              {loading ? 'Dodawanie...' : 'Dodaj zasób'}
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-            >
-              Anuluj
-            </button>
-          </div>
-        </form>
+          <ResourceForm
+            subjects={subjects}
+            topics={topics}
+            levels={levels}
+            title={title}
+            url={url}
+            type={type}
+            description={description}
+            subjectId={subjectId}
+            selectedTopics={selectedTopics}
+            selectedLevels={selectedLevels}
+            language={language}
+            aiGenerated={aiGenerated}
+            error={error}
+            loading={loading}
+            thumbnailPreview={thumbnailPreview}
+            thumbnailUploading={thumbnailUploading}
+            onSubmit={handleSubmit}
+            onCancel={onClose}
+            onTitleChange={setTitle}
+            onUrlChange={setUrl}
+            onTypeChange={setType}
+            onDescriptionChange={setDescription}
+            onSubjectChange={(value) => {
+              setSubjectId(value);
+              setSelectedTopics([]);
+            }}
+            onToggleTopic={handleTopicToggle}
+            onToggleLevel={handleLevelToggle}
+            onLanguageChange={setLanguage}
+            onAiGeneratedChange={setAiGenerated}
+            onThumbnailSelect={(file, previewUrl) => {
+              setThumbnailFile(file);
+              setThumbnailPreview(previewUrl);
+            }}
+          />
+        </div>
       </div>
     </div>
   );

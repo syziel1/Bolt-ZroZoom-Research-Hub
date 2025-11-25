@@ -1,5 +1,6 @@
 import { Resource } from '../lib/supabase';
-import { Video, FileText, Presentation, Beaker, Wrench, Star, ExternalLink } from 'lucide-react';
+import { Video, FileText, Presentation, Beaker, Wrench, Star, ExternalLink, ImageOff } from 'lucide-react';
+import { getThumbnailPublicUrl } from '../lib/storage';
 
 type ResourceCardProps = {
   resource: Resource;
@@ -19,6 +20,7 @@ const typeIcons: Record<string, any> = {
 
 export function ResourceCard({ resource, onTopicClick, onCardClick }: ResourceCardProps) {
   const Icon = typeIcons[resource.type] || FileText;
+  const thumbnailUrl = getThumbnailPublicUrl(resource.thumbnail_path);
 
   const calculateOverallRating = (): number | null => {
     const { avg_usefulness, avg_correctness } = resource;
@@ -53,6 +55,23 @@ export function ResourceCard({ resource, onTopicClick, onCardClick }: ResourceCa
       onClick={() => onCardClick?.(resource)}
       className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6 border border-gray-200 min-w-[300px] cursor-pointer"
     >
+      <div className="mb-4">
+        <div className="aspect-video w-full overflow-hidden rounded-lg border border-gray-100 bg-gray-50 flex items-center justify-center">
+          {thumbnailUrl ? (
+            <img
+              src={thumbnailUrl}
+              alt={`Miniatura zasobu ${resource.title}`}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center text-gray-400 text-sm gap-1">
+              <ImageOff size={24} />
+              <span>Brak miniatury</span>
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="flex items-start gap-3 mb-3">
         <div className="bg-blue-50 p-2 rounded-lg">
           <Icon size={24} className="text-blue-600" />

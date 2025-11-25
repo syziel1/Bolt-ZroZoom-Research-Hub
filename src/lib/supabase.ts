@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+export const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
@@ -15,6 +15,7 @@ export type Resource = {
   url: string;
   type: string;
   description: string;
+  thumbnail_path: string | null;
   subject_name: string;
   subject_slug: string;
   contributor_nick: string;
