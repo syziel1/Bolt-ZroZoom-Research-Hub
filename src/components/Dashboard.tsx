@@ -12,6 +12,7 @@ export function Dashboard() {
   const [resources, setResources] = useState<Resource[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [levels, setLevels] = useState<Level[]>([]);
+  const [totalTopicsCount, setTotalTopicsCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const { topics: topicNodes, loading: topicsLoading } = useTopics(selectedSubject);
@@ -48,15 +49,17 @@ export function Dashboard() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [resourcesRes, subjectsRes, levelsRes] = await Promise.all([
+      const [resourcesRes, subjectsRes, levelsRes, topicsCountRes] = await Promise.all([
         supabase.from('v_resources_full').select('*'),
         supabase.from('v_subjects_basic').select('*').order('order_index'),
         supabase.from('levels').select('*').order('order_index'),
+        supabase.from('topics').select('id', { count: 'exact', head: true }),
       ]);
 
       if (resourcesRes.data) setResources(resourcesRes.data);
       if (subjectsRes.data) setSubjects(subjectsRes.data);
       if (levelsRes.data) setLevels(levelsRes.data);
+      setTotalTopicsCount(topicsCountRes.count ?? 0);
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
@@ -142,9 +145,9 @@ export function Dashboard() {
     return {
       totalResources: resources.length,
       totalSubjects: subjects.length,
-      totalTopics: 0, // Topics are now fetched per subject
+      totalTopics: totalTopicsCount,
     };
-  }, [resources.length, subjects.length]);
+  }, [resources.length, subjects.length, totalTopicsCount]);
 
   const recentlyAddedResources = useMemo(() => {
     const sorted = [...resources].sort((a, b) => {
