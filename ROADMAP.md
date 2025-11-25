@@ -16,7 +16,7 @@ Ten dokument opisuje plany rozwoju platformy ZroZoom Research Hub. Cele podzielo
 - [ ] **Profile Publiczne:** Strona profilu użytkownika z listą dodanych zasobów i odznak.
 - [ ] **System Reputacji:** Naliczanie punktów za dodanie zasobu (+10) i otrzymanie „łapki w górę” (+1).
 - [ ] **Leaderboard:** Ranking najbardziej pomocnych współpracowników (Top Contributors).
-- [ ] **Powiadomienia:** E-mail lub dzwoneczek w aplikacji, gdy ktoś skomentuje Twój zasób.
+- [ ] **Powiadomienia:** Email lub dzwoneczek w aplikacji, gdy ktoś skomentuje Twój zasób.
 
 🔵 **Faza 3: Skalowalność i AI (Q2 2026)**
 **Cel:** Obsługa tysięcy zasobów i inteligentne wsparcie.
