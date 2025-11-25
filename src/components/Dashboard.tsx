@@ -100,11 +100,14 @@ export function Dashboard() {
 
   // Helper to flatten tree and find topic names by IDs
   const findTopicNames = useCallback((nodes: TopicNode[], ids: string[]): string[] => {
-    let names: string[] = [];
-    for (const node of nodes) {
-      if (ids.includes(node.id)) names.push(node.name);
-      if (node.children) names = [...names, ...findTopicNames(node.children, ids)];
-    }
+    const names: string[] = [];
+    const collectNames = (nodeList: TopicNode[]) => {
+      for (const node of nodeList) {
+        if (ids.includes(node.id)) names.push(node.name);
+        if (node.children) collectNames(node.children);
+      }
+    };
+    collectNames(nodes);
     return names;
   }, []);
 
