@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Plus, Edit, Trash2, ChevronUp, ChevronDown, Save, X } from 'lucide-react';
+import { ConfirmationModal } from './ConfirmationModal';
 
 type Subject = {
     id: string;
@@ -17,6 +18,7 @@ export function SubjectsManager() {
     const [isAdding, setIsAdding] = useState(false);
     const [formData, setFormData] = useState({ name: '', slug: '' });
     const [error, setError] = useState('');
+    const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
 
     useEffect(() => {
         loadSubjects();
@@ -118,31 +120,46 @@ export function SubjectsManager() {
         }
     };
 
-    const handleDelete = async (id: string, name: string) => {
-        if (!confirm(`Czy na pewno chcesz usunąć przedmiot "${name}"?`)) return;
+    const handleDeleteClick = (id: string, name: string) => {
+        setDeleteConfirm({ id, name });
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!deleteConfirm) return;
+        
+        const { id, name } = deleteConfirm;
+        setDeleteConfirm(null);
         setError('');
 
         try {
             // Check if subject has resources
-            const { count } = await supabase
+            const { count, error: countError } = await supabase
                 .from('resources')
                 .select('*', { count: 'exact', head: true })
                 .eq('subject_id', id);
+
+            if (countError) {
+                setError(`Błąd sprawdzania powiązanych zasobów: ${countError.message}`);
+                return;
+            }
 
             if (count && count > 0) {
                 setError(`Nie można usunąć przedmiotu "${name}" - ma przypisane zasoby (${count})`);
                 return;
             }
 
-            const { error } = await supabase
+            const { error: deleteError } = await supabase
                 .from('subjects')
                 .delete()
                 .eq('id', id);
 
-            if (error) throw error;
+            if (deleteError) {
+                setError(`Błąd usuwania przedmiotu: ${deleteError.message}`);
+                return;
+            }
             loadSubjects();
         } catch (err: any) {
-            setError(err.message);
+            setError(`Nieoczekiwany błąd: ${err.message}`);
         }
     };
 
@@ -340,7 +357,7 @@ export function SubjectsManager() {
                                                 <Edit size={16} />
                                             </button>
                                             <button
-                                                onClick={() => handleDelete(subject.id, subject.name)}
+                                                onClick={() => handleDeleteClick(subject.id, subject.name)}
                                                 className="text-red-600 hover:text-red-900"
                                             >
                                                 <Trash2 size={16} />
@@ -353,6 +370,17 @@ export function SubjectsManager() {
                     </tbody>
                 </table>
             </div>
+
+            <ConfirmationModal
+                isOpen={deleteConfirm !== null}
+                title="Usuń przedmiot"
+                message={deleteConfirm ? `Czy na pewno chcesz usunąć przedmiot "${deleteConfirm.name}"?` : ''}
+                confirmLabel="Usuń"
+                cancelLabel="Anuluj"
+                onConfirm={handleDeleteConfirm}
+                onCancel={() => setDeleteConfirm(null)}
+                variant="danger"
+            />
         </div>
     );
 }
