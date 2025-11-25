@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { supabase, Resource, Subject, Level } from '../lib/supabase';
+import { supabase, Resource, Subject, Level, TopicNode } from '../lib/supabase';
 import { useTopics } from '../hooks/useTopics';
 import { Sidebar } from './Sidebar';
 import { ResourceCard } from './ResourceCard';
