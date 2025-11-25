@@ -92,6 +92,11 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
     );
   };
 
+  const handleSubjectChange = (subjectId: string | null) => {
+    setSelectedSubject(subjectId);
+    setSelectedTopics([]); // Clear selected topics when subject changes
+  };
+
   const handleTopicClick = (topicName: string) => {
     // Logic for clicking a topic on a card
     // Since we don't have all topics loaded, we can't easily switch subject and select topic
@@ -220,7 +225,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
         selectedSubject={selectedSubject}
         selectedTopics={selectedTopics}
         selectedLevels={selectedLevels}
-        onSubjectChange={setSelectedSubject}
+        onSubjectChange={handleSubjectChange}
         onTopicToggle={handleTopicToggle}
         onLevelToggle={handleLevelToggle}
         isOpen={isSidebarOpen}
