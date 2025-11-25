@@ -3,8 +3,7 @@ insert into storage.buckets (id, name, public)
 values ('resource-thumbnails', 'resource-thumbnails', true)
 on conflict (id) do nothing;
 
--- Enable RLS
-alter table storage.objects enable row level security;
+-- Note: RLS is already enabled on storage.objects by default in Supabase
 
 -- Allow public access to view thumbnails
 create policy "Public Access"
