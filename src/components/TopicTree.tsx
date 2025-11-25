@@ -46,7 +46,7 @@ function TopicItem({ node, selectedTopics, onTopicToggle, level = 0 }: TopicItem
                     )}
                 </div>
 
-                <div className="flex items-center gap-2 flex-1 min-w-0">
+                <label className="flex items-center gap-2 flex-1 min-w-0">
                     <input
                         type="checkbox"
                         checked={isSelected}
@@ -57,7 +57,7 @@ function TopicItem({ node, selectedTopics, onTopicToggle, level = 0 }: TopicItem
                     <span className={`text-sm truncate ${isSelected ? 'text-blue-700 font-medium' : 'text-gray-700'}`}>
                         {node.name}
                     </span>
-                </div>
+                </label>
             </div>
 
             {hasChildren && isExpanded && (
