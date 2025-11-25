@@ -124,25 +124,33 @@ export function SubjectsManager() {
 
         try {
             // Check if subject has resources
-            const { count } = await supabase
+            const { count, error: countError } = await supabase
                 .from('resources')
                 .select('*', { count: 'exact', head: true })
                 .eq('subject_id', id);
+
+            if (countError) {
+                setError(`Błąd sprawdzania powiązanych zasobów: ${countError.message}`);
+                return;
+            }
 
             if (count && count > 0) {
                 setError(`Nie można usunąć przedmiotu "${name}" - ma przypisane zasoby (${count})`);
                 return;
             }
 
-            const { error } = await supabase
+            const { error: deleteError } = await supabase
                 .from('subjects')
                 .delete()
                 .eq('id', id);
 
-            if (error) throw error;
+            if (deleteError) {
+                setError(`Błąd usuwania przedmiotu: ${deleteError.message}`);
+                return;
+            }
             loadSubjects();
         } catch (err: any) {
-            setError(err.message);
+            setError(`Nieoczekiwany błąd: ${err.message}`);
         }
     };
 
