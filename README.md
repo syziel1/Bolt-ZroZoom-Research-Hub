@@ -217,11 +217,16 @@ Szczegóły w pliku [`technical.md`](./technical.md)
 
 ### Developer Shortcut (tylko w dev mode)
 
-W trybie deweloperskim dostępny jest przycisk "Auto-fill Test User" na formularzu logowania:
-- Email: `test@zrozoomai.pl`
-- Hasło: `123TesT456`
+W trybie deweloperskim dostępny jest przycisk "Auto-fill Test User" na formularzu logowania.
 
-> **Uwaga:** Ta funkcja jest widoczna tylko gdy `import.meta.env.DEV === true`
+**Konfiguracja danych testowych:**
+Dodaj do pliku `.env`:
+```env
+VITE_TEST_EMAIL=your-test-email@example.com
+VITE_TEST_PASSWORD=your-test-password
+```
+
+> **Uwaga:** Ta funkcja jest widoczna tylko gdy `import.meta.env.DEV === true`. Nigdy nie commituj pliku `.env` do repozytorium!
 
 ### Responsive Design
 
