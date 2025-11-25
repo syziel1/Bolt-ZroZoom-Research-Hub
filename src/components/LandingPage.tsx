@@ -110,7 +110,7 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
 
   return (
     <div className="min-h-screen bg-white">
-      <Navigation onNavigateToAuth={onNavigateToAuth} onScrollToResources={scrollToResources} />
+      <Navigation onNavigateToAuth={onNavigateToAuth} onScrollToResources={scrollToResources} onScrollToSubjects={scrollToSubjects} />
       <section className="relative min-h-[70vh] bg-gradient-to-br from-violet-600 via-purple-600 to-violet-700 flex items-center justify-center px-4 pt-24 pb-12 overflow-hidden">
         <div className="max-w-6xl w-full text-center relative z-10">
           <div className="mb-8">
@@ -131,15 +131,6 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
               Odkryj materiały edukacyjne, pogrupowane według tematów i poziomów.
               Ucz się efektywniej z zasobów wybranych przez społeczność.
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up" style={{ animationDelay: '0.6s', opacity: 0 }}>
-              <button
-                onClick={scrollToSubjects}
-                className="bg-white text-violet-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-violet-50 transition-all hover:scale-105 shadow-lg inline-flex items-center gap-2"
-              >
-                Wybierz przedmiot
-                <BookOpen size={20} />
-              </button>
-            </div>
           </div>
         </div>
         <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 120" preserveAspectRatio="none" style={{ height: '120px' }}>

@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Library, Menu, X, ArrowRight } from 'lucide-react';
+import { Library, Menu, X, ArrowRight, BookOpen } from 'lucide-react';
 
 type NavigationProps = {
   onNavigateToAuth: () => void;
   onScrollToResources: () => void;
+  onScrollToSubjects: () => void;
 };
 
-export function Navigation({ onNavigateToAuth, onScrollToResources }: NavigationProps) {
+export function Navigation({ onNavigateToAuth, onScrollToResources, onScrollToSubjects }: NavigationProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -59,6 +60,17 @@ export function Navigation({ onNavigateToAuth, onScrollToResources }: Navigation
               Przeglądaj zasoby
             </button>
             <button
+              onClick={onScrollToSubjects}
+              className={`px-6 py-2 rounded-lg font-semibold transition-all hover:scale-105 flex items-center gap-2 ${
+                isScrolled
+                  ? 'text-violet-600 hover:bg-violet-50'
+                  : 'text-white hover:bg-white/10'
+              }`}
+            >
+              Wybierz przedmiot
+              <BookOpen size={18} />
+            </button>
+            <button
               onClick={onNavigateToAuth}
               className={`px-6 py-2 rounded-lg font-semibold transition-all hover:scale-105 shadow-md flex items-center gap-2 ${
                 isScrolled
@@ -99,6 +111,20 @@ export function Navigation({ onNavigateToAuth, onScrollToResources }: Navigation
               }`}
             >
               Przeglądaj zasoby
+            </button>
+            <button
+              onClick={() => {
+                onScrollToSubjects();
+                setIsMobileMenuOpen(false);
+              }}
+              className={`w-full px-6 py-3 rounded-lg font-semibold transition-all text-center flex items-center justify-center gap-2 ${
+                isScrolled
+                  ? 'text-violet-600 hover:bg-violet-50 bg-violet-50'
+                  : 'text-white hover:bg-white/10 bg-white/5'
+              }`}
+            >
+              Wybierz przedmiot
+              <BookOpen size={18} />
             </button>
             <button
               onClick={() => {
