@@ -41,6 +41,14 @@ export type Topic = {
   subject_id: string;
   name: string;
   slug: string;
+  parent_topic_id: string | null;
+  order_index: number | null;
+};
+
+export type TopicRow = Topic;
+
+export type TopicNode = TopicRow & {
+  children: TopicNode[];
 };
 
 export type Level = {
