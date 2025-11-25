@@ -18,6 +18,11 @@ export function Dashboard() {
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Clear selected topics when subject changes to prevent filtering issues
+  useEffect(() => {
+    setSelectedTopics([]);
+  }, [selectedSubject]);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
   const [userNick, setUserNick] = useState('');
