@@ -15,6 +15,7 @@ export type Resource = {
   url: string;
   type: string;
   description: string;
+  contributor_id?: string;
   subject_name: string;
   subject_slug: string;
   contributor_nick: string;
