@@ -1,4 +1,4 @@
-import { Subject, Topic, Level } from '../lib/supabase';
+import { Subject, Topic, Level, Resource } from '../lib/supabase';
 import { ResourceForm } from './ResourceForm';
 
 type AddResourceModalProps = {
@@ -8,6 +8,7 @@ type AddResourceModalProps = {
   subjects: Subject[];
   topics: Topic[];
   levels: Level[];
+  initialData?: Resource | null;
 };
 
 export function AddResourceModal({
@@ -17,6 +18,7 @@ export function AddResourceModal({
   subjects,
   topics,
   levels,
+  initialData,
 }: AddResourceModalProps) {
   if (!isOpen) return null;
 
@@ -29,6 +31,7 @@ export function AddResourceModal({
           levels={levels}
           onSuccess={onSuccess}
           onCancel={onClose}
+          initialData={initialData}
         />
       </div>
     </div>

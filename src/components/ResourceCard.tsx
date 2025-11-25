@@ -24,14 +24,14 @@ export function ResourceCard({ resource, onTopicClick, onCardClick }: ResourceCa
 
   const calculateOverallRating = (): number | null => {
     const { avg_usefulness, avg_correctness } = resource;
-    if (avg_usefulness !== null && avg_correctness !== null) {
+    if (avg_usefulness != null && avg_correctness != null) {
       return (avg_usefulness + avg_correctness) / 2;
     }
     return avg_usefulness ?? avg_correctness ?? null;
   };
 
   const overallRating = calculateOverallRating();
-  const hasRatings = resource.ratings_count > 0;
+  const hasRatings = (resource.ratings_count || 0) > 0;
 
   const getRatingColor = (rating: number | null): string => {
     if (rating === null) return 'text-gray-400';
