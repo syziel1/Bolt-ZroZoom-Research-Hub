@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { supabase, Resource, Subject, Level, TopicNode, Topic } from '../lib/supabase';
 import { useTopics } from '../hooks/useTopics';
 import { Sidebar } from './Sidebar';
@@ -32,14 +32,9 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  useEffect(() => {
-    loadData();
-    if (!isGuestMode) {
-      loadUserProfile();
-    }
-  }, [isGuestMode]);
 
-  const loadUserProfile = async () => {
+
+  const loadUserProfile = useCallback(async () => {
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -52,9 +47,9 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
       setUserNick(profile?.nick || user.email?.split('@')[0] || 'User');
       setUserRole(profile?.role || '');
     }
-  };
+  }, []);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     try {
       const [resourcesRes, subjectsRes, levelsRes, topicsRes] = await Promise.all([
@@ -73,7 +68,14 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadData();
+    if (!isGuestMode) {
+      loadUserProfile();
+    }
+  }, [isGuestMode, loadData, loadUserProfile]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -138,7 +140,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
     if (selectedTopics.length > 0) {
       // Helper to flatten tree to find names
       const findTopicNames = (nodes: TopicNode[], ids: string[]): string[] => {
-        let names: string[] = [];
+        const names: string[] = [];
         for (const node of nodes) {
           if (ids.includes(node.id)) names.push(node.name);
           if (node.children) names.push(...findTopicNames(node.children, ids));

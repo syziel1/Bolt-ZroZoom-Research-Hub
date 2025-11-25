@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { generateSlug } from '../lib/utils';
 import { Plus, Edit, Trash2, ChevronUp, ChevronDown, Save, X } from 'lucide-react';
@@ -28,17 +28,9 @@ export function TopicsManager() {
     const [error, setError] = useState('');
     const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
 
-    useEffect(() => {
-        loadSubjects();
-    }, []);
 
-    useEffect(() => {
-        if (selectedSubjectId) {
-            loadTopics();
-        }
-    }, [selectedSubjectId]);
 
-    const loadSubjects = async () => {
+    const loadSubjects = useCallback(async () => {
         try {
             const { data, error } = await supabase
                 .from('subjects')
@@ -47,17 +39,14 @@ export function TopicsManager() {
 
             if (error) throw error;
             setSubjects(data || []);
-            if (data && data.length > 0 && !selectedSubjectId) {
-                setSelectedSubjectId(data[0].id);
-            }
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : 'An unknown error occurred');
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
-    const loadTopics = async () => {
+    const loadTopics = useCallback(async () => {
         if (!selectedSubjectId) return;
 
         setLoading(true);
@@ -75,7 +64,23 @@ export function TopicsManager() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [selectedSubjectId]);
+
+    useEffect(() => {
+        loadSubjects();
+    }, [loadSubjects]);
+
+    useEffect(() => {
+        if (selectedSubjectId) {
+            loadTopics();
+        }
+    }, [selectedSubjectId, loadTopics]);
+
+    useEffect(() => {
+        if (subjects.length > 0 && !selectedSubjectId) {
+            setSelectedSubjectId(subjects[0].id);
+        }
+    }, [subjects, selectedSubjectId]);
 
     const handleAdd = async () => {
         setError('');
