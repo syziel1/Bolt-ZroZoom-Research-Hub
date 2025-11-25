@@ -1,12 +1,12 @@
-import { TopicRow, TopicNode } from '../lib/supabase';
+import { Topic, TopicNode } from '../lib/supabase';
 
 /**
- * Builds a hierarchical tree of topics from a flat list of rows.
+ * Builds a hierarchical tree of topics from a flat list of topics.
  * 
- * @param rows - The flat list of topic rows from the database.
+ * @param rows - The flat list of Topic objects from the database.
  * @returns An array of root TopicNodes, each containing their children.
  */
-export function buildTopicTree(rows: TopicRow[]): TopicNode[] {
+export function buildTopicTree(rows: Topic[]): TopicNode[] {
     const nodeMap = new Map<string, TopicNode>();
     const roots: TopicNode[] = [];
 

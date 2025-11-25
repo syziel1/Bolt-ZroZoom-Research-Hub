@@ -14,7 +14,7 @@ export function Dashboard() {
   const [levels, setLevels] = useState<Level[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
-  const { topics: topicNodes, loading: topicsLoading } = useTopics(selectedSubject);
+  const { topics: topicNodes, loading: topicsLoading, error: topicsError } = useTopics(selectedSubject);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -98,6 +98,19 @@ export function Dashboard() {
     setSelectedResource(null);
   };
 
+  // Create a memoized flat map of topic IDs to names for O(1) lookups
+  const topicIdToNameMap = useMemo(() => {
+    const map = new Map<string, string>();
+    const flattenTopics = (nodes: TopicNode[]) => {
+      for (const node of nodes) {
+        map.set(node.id, node.name);
+        if (node.children) flattenTopics(node.children);
+      }
+    };
+    flattenTopics(topicNodes);
+    return map;
+  }, [topicNodes]);
+
   const filteredResources = resources.filter((resource) => {
     if (selectedSubject) {
       const subject = subjects.find((s) => s.subject_id === selectedSubject);
@@ -107,19 +120,12 @@ export function Dashboard() {
     }
 
     if (selectedTopics.length > 0) {
-      // Helper to flatten tree to find names
-      const findTopicNames = (nodes: TopicNode[], ids: string[]): string[] => {
-        let names: string[] = [];
-        for (const node of nodes) {
-          if (ids.includes(node.id)) names.push(node.name);
-          if (node.children) names.push(...findTopicNames(node.children, ids));
-        }
-        return names;
-      };
+      // Use memoized map for O(1) lookups instead of tree traversal
+      const selectedTopicNames = selectedTopics
+        .map((id) => topicIdToNameMap.get(id))
+        .filter((name): name is string => name !== undefined);
 
-      const resourceTopics = findTopicNames(topicNodes, selectedTopics);
-
-      const hasMatchingTopic = resourceTopics.some((topicName) =>
+      const hasMatchingTopic = selectedTopicNames.some((topicName) =>
         resource.topic_names?.includes(topicName)
       );
       if (!hasMatchingTopic) return false;
@@ -202,6 +208,7 @@ export function Dashboard() {
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
         isLoading={topicsLoading}
+        topicsError={topicsError}
       />
 
       <div className="flex-1 flex flex-col overflow-hidden">

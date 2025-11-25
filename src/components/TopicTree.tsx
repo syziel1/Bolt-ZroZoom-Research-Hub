@@ -33,6 +33,7 @@ function TopicItem({ node, selectedTopics, onTopicToggle, level = 0 }: TopicItem
                 style={{ marginLeft: `${level * 16}px` }}
                 onClick={() => onTopicToggle(node.id)}
                 tabIndex={0}
+                role="button"
                 onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
@@ -86,7 +87,7 @@ function TopicItem({ node, selectedTopics, onTopicToggle, level = 0 }: TopicItem
 
 export function TopicTree({ nodes, selectedTopics, onTopicToggle }: TopicTreeProps) {
     if (nodes.length === 0) {
-        return <div className="text-sm text-gray-500 px-4 py-2">Brak tematów dla tego przedmiotu</div>;
+        return <div className="text-sm text-gray-500 px-4 py-2">No topics for this subject</div>;
     }
 
     return (
