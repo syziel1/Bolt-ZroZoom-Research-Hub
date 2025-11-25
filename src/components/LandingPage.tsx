@@ -9,13 +9,13 @@ type LandingPageProps = {
 };
 
 type Stats = {
-  resourcesCount: number;
+  topicsCount: number;
   subjectsCount: number;
   levelsCount: number;
 };
 
 export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPageProps) {
-  const [stats, setStats] = useState<Stats>({ resourcesCount: 0, subjectsCount: 0, levelsCount: 0 });
+  const [stats, setStats] = useState<Stats>({ topicsCount: 0, subjectsCount: 0, levelsCount: 0 });
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [latestResources, setLatestResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,8 +27,8 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
   const loadLandingPageData = async () => {
     setLoading(true);
     try {
-      const [resourcesCount, subjectsData, levelsCount, latestResourcesData] = await Promise.all([
-        supabase.from('v_resources_full').select('*', { count: 'exact', head: true }),
+      const [topicsCount, subjectsData, levelsCount, latestResourcesData] = await Promise.all([
+        supabase.from('topics').select('*', { count: 'exact', head: true }),
         supabase.from('v_subjects_basic').select('*').order('resources_count', { ascending: false }),
         supabase.from('levels').select('*', { count: 'exact', head: true }),
         supabase
@@ -39,7 +39,7 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
       ]);
 
       setStats({
-        resourcesCount: resourcesCount.count || 0,
+        topicsCount: topicsCount.count || 0,
         subjectsCount: subjectsData.data?.length || 0,
         levelsCount: levelsCount.count || 0,
       });
@@ -103,38 +103,6 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
             >
               Przeglądaj zasoby
             </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-              <div className="flex items-center justify-center mb-4">
-                <div className="bg-blue-50 p-3 rounded-full">
-                  <BookOpen size={32} className="text-blue-600" />
-                </div>
-              </div>
-              <div className="text-4xl font-bold text-gray-900 mb-2">{stats.resourcesCount}</div>
-              <div className="text-gray-600">Dostępnych zasobów</div>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-              <div className="flex items-center justify-center mb-4">
-                <div className="bg-green-50 p-3 rounded-full">
-                  <Layers size={32} className="text-green-600" />
-                </div>
-              </div>
-              <div className="text-4xl font-bold text-gray-900 mb-2">{stats.subjectsCount}</div>
-              <div className="text-gray-600">Przedmiotów</div>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-              <div className="flex items-center justify-center mb-4">
-                <div className="bg-purple-50 p-3 rounded-full">
-                  <Award size={32} className="text-purple-600" />
-                </div>
-              </div>
-              <div className="text-4xl font-bold text-gray-900 mb-2">{stats.levelsCount}</div>
-              <div className="text-gray-600">Poziomów</div>
-            </div>
           </div>
         </div>
       </section>
@@ -210,6 +178,42 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
               <p>Brak dostępnych przedmiotów</p>
             </div>
           )}
+        </div>
+      </section>
+
+      <section className="py-20 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+              <div className="flex items-center justify-center mb-4">
+                <div className="bg-blue-50 p-3 rounded-full">
+                  <BookOpen size={32} className="text-blue-600" />
+                </div>
+              </div>
+              <div className="text-4xl font-bold text-gray-900 mb-2">{stats.topicsCount}</div>
+              <div className="text-gray-600">Tematów</div>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+              <div className="flex items-center justify-center mb-4">
+                <div className="bg-green-50 p-3 rounded-full">
+                  <Layers size={32} className="text-green-600" />
+                </div>
+              </div>
+              <div className="text-4xl font-bold text-gray-900 mb-2">{stats.subjectsCount}</div>
+              <div className="text-gray-600">Przedmiotów</div>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+              <div className="flex items-center justify-center mb-4">
+                <div className="bg-purple-50 p-3 rounded-full">
+                  <Award size={32} className="text-purple-600" />
+                </div>
+              </div>
+              <div className="text-4xl font-bold text-gray-900 mb-2">{stats.levelsCount}</div>
+              <div className="text-gray-600">Poziomów</div>
+            </div>
+          </div>
         </div>
       </section>
 
