@@ -32,6 +32,21 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
 
   const filteredTopics = useMemo(() => (subjectId ? topics.filter((t) => t.subject_id === subjectId) : []), [subjectId, topics]);
 
+  // Update state when initialData changes (e.g., switching from add to edit mode)
+  useEffect(() => {
+    setTitle(initialData?.title || '');
+    setUrl(initialData?.url || '');
+    setType(initialData?.type || 'article');
+    setDescription(initialData?.description || '');
+    setSubjectId(initialData?.subject_id || '');
+    setLanguage(initialData?.language || 'pl');
+    setAiGenerated(initialData?.ai_generated || false);
+    setThumbnailPreview(initialData?.thumbnail_url || null);
+    setThumbnailFile(null);
+    setSelectedTopics([]);
+    setSelectedLevels([]);
+  }, [initialData]);
+
   useEffect(() => {
     if (initialData) {
       let isMounted = true;
