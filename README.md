@@ -4,16 +4,16 @@
 
 ## 📋 Spis treści
 
-- [O projekcie](#o-projekcie)
-- [Funkcjonalności](#funkcjonalności)
-- [Stack technologiczny](#stack-technologiczny)
-- [Instalacja](#instalacja)
-- [Konfiguracja](#konfiguracja)
-- [Uruchomienie](#uruchomienie)
-- [Struktura projektu](#struktura-projektu)
-- [Baza danych](#baza-danych)
-- [Developer Tools](#developer-tools)
-- [Dokumentacja](#dokumentacja)
+- [O projekcie](#-o-projekcie)
+- [Funkcjonalności](#-funkcjonalności)
+- [Stack technologiczny](#-stack-technologiczny)
+- [Instalacja](#-instalacja)
+- [Konfiguracja](#%EF%B8%8F-konfiguracja)
+- [Uruchomienie](#-uruchomienie)
+- [Struktura projektu](#-struktura-projektu)
+- [Baza danych](#%EF%B8%8F-baza-danych)
+- [Developer Tools](#-developer-tools)
+- [Dokumentacja](#-dokumentacja)
 
 ## 🎯 O projekcie
 
@@ -63,7 +63,7 @@ ZroZoom Research Hub to platforma do gromadzenia, organizowania i udostępniania
 ## 📦 Instalacja
 
 ### Wymagania
-- Node.js 18+ 
+- Node.js 18+
 - npm lub yarn
 - Konto Supabase (darmowe)
 
@@ -154,7 +154,7 @@ npm run typecheck
 
 ## 📁 Struktura projektu
 
-```
+```text
 Bolt-ZroZoom-Research-Hub/
 ├── src/
 │   ├── components/          # Komponenty React
@@ -238,6 +238,9 @@ Aplikacja jest w pełni responsywna:
 - [`technical.md`](./technical.md) - Szczegółowa dokumentacja techniczna
 - [`docs/specyfikacja_bazy_szkola_przyszlosci.md`](./docs/specyfikacja_bazy_szkola_przyszlosci.md) - Specyfikacja bazy danych
 - [`docs/prompt_codex_resource_thumbnails.md`](./docs/prompt_codex_resource_thumbnails.md) - Dokumentacja miniatur
+- [`Changelog.md`](./Changelog.md) - Historia zmian
+- [`ROADMAP.md`](./ROADMAP.md) - Plan rozwoju
+- [`LICENSE`](./LICENSE) - Licencja MIT
 
 ### Komponenty
 

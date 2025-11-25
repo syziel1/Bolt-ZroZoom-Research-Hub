@@ -9,9 +9,9 @@ permissions:
 on:
   pull_request: # Oraz przy każdym otwarciu/aktualizacji Pull Requesta
     branches:
-      - main # Celującego w 'main'
+      - main # Celujących w 'main'
 
-# Jakie zadania (joby) ma wykonać?
+# Jakie zadania (jobs) ma wykonać?
 jobs:
   # Nazwa naszego zadania (to jest nazwa "status check")
   lint-code:
@@ -37,7 +37,5 @@ jobs:
           VALIDATE_CSS: false # Wyłącz sprawdzanie CSS
           VALIDATE_JAVASCRIPT_STANDARD: false # Wyłącz sprawdzanie standardów JS
           VALIDATE_TSX: false # Wyłącz - conflict with eslint.config.js
-          VALIDATE_TYPESCRIPT_ES: false # Wyłącz - conflict with eslint.config.js
+#          VALIDATE_TYPESCRIPT_ES: false # Wyłącz - conflict with eslint.config.js
           VALIDATE_TYPESCRIPT_STANDARD: false # Wyłącz - parser issues
-          VALIDATE_JSON: false # Wyłącz - conflict with eslint.config.js
-
