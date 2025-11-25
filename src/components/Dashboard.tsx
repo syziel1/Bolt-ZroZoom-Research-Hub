@@ -14,7 +14,7 @@ export function Dashboard() {
   const [levels, setLevels] = useState<Level[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
-  const { topics: topicNodes, loading: topicsLoading } = useTopics(selectedSubject);
+  const { topics: topicNodes, loading: topicsLoading, error: topicsError } = useTopics(selectedSubject);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -202,6 +202,7 @@ export function Dashboard() {
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
         isLoading={topicsLoading}
+        errorMessage={topicsError}
       />
 
       <div className="flex-1 flex flex-col overflow-hidden">
