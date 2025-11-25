@@ -23,7 +23,7 @@ export function useTopics(subjectId: string | null) {
                     .from('topics')
                     .select('*')
                     .eq('subject_id', subjectId)
-                    .order('order_index');
+                    .order('order_index', { nullsLast: true });
 
                 if (error) throw error;
 
