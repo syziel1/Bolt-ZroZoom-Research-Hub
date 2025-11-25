@@ -1,0 +1,26 @@
+
+> vite-react-typescript-starter@0.0.0 lint
+> eslint .
+
+
+C:\GitHub-repozytoria\Bolt-ZroZoom-Research-Hub\src\App.tsx
+  11:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\GitHub-repozytoria\Bolt-ZroZoom-Research-Hub\src\components\AdminPanel.tsx
+  18:39  error  React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render  react-hooks/rules-of-hooks
+
+C:\GitHub-repozytoria\Bolt-ZroZoom-Research-Hub\src\components\ResourceCard.tsx
+  11:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\GitHub-repozytoria\Bolt-ZroZoom-Research-Hub\src\components\ResourceDetailModal.tsx
+   32:33  error    Unexpected any. Specify a different type                                                                                                                 @typescript-eslint/no-explicit-any
+   69:6   warning  React Hook useEffect has missing dependencies: 'checkUserRating', 'loadComments', and 'loadRatings'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  118:35  error    Unexpected any. Specify a different type                                                                                                                 @typescript-eslint/no-explicit-any
+  141:35  error    Unexpected any. Specify a different type                                                                                                                 @typescript-eslint/no-explicit-any
+
+C:\GitHub-repozytoria\Bolt-ZroZoom-Research-Hub\src\components\TopicsManager.tsx
+  33:8  warning  React Hook useEffect has a missing dependency: 'loadSubjects'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  39:8  warning  React Hook useEffect has a missing dependency: 'loadTopics'. Either include it or remove the dependency array    react-hooks/exhaustive-deps
+
+Ôťľ 9 problems (6 errors, 3 warnings)
+

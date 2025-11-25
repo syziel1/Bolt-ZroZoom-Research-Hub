@@ -12,10 +12,11 @@ type AdminPanelProps = {
 };
 
 export function AdminPanel({ userRole, requireAdmin }: AdminPanelProps) {
+    const [activeTab, setActiveTab] = useState<Tab>('subjects');
+
     if (requireAdmin && userRole !== 'admin') {
         return <div className="p-8 text-center text-red-600">Brak uprawnień administratora.</div>;
     }
-    const [activeTab, setActiveTab] = useState<Tab>('subjects');
 
     const tabs = [
         { id: 'subjects' as Tab, name: 'Przedmioty', icon: BookOpen },

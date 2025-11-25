@@ -1,3 +1,4 @@
+import React from 'react';
 import { Resource } from '../lib/supabase';
 import { getThumbnailUrl } from '../lib/storage';
 import { Video, FileText, Presentation, Beaker, Wrench, Star, ExternalLink, ImageIcon } from 'lucide-react';
@@ -8,7 +9,7 @@ type ResourceCardProps = {
   onCardClick?: (resource: Resource) => void;
 };
 
-const typeIcons: Record<string, any> = {
+const typeIcons: Record<string, React.ElementType> = {
   video: Video,
   article: FileText,
   pdf: FileText,

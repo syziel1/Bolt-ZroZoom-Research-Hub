@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { supabase, Resource } from '../lib/supabase';
 import { X, Star, MessageSquare, Edit, Trash2, ExternalLink, Video, FileText, Presentation, Beaker, Wrench } from 'lucide-react';
 import { ConfirmationModal } from './ConfirmationModal';
@@ -29,7 +29,7 @@ type Comment = {
   author_id: string;
 };
 
-const typeIcons: Record<string, any> = {
+const typeIcons: Record<string, React.ElementType> = {
   video: Video,
   article: FileText,
   pdf: FileText,
@@ -57,18 +57,9 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
   const [deleteCommentConfirm, setDeleteCommentConfirm] = useState<string | null>(null);
   const [deleteResourceConfirm, setDeleteResourceConfirm] = useState(false);
 
-  useEffect(() => {
-    if (isOpen && resource) {
-      if (!isGuestMode) {
-        loadUserData();
-        checkUserRating();
-      }
-      loadRatings();
-      loadComments();
-    }
-  }, [isOpen, resource, isGuestMode]);
 
-  const loadUserData = async () => {
+
+  const loadUserData = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       setCurrentUserId(user.id);
@@ -81,9 +72,9 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
         setCurrentUserRole(profile.role || 'student');
       }
     }
-  };
+  }, []);
 
-  const checkUserRating = async () => {
+  const checkUserRating = useCallback(async () => {
     if (!resource) return;
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
@@ -95,9 +86,9 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
         .maybeSingle();
       setUserHasRated(!!data);
     }
-  };
+  }, [resource]);
 
-  const loadRatings = async () => {
+  const loadRatings = useCallback(async () => {
     if (!resource) return;
     const { data } = await supabase
       .from('ratings')
@@ -115,12 +106,12 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     if (data) {
       setRatings(data.map(r => ({
         ...r,
-        author_nick: (r.author as any)?.nick || 'Unknown',
+        author_nick: (r.author as unknown as { nick: string })?.nick || 'Unknown',
       })));
     }
-  };
+  }, [resource]);
 
-  const loadComments = async () => {
+  const loadComments = useCallback(async () => {
     if (!resource) return;
     const { data } = await supabase
       .from('comments')
@@ -138,10 +129,21 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     if (data) {
       setComments(data.map(c => ({
         ...c,
-        author_nick: (c.author as any)?.nick || 'Unknown',
+        author_nick: (c.author as unknown as { nick: string })?.nick || 'Unknown',
       })));
     }
-  };
+  }, [resource]);
+
+  useEffect(() => {
+    if (isOpen && resource) {
+      if (!isGuestMode) {
+        loadUserData();
+        checkUserRating();
+      }
+      loadRatings();
+      loadComments();
+    }
+  }, [isOpen, resource, isGuestMode, loadUserData, checkUserRating, loadRatings, loadComments]);
 
   const handleSubmitRating = async () => {
     if (!resource || !currentUserId || userHasRated) return;

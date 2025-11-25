@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Session } from '@supabase/supabase-js';
 import { supabase } from './lib/supabase';
 import { LandingPage } from './components/LandingPage';
 import { AuthForm } from './components/AuthForm';
@@ -8,7 +9,7 @@ import { Loader } from 'lucide-react';
 type View = 'landing' | 'auth' | 'dashboard' | 'browse';
 
 function App() {
-  const [session, setSession] = useState<any>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<View>('landing');
 
