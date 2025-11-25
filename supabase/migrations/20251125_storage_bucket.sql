@@ -1,35 +1,35 @@
 -- Create the storage bucket for resource thumbnails
-insert into storage.buckets (id, name, public)
-values ('resource-thumbnails', 'resource-thumbnails', true)
-on conflict (id) do nothing;
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('resource-thumbnails', 'resource-thumbnails', true)
+ON CONFLICT (id) DO NOTHING;
 
 -- Note: RLS is already enabled on storage.objects by default in Supabase
 
 -- Allow public access to view thumbnails
-create policy "Public Access"
-  on storage.objects for select
-  using ( bucket_id = 'resource-thumbnails' );
+CREATE POLICY "public_access"
+ON storage.objects FOR SELECT
+USING (bucket_id = 'resource-thumbnails');
 
 -- Allow authenticated users to upload thumbnails
-create policy "Authenticated users can upload thumbnails"
-  on storage.objects for insert
-  with check (
-    bucket_id = 'resource-thumbnails'
-    and auth.role() = 'authenticated'
-  );
+CREATE POLICY "authenticated_upload"
+ON storage.objects FOR INSERT
+WITH CHECK (
+bucket_id = 'resource-thumbnails'
+AND auth.role() = 'authenticated'
+);
 
 -- Allow authenticated users to update their own thumbnails
-create policy "Authenticated users can update thumbnails"
-  on storage.objects for update
-  using (
-    bucket_id = 'resource-thumbnails'
-    and auth.role() = 'authenticated'
-  );
+CREATE POLICY "authenticated_update"
+ON storage.objects FOR UPDATE
+USING (
+bucket_id = 'resource-thumbnails'
+AND auth.role() = 'authenticated'
+);
 
 -- Allow authenticated users to delete thumbnails
-create policy "Authenticated users can delete thumbnails"
-  on storage.objects for delete
-  using (
-    bucket_id = 'resource-thumbnails'
-    and auth.role() = 'authenticated'
-  );
+CREATE POLICY "authenticated_delete"
+ON storage.objects FOR DELETE
+USING (
+bucket_id = 'resource-thumbnails'
+AND auth.role() = 'authenticated'
+);
