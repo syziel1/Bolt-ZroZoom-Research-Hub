@@ -59,7 +59,9 @@ export function Dashboard() {
       if (resourcesRes.data) setResources(resourcesRes.data);
       if (subjectsRes.data) setSubjects(subjectsRes.data);
       if (levelsRes.data) setLevels(levelsRes.data);
-      if (!topicsCountRes.error && topicsCountRes.count !== null) {
+      if (topicsCountRes.error) {
+        console.error('Error fetching topics count:', topicsCountRes.error);
+      } else if (topicsCountRes.count !== null) {
         setTotalTopicsCount(topicsCountRes.count);
       }
     } catch (error) {
