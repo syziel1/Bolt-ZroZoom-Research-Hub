@@ -2,7 +2,7 @@
 
 **Mapa Drogowa – ZroZoom Hub**
 
-Ten dokument opisuje plany rozwoju platformy ZroZoom Research Hub. Cele podzielone są na fazy, od zadań natychmiastowych po długoterminową wizję "Szkoły Przyszłości".
+Ten dokument opisuje plany rozwoju platformy ZroZoom Research Hub. Cele podzielone są na fazy, od zadań natychmiastowych po długoterminową wizję „Szkoły Przyszłości”.
 
 🟢 **Faza 1: Stabilizacja i Content (Q4 2025)**
 **Cel:** Wypełnienie pustej aplikacji treścią i dopięcie techniczne MVP.
