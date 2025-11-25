@@ -37,7 +37,6 @@ export function Sidebar({
 
   // filteredTopics logic removed as it's handled by useTopics in parent
 
-
   return (
     <>
       {/* Mobile overlay */}
