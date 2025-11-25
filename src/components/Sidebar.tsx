@@ -112,7 +112,7 @@ export function Sidebar({
               {topicsExpanded && (
                 <div className="pl-1">
                   {isLoading ? (
-                    <div className="text-sm text-gray-500 px-2 py-1">Ładowanie tematów...</div>
+                    <div className="text-sm text-gray-500 px-2 py-1">Loading topics...</div>
                   ) : (
                     <TopicTree
                       nodes={topicNodes}

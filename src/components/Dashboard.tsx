@@ -30,6 +30,11 @@ export function Dashboard() {
     loadUserProfile();
   }, []);
 
+  // Clear selected topics when subject changes (topics are subject-specific)
+  useEffect(() => {
+    setSelectedTopics([]);
+  }, [selectedSubject]);
+
   const loadUserProfile = async () => {
     const {
       data: { user },
@@ -81,11 +86,61 @@ export function Dashboard() {
     );
   };
 
-  const handleTopicClick = (topicName: string) => {
-    // Logic for clicking a topic on a card
-    // Since we don't have all topics loaded, we can't easily switch subject and select topic
-    // without fetching. For now, we'll log it.
-    console.log('Topic clicked:', topicName);
+  const handleTopicClick = async (topicName: string) => {
+    // Find which subject has a resource with this topic
+    const resourceWithTopic = resources.find((r) => r.topic_names?.includes(topicName));
+    if (!resourceWithTopic) return;
+
+    // Find the subject for this resource
+    const subject = subjects.find((s) => s.subject_slug === resourceWithTopic.subject_slug);
+    if (!subject) return;
+
+    // If this is a different subject, switch to it
+    if (selectedSubject !== subject.subject_id) {
+      setSelectedSubject(subject.subject_id);
+      // Clear any existing topic selection since we're changing subjects
+      setSelectedTopics([]);
+      
+      // Fetch topics for the new subject and select the matching topic
+      try {
+        const { data, error } = await supabase
+          .from('topics')
+          .select('*')
+          .eq('subject_id', subject.subject_id);
+        
+        if (error) throw error;
+        
+        // Find the topic by name in the fetched data
+        const matchingTopic = data?.find((t) => t.name === topicName);
+        if (matchingTopic) {
+          setSelectedTopics([matchingTopic.id]);
+        }
+      } catch (err) {
+        console.error('Error fetching topics for subject:', err);
+      }
+    } else {
+      // Same subject - find the topic in already loaded topicNodes
+      const findTopicByName = (nodes: TopicNode[], name: string): TopicNode | null => {
+        for (const node of nodes) {
+          if (node.name === name) return node;
+          if (node.children) {
+            const found = findTopicByName(node.children, name);
+            if (found) return found;
+          }
+        }
+        return null;
+      };
+
+      const matchingTopic = findTopicByName(topicNodes, topicName);
+      if (matchingTopic) {
+        // Toggle the topic selection
+        setSelectedTopics((prev) =>
+          prev.includes(matchingTopic.id)
+            ? prev.filter((id) => id !== matchingTopic.id)
+            : [...prev, matchingTopic.id]
+        );
+      }
+    }
   };
 
   const handleCardClick = (resource: Resource) => {
@@ -109,7 +164,7 @@ export function Dashboard() {
     if (selectedTopics.length > 0) {
       // Helper to flatten tree to find names
       const findTopicNames = (nodes: TopicNode[], ids: string[]): string[] => {
-        let names: string[] = [];
+        const names: string[] = [];
         for (const node of nodes) {
           if (ids.includes(node.id)) names.push(node.name);
           if (node.children) names.push(...findTopicNames(node.children, ids));
@@ -139,12 +194,24 @@ export function Dashboard() {
   });
 
   const stats = useMemo(() => {
+    // Recursively count all topics in the tree
+    const countTopics = (nodes: TopicNode[]): number => {
+      let count = 0;
+      for (const node of nodes) {
+        count += 1;
+        if (node.children) {
+          count += countTopics(node.children);
+        }
+      }
+      return count;
+    };
+
     return {
       totalResources: resources.length,
       totalSubjects: subjects.length,
-      totalTopics: 0, // Topics are now fetched per subject
+      totalTopics: countTopics(topicNodes),
     };
-  }, [resources.length, subjects.length]);
+  }, [resources.length, subjects.length, topicNodes]);
 
   const recentlyAddedResources = useMemo(() => {
     const sorted = [...resources].sort((a, b) => {
