@@ -34,6 +34,8 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
 
   useEffect(() => {
     if (initialData) {
+      let isMounted = true;
+
       // Load initial relations
       const loadRelations = async () => {
         const { data: topicData } = await supabase
@@ -41,7 +43,7 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
           .select('topic_id')
           .eq('resource_id', initialData.id);
 
-        if (topicData) {
+        if (isMounted && topicData) {
           setSelectedTopics(topicData.map(t => t.topic_id));
         }
 
@@ -50,11 +52,15 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
           .select('level_id')
           .eq('resource_id', initialData.id);
 
-        if (levelData) {
+        if (isMounted && levelData) {
           setSelectedLevels(levelData.map(l => l.level_id));
         }
       };
       loadRelations();
+
+      return () => {
+        isMounted = false;
+      };
     }
   }, [initialData]);
 
@@ -137,6 +143,8 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
       if (!resourceId) throw new Error('Failed to get resource ID');
 
       // Update relations (delete all and re-insert for simplicity)
+      // Note: For updates, we always delete existing relations first, then re-insert selected ones (if any).
+      // For creates, there are no existing relations to delete, so we skip directly to inserting.
       if (initialData) {
         await supabase.from('resource_topics').delete().eq('resource_id', resourceId);
         await supabase.from('resource_levels').delete().eq('resource_id', resourceId);
