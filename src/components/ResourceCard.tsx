@@ -157,6 +157,7 @@ export function ResourceCard({ resource, onTopicClick, onCardClick, variant = 'd
           rel="noopener noreferrer"
           onClick={handleLinkClick}
           className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+          aria-label={`Open ${resource.title}`}
         >
           <ExternalLink size={20} />
         </a>
