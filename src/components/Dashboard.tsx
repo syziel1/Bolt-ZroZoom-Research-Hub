@@ -112,7 +112,7 @@ export function Dashboard() {
         let names: string[] = [];
         for (const node of nodes) {
           if (ids.includes(node.id)) names.push(node.name);
-          if (node.children) names = [...names, ...findTopicNames(node.children, ids)];
+          if (node.children) names.push(...findTopicNames(node.children, ids));
         }
         return names;
       };
