@@ -1,12 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase, Resource, Subject } from '../lib/supabase';
 import { ResourceCard } from './ResourceCard';
 import { Navigation } from './Navigation';
-import { BookOpen, Library, Layers, TrendingUp, Award, Sparkles } from 'lucide-react';
+import { BookOpen, Library, Layers, TrendingUp, Award, Sparkles, ArrowRight } from 'lucide-react';
 
 type LandingPageProps = {
   onNavigateToAuth: () => void;
-  onBrowseAsGuest: () => void;
+  onBrowseAsGuest: (subjectId?: string) => void;
 };
 
 type Stats = {
@@ -20,8 +20,6 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [latestResources, setLatestResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
-  const resourcesRef = useRef<HTMLDivElement>(null);
-  const subjectsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadLandingPageData();
@@ -94,6 +92,11 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
     element?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const scrollToSubjects = () => {
+    const element = document.getElementById('available-subjects');
+    element?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
@@ -108,34 +111,43 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
   return (
     <div className="min-h-screen bg-white">
       <Navigation onNavigateToAuth={onNavigateToAuth} onScrollToResources={scrollToResources} />
-      <section className="relative min-h-screen bg-gradient-to-br from-violet-600 via-purple-600 to-violet-700 flex items-center justify-center px-4 pt-32 pb-20 overflow-hidden">
+      <section className="relative min-h-[70vh] bg-gradient-to-br from-violet-600 via-purple-600 to-violet-700 flex items-center justify-center px-4 pt-24 pb-12 overflow-hidden">
         <div className="max-w-6xl w-full text-center relative z-10">
           <div className="mb-8">
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6 animate-fade-in-up" style={{animationDelay: '0.1s', opacity: 0}}>
+            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6 animate-fade-in-up" style={{ animationDelay: '0.1s', opacity: 0 }}>
               <Sparkles size={20} className="text-yellow-300" />
               <span className="text-white text-sm font-medium">AI-powered • Nowoczesna edukacja</span>
             </div>
-            <div className="inline-block bg-white/10 backdrop-blur-sm p-4 rounded-2xl mb-6 animate-float" style={{animationDelay: '0.2s'}}>
+            <div className="inline-block bg-white/10 backdrop-blur-sm p-4 rounded-2xl mb-6 animate-float" style={{ animationDelay: '0.2s' }}>
               <Library size={64} className="text-white" />
             </div>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 animate-fade-in-up" style={{animationDelay: '0.3s', opacity: 0}}>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 animate-fade-in-up" style={{ animationDelay: '0.3s', opacity: 0 }}>
               Szkoła Przyszłości z AI
             </h1>
-            <p className="text-2xl md:text-3xl lg:text-4xl text-violet-100 mb-6 max-w-3xl mx-auto animate-fade-in-up" style={{animationDelay: '0.4s', opacity: 0}}>
+            <p className="text-2xl md:text-3xl lg:text-4xl text-violet-100 mb-6 max-w-3xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.4s', opacity: 0 }}>
               ZroZoom AI Hub
             </p>
-            <p className="text-lg md:text-xl text-violet-50 max-w-2xl mx-auto animate-fade-in-up" style={{animationDelay: '0.5s', opacity: 0}}>
-              Odkryj tysiące materiałów edukacyjnych, pogrupowanych według przedmiotów i poziomów.
-              Ucz się efektywniej z zaufanymi zasobami wybranymi przez społeczność.
+            <p className="text-lg md:text-xl text-violet-50 max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.5s', opacity: 0 }}>
+              Odkryj materiały edukacyjne, pogrupowane według tematów i poziomów.
+              Ucz się efektywniej z zasobów wybranych przez społeczność.
             </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up" style={{ animationDelay: '0.6s', opacity: 0 }}>
+              <button
+                onClick={scrollToSubjects}
+                className="bg-white text-violet-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-violet-50 transition-all hover:scale-105 shadow-lg inline-flex items-center gap-2"
+              >
+                Wybierz przedmiot
+                <BookOpen size={20} />
+              </button>
+            </div>
           </div>
         </div>
-        <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 120" preserveAspectRatio="none" style={{height: '120px'}}>
+        <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 120" preserveAspectRatio="none" style={{ height: '120px' }}>
           <path d="M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,64C960,75,1056,85,1152,80C1248,75,1344,53,1392,42.7L1440,32L1440,120L1392,120C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120L0,120Z" fill="#ffffff"></path>
         </svg>
       </section>
 
-      <section id="latest-resources" className="py-20 px-4 bg-white">
+      <section id="latest-resources" className="py-12 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <div className="inline-block bg-blue-50 p-3 rounded-full mb-4">
@@ -163,7 +175,7 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
 
           <div className="text-center mt-12">
             <button
-              onClick={onBrowseAsGuest}
+              onClick={() => onBrowseAsGuest()}
               className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-all hover:scale-105 shadow-lg inline-flex items-center gap-2"
             >
               Przeglądaj materiały jako gość
@@ -173,7 +185,7 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
         </div>
       </section>
 
-      <section className="py-20 px-4 bg-gray-50">
+      <section id="available-subjects" className="py-20 px-4 bg-gray-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Dostępne przedmioty</h2>
@@ -195,6 +207,7 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
               return (
                 <div
                   key={subject.subject_id}
+                  onClick={() => onBrowseAsGuest(subject.subject_id)}
                   className={`subject-card-animate opacity-0 bg-gradient-to-br ${gradient} p-6 rounded-lg shadow-lg hover:shadow-2xl transition-all hover:scale-105 cursor-pointer group`}
                 >
                   <div className="flex items-center gap-4">
@@ -277,8 +290,8 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
 
       <footer className="py-8 px-4 bg-gray-900 text-gray-400 text-center">
         <div className="max-w-6xl mx-auto">
-          <p className="mb-2">ZroZoom Research Hub - Twoja baza wiedzy edukacyjnej</p>
-          <p className="text-sm">&copy; {new Date().getFullYear()} All rights reserved</p>
+          <p className="mb-2">Szkoła Przyszłości AI - ZroZoom Hub - Twoja baza wiedzy edukacyjnej</p>
+          <p className="text-sm">&copy; {new Date().getFullYear()} Sylwester Zieliński. All rights reserved</p>
         </div>
       </footer>
     </div>

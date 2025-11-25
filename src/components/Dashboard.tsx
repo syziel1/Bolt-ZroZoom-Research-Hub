@@ -12,15 +12,16 @@ type DashboardProps = {
   isGuestMode?: boolean;
   onNavigateToAuth?: () => void;
   onBackToLanding?: () => void;
+  initialSubject?: string | null;
 };
 
-export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLanding }: DashboardProps) {
+export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLanding, initialSubject = null }: DashboardProps) {
   const [resources, setResources] = useState<Resource[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [levels, setLevels] = useState<Level[]>([]);
   const [allTopics, setAllTopics] = useState<Topic[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(initialSubject);
   const { topics: topicNodes, loading: topicsLoading } = useTopics(selectedSubject);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
@@ -59,7 +60,29 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
         supabase.from('topics').select('*').order('order_index'),
       ]);
 
-      if (resourcesRes.data) setResources(resourcesRes.data);
+      if (resourcesRes.data) {
+        let resourcesData = resourcesRes.data;
+
+        // Manual fetch of contributor nicks if missing or just to be safe
+        const contributorIds = [...new Set(resourcesData.map(r => r.contributor_id).filter(Boolean))];
+
+        if (contributorIds.length > 0) {
+          const { data: profiles } = await supabase
+            .from('profiles')
+            .select('id, nick')
+            .in('id', contributorIds);
+
+          if (profiles) {
+            const nickMap = new Map(profiles.map(p => [p.id, p.nick]));
+            resourcesData = resourcesData.map(r => ({
+              ...r,
+              contributor_nick: r.contributor_nick || nickMap.get(r.contributor_id!) || 'Anonim'
+            }));
+          }
+        }
+
+        setResources(resourcesData);
+      }
       if (subjectsRes.data) setSubjects(subjectsRes.data);
       if (levelsRes.data) setLevels(levelsRes.data);
       if (topicsRes.data) setAllTopics(topicsRes.data);
@@ -131,8 +154,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
 
   const filteredResources = resources.filter((resource) => {
     if (selectedSubject) {
-      const subject = subjects.find((s) => s.subject_id === selectedSubject);
-      if (subject && resource.subject_slug !== subject.subject_slug) {
+      if (resource.subject_id !== selectedSubject) {
         return false;
       }
     }
@@ -194,7 +216,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
       <div className="min-h-screen bg-gray-50">
         <div className="bg-white border-b border-gray-200 px-4 md:px-8 py-4">
           <div className="flex items-center justify-between max-w-7xl mx-auto">
-            <h1 className="text-xl md:text-2xl font-bold text-gray-900">ZroZoom Research Hub</h1>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900">ZroZoom Hub</h1>
             <div className="flex items-center gap-2 md:gap-4">
               <button
                 onClick={() => setShowAdminPanel(false)}
@@ -246,7 +268,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
                 <Menu size={24} />
               </button>
               <div>
-                <h1 className="text-xl md:text-2xl font-bold text-gray-900">ZroZoom Research Hub</h1>
+                <h1 className="text-xl md:text-2xl font-bold text-gray-900">Szkoła Przyszłości z AI - ZroZoom Hub</h1>
                 <p className="text-xs md:text-sm text-gray-600 mt-1 hidden sm:block">
                   Odkrywaj i dziel się zasobami edukacyjnymi
                 </p>

@@ -6,12 +6,14 @@ import { AuthForm } from './components/AuthForm';
 import { Dashboard } from './components/Dashboard';
 import { Loader } from 'lucide-react';
 
+
 type View = 'landing' | 'auth' | 'dashboard' | 'browse';
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<View>('landing');
+  const [initialSubject, setInitialSubject] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -40,17 +42,19 @@ function App() {
     setView('auth');
   };
 
-  const handleBrowseAsGuest = () => {
+  const handleBrowseAsGuest = (subjectId?: string) => {
+    setInitialSubject(subjectId || null);
     setView('browse');
   };
 
   const handleBackToLanding = () => {
     setView('landing');
+    setInitialSubject(null);
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Loader className="animate-spin text-blue-600" size={48} />
       </div>
     );
@@ -65,7 +69,7 @@ function App() {
   }
 
   if (view === 'browse') {
-    return <Dashboard isGuestMode={true} onNavigateToAuth={handleNavigateToAuth} onBackToLanding={handleBackToLanding} />;
+    return <Dashboard isGuestMode={true} onNavigateToAuth={handleNavigateToAuth} onBackToLanding={handleBackToLanding} initialSubject={initialSubject} />;
   }
 
   return <LandingPage onNavigateToAuth={handleNavigateToAuth} onBrowseAsGuest={handleBrowseAsGuest} />;
