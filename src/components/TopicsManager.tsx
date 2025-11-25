@@ -39,15 +39,12 @@ export function TopicsManager() {
 
             if (error) throw error;
             setSubjects(data || []);
-            if (data && data.length > 0 && !selectedSubjectId) {
-                setSelectedSubjectId(data[0].id);
-            }
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : 'An unknown error occurred');
         } finally {
             setLoading(false);
         }
-    }, [selectedSubjectId]);
+    }, []);
 
     const loadTopics = useCallback(async () => {
         if (!selectedSubjectId) return;
@@ -78,6 +75,12 @@ export function TopicsManager() {
             loadTopics();
         }
     }, [selectedSubjectId, loadTopics]);
+
+    useEffect(() => {
+        if (subjects.length > 0 && !selectedSubjectId) {
+            setSelectedSubjectId(subjects[0].id);
+        }
+    }, [subjects, selectedSubjectId]);
 
     const handleAdd = async () => {
         setError('');
