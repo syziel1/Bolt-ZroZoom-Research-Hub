@@ -4,7 +4,7 @@
 
 Ten dokument opisuje plany rozwoju platformy ZroZoom Research Hub. Cele podzielone są na fazy, od zadań natychmiastowych po długoterminową wizję „Szkoły Przyszłości”.
 
-🟢 **Faza 1: Stabilizacja i Content (Q4 2025)**
+🟢 **Faza 1: Stabilizacja i Content (Q4 2025 – w trakcie)**
 **Cel:** Wypełnienie pustej aplikacji treścią i dopięcie techniczne MVP.
 - [ ] **Konfiguracja Storage:** Uruchomienie bucketu `resource-thumbnails` w Supabase i polityk RLS (umożliwienie uploadu miniatur).
 - [ ] **Seed Danych:** Import 50‑100 quizów z Matzoo.pl oraz wybranych kanałów YouTube (automatyzacja przez AI/SQL).
