@@ -124,7 +124,7 @@ export function LevelsManager() {
 
     const handleDeleteConfirm = async () => {
         if (!deleteConfirm) return;
-        
+
         const { id, name } = deleteConfirm;
         setDeleteConfirm(null);
         setError('');
@@ -179,30 +179,22 @@ export function LevelsManager() {
         const level2 = levels[swapIndex];
 
         try {
-            // First update
-            const { error: error1 } = await supabase
-                .from('levels')
-                .update({ order_index: level2.order_index })
-                .eq('id', level1.id);
-            if (error1) throw error1;
+            // Use atomic RPC function to swap order indices
+            const { error } = await supabase.rpc('swap_levels_order', {
+                level1_id: level1.id,
+                level2_id: level2.id
+            });
 
-            // Second update
-            const { error: error2 } = await supabase
-                .from('levels')
-                .update({ order_index: level1.order_index })
-                .eq('id', level2.id);
-            if (error2) {
-                // Attempt rollback of first update
-                await supabase
-                    .from('levels')
-                    .update({ order_index: level1.order_index })
-                    .eq('id', level1.id);
-                throw error2;
+            if (error) {
+                setError(`Nie udało się przesunąć poziomu: ${error.message}`);
+                return;
             }
 
+            // Reload levels to reflect the change
             loadLevels();
         } catch (err: any) {
             setError(err.message || 'Wystąpił błąd podczas zmiany kolejności poziomów.');
+            loadLevels(); // Reload to ensure UI is in sync with database
         }
     };
 
