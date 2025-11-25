@@ -53,7 +53,7 @@ export function ResourceCard({ resource, onTopicClick, onCardClick }: ResourceCa
   return (
     <div
       onClick={() => onCardClick?.(resource)}
-      className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6 border border-gray-200 min-w-[300px] cursor-pointer"
+      className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6 border border-gray-200 cursor-pointer flex flex-col h-full"
     >
       <div className="flex items-start gap-4 mb-4">
         <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">

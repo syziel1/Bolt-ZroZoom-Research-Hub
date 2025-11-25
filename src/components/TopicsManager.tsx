@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Plus, Edit, Trash2, ChevronUp, ChevronDown, Save, X } from 'lucide-react';
+import { ConfirmationModal } from './ConfirmationModal';
 
 type Topic = {
     id: string;
@@ -24,6 +25,7 @@ export function TopicsManager() {
     const [isAdding, setIsAdding] = useState(false);
     const [formData, setFormData] = useState({ name: '', slug: '', subject_id: '' });
     const [error, setError] = useState('');
+    const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
 
     useEffect(() => {
         loadSubjects();
@@ -148,8 +150,15 @@ export function TopicsManager() {
         }
     };
 
-    const handleDelete = async (id: string, name: string) => {
-        if (!confirm(`Czy na pewno chcesz usunąć temat "${name}"?`)) return;
+    const handleDeleteClick = (id: string, name: string) => {
+        setDeleteConfirm({ id, name });
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!deleteConfirm) return;
+
+        const { id, name } = deleteConfirm;
+        setDeleteConfirm(null);
         setError('');
 
         try {
@@ -187,38 +196,23 @@ export function TopicsManager() {
         const topic1 = topics[index];
         const topic2 = topics[swapIndex];
 
-        // Manual rollback logic
         try {
-            // First update
-            const { error: error1 } = await supabase
-                .from('topics')
-                .update({ order_index: topic2.order_index })
-                .eq('id', topic1.id);
+            // Use atomic RPC function to swap order indices
+            const { error } = await supabase.rpc('swap_topics_order', {
+                topic1_id: topic1.id,
+                topic2_id: topic2.id
+            });
 
-            if (error1) {
-                setError(`Nie udało się przesunąć tematu: ${error1.message}`);
+            if (error) {
+                setError(`Nie udało się przesunąć tematu: ${error.message}`);
                 return;
             }
 
-            // Second update
-            const { error: error2 } = await supabase
-                .from('topics')
-                .update({ order_index: topic1.order_index })
-                .eq('id', topic2.id);
-
-            if (error2) {
-                // Rollback first update
-                await supabase
-                    .from('topics')
-                    .update({ order_index: topic1.order_index })
-                    .eq('id', topic1.id);
-                setError(`Nie udało się przesunąć tematu: ${error2.message}. Zmiany zostały cofnięte.`);
-                return;
-            }
-
+            // Reload topics to reflect the change
             loadTopics();
         } catch (err: any) {
             setError(`Wystąpił błąd podczas przesuwania tematu: ${err.message}`);
+            loadTopics(); // Reload to ensure UI is in sync with database
         }
     };
 
@@ -409,7 +403,7 @@ export function TopicsManager() {
                                                         <Edit size={16} />
                                                     </button>
                                                     <button
-                                                        onClick={() => handleDelete(topic.id, topic.name)}
+                                                        onClick={() => handleDeleteClick(topic.id, topic.name)}
                                                         className="text-red-600 hover:text-red-900"
                                                     >
                                                         <Trash2 size={16} />
@@ -424,6 +418,17 @@ export function TopicsManager() {
                     </table>
                 </div>
             )}
+
+            <ConfirmationModal
+                isOpen={deleteConfirm !== null}
+                title="Usuń temat"
+                message={deleteConfirm ? `Czy na pewno chcesz usunąć temat "${deleteConfirm.name}"?` : ''}
+                confirmLabel="Usuń"
+                cancelLabel="Anuluj"
+                onConfirm={handleDeleteConfirm}
+                onCancel={() => setDeleteConfirm(null)}
+                variant="danger"
+            />
         </div>
     );
 }

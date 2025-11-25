@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Plus, Edit, Trash2, ChevronUp, ChevronDown, Save, X } from 'lucide-react';
+import { ConfirmationModal } from './ConfirmationModal';
 
 type Level = {
     id: string;
@@ -16,6 +17,7 @@ export function LevelsManager() {
     const [isAdding, setIsAdding] = useState(false);
     const [formData, setFormData] = useState({ name: '', slug: '' });
     const [error, setError] = useState('');
+    const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
 
     useEffect(() => {
         loadLevels();
@@ -116,8 +118,15 @@ export function LevelsManager() {
         }
     };
 
-    const handleDelete = async (id: string, name: string) => {
-        if (!confirm(`Czy na pewno chcesz usunąć poziom "${name}"?`)) return;
+    const handleDeleteClick = (id: string, name: string) => {
+        setDeleteConfirm({ id, name });
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!deleteConfirm) return;
+
+        const { id, name } = deleteConfirm;
+        setDeleteConfirm(null);
         setError('');
 
         // First, check if level has resources
@@ -170,30 +179,22 @@ export function LevelsManager() {
         const level2 = levels[swapIndex];
 
         try {
-            // First update
-            const { error: error1 } = await supabase
-                .from('levels')
-                .update({ order_index: level2.order_index })
-                .eq('id', level1.id);
-            if (error1) throw error1;
+            // Use atomic RPC function to swap order indices
+            const { error } = await supabase.rpc('swap_levels_order', {
+                level1_id: level1.id,
+                level2_id: level2.id
+            });
 
-            // Second update
-            const { error: error2 } = await supabase
-                .from('levels')
-                .update({ order_index: level1.order_index })
-                .eq('id', level2.id);
-            if (error2) {
-                // Attempt rollback of first update
-                await supabase
-                    .from('levels')
-                    .update({ order_index: level1.order_index })
-                    .eq('id', level1.id);
-                throw error2;
+            if (error) {
+                setError(`Nie udało się przesunąć poziomu: ${error.message}`);
+                return;
             }
 
+            // Reload levels to reflect the change
             loadLevels();
         } catch (err: any) {
             setError(err.message || 'Wystąpił błąd podczas zmiany kolejności poziomów.');
+            loadLevels(); // Reload to ensure UI is in sync with database
         }
     };
 
@@ -359,7 +360,7 @@ export function LevelsManager() {
                                                 <Edit size={16} />
                                             </button>
                                             <button
-                                                onClick={() => handleDelete(level.id, level.name)}
+                                                onClick={() => handleDeleteClick(level.id, level.name)}
                                                 className="text-red-600 hover:text-red-900"
                                             >
                                                 <Trash2 size={16} />
@@ -372,6 +373,17 @@ export function LevelsManager() {
                     </tbody>
                 </table>
             </div>
+
+            <ConfirmationModal
+                isOpen={deleteConfirm !== null}
+                title="Usuń poziom"
+                message={deleteConfirm ? `Czy na pewno chcesz usunąć poziom "${deleteConfirm.name}"?` : ''}
+                confirmLabel="Usuń"
+                cancelLabel="Anuluj"
+                onConfirm={handleDeleteConfirm}
+                onCancel={() => setDeleteConfirm(null)}
+                variant="danger"
+            />
         </div>
     );
 }

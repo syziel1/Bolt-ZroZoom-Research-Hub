@@ -5,7 +5,7 @@ import { AuthForm } from './components/AuthForm';
 import { Dashboard } from './components/Dashboard';
 import { Loader } from 'lucide-react';
 
-type View = 'landing' | 'auth' | 'dashboard';
+type View = 'landing' | 'auth' | 'dashboard' | 'browse';
 
 function App() {
   const [session, setSession] = useState<any>(null);
@@ -39,6 +39,10 @@ function App() {
     setView('auth');
   };
 
+  const handleBrowseAsGuest = () => {
+    setView('browse');
+  };
+
   const handleBackToLanding = () => {
     setView('landing');
   };
@@ -56,10 +60,14 @@ function App() {
   }
 
   if (view === 'auth') {
-    return <AuthForm onSuccess={() => { }} onBack={handleBackToLanding} />;
+    return <AuthForm onSuccess={() => setView('dashboard')} onBack={handleBackToLanding} />;
   }
 
-  return <LandingPage onNavigateToAuth={handleNavigateToAuth} />;
+  if (view === 'browse') {
+    return <Dashboard isGuestMode={true} onNavigateToAuth={handleNavigateToAuth} onBackToLanding={handleBackToLanding} />;
+  }
+
+  return <LandingPage onNavigateToAuth={handleNavigateToAuth} onBrowseAsGuest={handleBrowseAsGuest} />;
 }
 
 export default App;

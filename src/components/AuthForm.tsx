@@ -40,8 +40,12 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
         if (error) throw error;
       }
       onSuccess();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred');
+      }
     } finally {
       setLoading(false);
     }
@@ -143,6 +147,42 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
           >
             {isLogin ? "Nie masz konta? Zarejestruj się" : 'Masz już konto? Zaloguj się'}
           </button>
+
+          {/**
+           * Developer Shortcut Panel
+           * 
+           * This section is only visible in development mode (import.meta.env.DEV).
+           * It provides a quick way to auto-fill login credentials for testing purposes.
+           * 
+           * Environment Variables (optional):
+           * - VITE_TEST_EMAIL: Email address for test user (default: 'test@zrozoomai.pl')
+           * - VITE_TEST_PASSWORD: Password for test user (default: '123TesT456')
+           * 
+           * To configure custom test credentials, add these to your .env file:
+           * ```
+           * VITE_TEST_EMAIL=your-test-email@example.com
+           * VITE_TEST_PASSWORD=your-test-password
+           * ```
+           * 
+           * Note: This feature is automatically removed in production builds.
+           */}
+          {import.meta.env.DEV && (
+            <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+              <div className="text-xs font-bold text-yellow-800 uppercase mb-2">
+                🚧 Developer Mode Only
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail(import.meta.env.VITE_TEST_EMAIL || '');
+                  setPassword(import.meta.env.VITE_TEST_PASSWORD || '');
+                }}
+                className="w-full bg-yellow-100 text-yellow-800 py-2 px-4 rounded border border-yellow-300 hover:bg-yellow-200 text-sm font-medium transition-colors"
+              >
+                Auto-fill Test User
+              </button>
+            </div>
+          )}
         </form>
       </div>
     </div>

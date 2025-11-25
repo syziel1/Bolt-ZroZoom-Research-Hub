@@ -5,6 +5,7 @@ import { BookOpen, Library, Layers, TrendingUp, Award, ArrowRight } from 'lucide
 
 type LandingPageProps = {
   onNavigateToAuth: () => void;
+  onBrowseAsGuest: () => void;
 };
 
 type Stats = {
@@ -13,7 +14,7 @@ type Stats = {
   levelsCount: number;
 };
 
-export function LandingPage({ onNavigateToAuth }: LandingPageProps) {
+export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPageProps) {
   const [stats, setStats] = useState<Stats>({ resourcesCount: 0, subjectsCount: 0, levelsCount: 0 });
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [latestResources, setLatestResources] = useState<Resource[]>([]);
@@ -202,10 +203,10 @@ export function LandingPage({ onNavigateToAuth }: LandingPageProps) {
 
           <div className="text-center mt-12">
             <button
-              onClick={onNavigateToAuth}
+              onClick={onBrowseAsGuest}
               className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-all hover:scale-105 shadow-lg inline-flex items-center gap-2"
             >
-              Zaloguj się, aby zobaczyć więcej
+              Przeglądaj materiały jako gość
               <ArrowRight size={20} />
             </button>
           </div>
