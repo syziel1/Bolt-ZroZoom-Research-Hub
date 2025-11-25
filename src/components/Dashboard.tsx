@@ -96,6 +96,8 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
     console.log('Topic clicked:', topicName);
   };
 
+  const [editingResource, setEditingResource] = useState<Resource | null>(null);
+
   const handleCardClick = (resource: Resource) => {
     setSelectedResource(resource);
     setIsDetailModalOpen(true);
@@ -104,6 +106,17 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
   const handleCloseDetailModal = () => {
     setIsDetailModalOpen(false);
     setSelectedResource(null);
+  };
+
+  const handleEditResource = (resource: Resource) => {
+    setEditingResource(resource);
+    setIsDetailModalOpen(false);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseAddModal = () => {
+    setIsModalOpen(false);
+    setEditingResource(null);
   };
 
   const filteredResources = resources.filter((resource) => {
@@ -388,11 +401,12 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
       {!isGuestMode && (
         <AddResourceModal
           isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onClose={handleCloseAddModal}
           onSuccess={loadData}
           subjects={subjects}
           topics={topicNodes}
           levels={levels}
+          initialData={editingResource}
         />
       )}
 
@@ -402,6 +416,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
         resource={selectedResource}
         onResourceUpdated={loadData}
         isGuestMode={isGuestMode}
+        onEdit={handleEditResource}
       />
     </div>
   );

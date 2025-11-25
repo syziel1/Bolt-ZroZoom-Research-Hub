@@ -9,6 +9,7 @@ type ResourceDetailModalProps = {
   resource: Resource | null;
   onResourceUpdated: () => void;
   isGuestMode?: boolean;
+  onEdit?: (resource: Resource) => void;
 };
 
 type Rating = {
@@ -38,7 +39,7 @@ const typeIcons: Record<string, any> = {
   tool: Wrench,
 };
 
-export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdated, isGuestMode = false }: ResourceDetailModalProps) {
+export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdated, isGuestMode = false, onEdit }: ResourceDetailModalProps) {
   const [ratings, setRatings] = useState<Rating[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -266,7 +267,10 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
             </div>
             {canEdit && (
               <div className="flex gap-2">
-                <button className="text-blue-600 hover:text-blue-800 p-2">
+                <button
+                  onClick={() => onEdit?.(resource)}
+                  className="text-blue-600 hover:text-blue-800 p-2"
+                >
                   <Edit size={20} />
                 </button>
                 <button

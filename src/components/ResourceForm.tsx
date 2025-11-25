@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { X } from 'lucide-react';
-import { supabase, Subject, Topic, Level } from '../lib/supabase';
+import { supabase, Subject, Topic, Level, Resource } from '../lib/supabase';
 import { uploadResourceThumbnail } from '../lib/storage';
 import { ThumbnailUploader } from './ThumbnailUploader';
 
@@ -10,26 +10,74 @@ type ResourceFormProps = {
   levels: Level[];
   onSuccess: () => void;
   onCancel: () => void;
+  initialData?: Resource | null;
 };
 
-export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel }: ResourceFormProps) {
-  const [title, setTitle] = useState('');
-  const [url, setUrl] = useState('');
-  const [type, setType] = useState('article');
-  const [description, setDescription] = useState('');
-  const [subjectId, setSubjectId] = useState('');
+export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, initialData }: ResourceFormProps) {
+  const [title, setTitle] = useState(initialData?.title || '');
+  const [url, setUrl] = useState(initialData?.url || '');
+  const [type, setType] = useState(initialData?.type || 'article');
+  const [description, setDescription] = useState(initialData?.description || '');
+  const [subjectId, setSubjectId] = useState(initialData?.subject_id || '');
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
-  const [language, setLanguage] = useState('pl');
-  const [aiGenerated, setAiGenerated] = useState(false);
+  const [language, setLanguage] = useState(initialData?.language || 'pl');
+  const [aiGenerated, setAiGenerated] = useState(initialData?.ai_generated || false);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
-  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(initialData?.thumbnail_url || null);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
   const filteredTopics = useMemo(() => (subjectId ? topics.filter((t) => t.subject_id === subjectId) : []), [subjectId, topics]);
+
+  // Update state when initialData changes (e.g., switching from add to edit mode)
+  useEffect(() => {
+    setTitle(initialData?.title || '');
+    setUrl(initialData?.url || '');
+    setType(initialData?.type || 'article');
+    setDescription(initialData?.description || '');
+    setSubjectId(initialData?.subject_id || '');
+    setLanguage(initialData?.language || 'pl');
+    setAiGenerated(initialData?.ai_generated || false);
+    setThumbnailPreview(initialData?.thumbnail_url || null);
+    setThumbnailFile(null);
+    setSelectedTopics([]);
+    setSelectedLevels([]);
+  }, [initialData]);
+
+  useEffect(() => {
+    if (initialData) {
+      let isMounted = true;
+
+      // Load initial relations
+      const loadRelations = async () => {
+        const { data: topicData } = await supabase
+          .from('resource_topics')
+          .select('topic_id')
+          .eq('resource_id', initialData.id);
+
+        if (isMounted && topicData) {
+          setSelectedTopics(topicData.map(t => t.topic_id));
+        }
+
+        const { data: levelData } = await supabase
+          .from('resource_levels')
+          .select('level_id')
+          .eq('resource_id', initialData.id);
+
+        if (isMounted && levelData) {
+          setSelectedLevels(levelData.map(l => l.level_id));
+        }
+      };
+      loadRelations();
+
+      return () => {
+        isMounted = false;
+      };
+    }
+  }, [initialData]);
 
   const resetForm = () => {
     setTitle('');
@@ -67,27 +115,59 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel }: 
       } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { data: resource, error: resourceError } = await supabase
-        .from('resources')
-        .insert({
-          title,
-          url,
-          type,
-          description,
-          subject_id: subjectId,
-          contributor_id: user.id,
-          author: user.user_metadata?.nick || user.email?.split('@')[0] || 'Anonymous',
-          language,
-          ai_generated: aiGenerated,
-        })
-        .select()
-        .single();
+      let resourceId = initialData?.id;
 
-      if (resourceError) throw resourceError;
+      if (initialData) {
+        // Update existing resource
+        const { error: updateError } = await supabase
+          .from('resources')
+          .update({
+            title,
+            url,
+            type,
+            description,
+            subject_id: subjectId,
+            language,
+            ai_generated: aiGenerated,
+          })
+          .eq('id', initialData.id);
+
+        if (updateError) throw updateError;
+      } else {
+        // Create new resource
+        const { data: resource, error: insertError } = await supabase
+          .from('resources')
+          .insert({
+            title,
+            url,
+            type,
+            description,
+            subject_id: subjectId,
+            contributor_id: user.id,
+            author: user.user_metadata?.nick || user.email?.split('@')[0] || 'Anonymous',
+            language,
+            ai_generated: aiGenerated,
+          })
+          .select()
+          .single();
+
+        if (insertError) throw insertError;
+        resourceId = resource.id;
+      }
+
+      if (!resourceId) throw new Error('Failed to get resource ID');
+
+      // Update relations (delete all and re-insert for simplicity)
+      // Note: For updates, we always delete existing relations first, then re-insert selected ones (if any).
+      // For creates, there are no existing relations to delete, so we skip directly to inserting.
+      if (initialData) {
+        await supabase.from('resource_topics').delete().eq('resource_id', resourceId);
+        await supabase.from('resource_levels').delete().eq('resource_id', resourceId);
+      }
 
       if (selectedTopics.length > 0) {
         const topicRelations = selectedTopics.map((topicId) => ({
-          resource_id: resource.id,
+          resource_id: resourceId,
           topic_id: topicId,
         }));
         const { error: topicsError } = await supabase.from('resource_topics').insert(topicRelations);
@@ -96,7 +176,7 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel }: 
 
       if (selectedLevels.length > 0) {
         const levelRelations = selectedLevels.map((levelId) => ({
-          resource_id: resource.id,
+          resource_id: resourceId,
           level_id: levelId,
         }));
         const { error: levelsError } = await supabase.from('resource_levels').insert(levelRelations);
@@ -105,11 +185,11 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel }: 
 
       if (thumbnailFile) {
         setUploading(true);
-        await uploadResourceThumbnail(resource.id, thumbnailFile);
+        await uploadResourceThumbnail(resourceId, thumbnailFile);
       }
 
-      setSuccessMessage('Zasób został zapisany.');
-      resetForm();
+      setSuccessMessage(initialData ? 'Zasób został zaktualizowany.' : 'Zasób został zapisany.');
+      if (!initialData) resetForm();
       onSuccess();
       onCancel();
     } catch (err: unknown) {
@@ -123,7 +203,7 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel }: 
   return (
     <form onSubmit={handleSubmit} className="p-6 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-gray-900">Dodaj nowy zasób</h2>
+        <h2 className="text-xl font-bold text-gray-900">{initialData ? 'Edytuj zasób' : 'Dodaj nowy zasób'}</h2>
         <button
           type="button"
           onClick={onCancel}
@@ -343,7 +423,7 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel }: 
           disabled={loading}
           className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400"
         >
-          {loading ? 'Zapisywanie...' : 'Zapisz zasób'}
+          {loading ? 'Zapisywanie...' : (initialData ? 'Zaktualizuj zasób' : 'Zapisz zasób')}
         </button>
         <button
           type="button"
