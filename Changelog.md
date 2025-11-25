@@ -8,10 +8,8 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 - ThumbnailUploader component for drag & drop image uploads.
 - `uploadResourceThumbnail` logic in the service layer.
 - Image display handling in `ResourceCard`.
-
-### Required (To be done in Supabase)
-- Create `resource-thumbnails` bucket (public).
-- Add `thumbnail_path` column to `resources` table.
+- Supabase: `resource-thumbnails` bucket (public).
+- Supabase: `thumbnail_path` column in `resources` table.
 
 ## [1.1.0] - 2025-11-25
 ### Added
