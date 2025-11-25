@@ -60,6 +60,7 @@ function TopicItem({ node, selectedTopics, onTopicToggle, level = 0 }: TopicItem
                         onChange={() => onTopicToggle(node.id)}
                         className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 flex-shrink-0"
                         onClick={(e) => e.stopPropagation()}
+                        aria-label={node.name}
                     />
                     <span className={`text-sm truncate ${isSelected ? 'text-blue-700 font-medium' : 'text-gray-700'}`}>
                         {node.name}

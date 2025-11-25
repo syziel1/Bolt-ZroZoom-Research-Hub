@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase, TopicNode, TopicRow } from '../lib/supabase';
+import { supabase, TopicNode, Topic } from '../lib/supabase';
 import { buildTopicTree } from '../utils/topicTree';
 
 export function useTopics(subjectId: string | null) {
@@ -27,7 +27,7 @@ export function useTopics(subjectId: string | null) {
 
                 if (error) throw error;
 
-                const tree = buildTopicTree(data as TopicRow[]);
+                const tree = buildTopicTree(data as Topic[]);
                 setTopics(tree);
             } catch (err: any) {
                 console.error('Error fetching topics:', err);

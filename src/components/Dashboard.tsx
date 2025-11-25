@@ -30,6 +30,11 @@ export function Dashboard() {
     loadUserProfile();
   }, []);
 
+  // Clear selected topics when subject changes since topics are subject-specific
+  useEffect(() => {
+    setSelectedTopics([]);
+  }, [selectedSubject]);
+
   const loadUserProfile = async () => {
     const {
       data: { user },
