@@ -4,16 +4,16 @@
 
 ## 📋 Spis treści
 
-- [O projekcie](#o-projekcie)
-- [Funkcjonalności](#funkcjonalności)
-- [Stack technologiczny](#stack-technologiczny)
-- [Instalacja](#instalacja)
-- [Konfiguracja](#konfiguracja)
-- [Uruchomienie](#uruchomienie)
-- [Struktura projektu](#struktura-projektu)
-- [Baza danych](#baza-danych)
-- [Developer Tools](#developer-tools)
-- [Dokumentacja](#dokumentacja)
+- [O projekcie](#-o-projekcie)
+- [Funkcjonalności](#-funkcjonalności)
+- [Stack technologiczny](#-stack-technologiczny)
+- [Instalacja](#-instalacja)
+- [Konfiguracja](#-konfiguracja)
+- [Uruchomienie](#-uruchomienie)
+- [Struktura projektu](#-struktura-projektu)
+- [Baza danych](#-baza-danych)
+- [Developer Tools](#-developer-tools)
+- [Dokumentacja](#-dokumentacja)
 
 ## 🎯 O projekcie
 
