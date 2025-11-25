@@ -86,7 +86,7 @@ function TopicItem({ node, selectedTopics, onTopicToggle, level = 0 }: TopicItem
 
 export function TopicTree({ nodes, selectedTopics, onTopicToggle }: TopicTreeProps) {
     if (nodes.length === 0) {
-        return <div className="text-sm text-gray-500 px-4 py-2">Brak tematów dla tego przedmiotu</div>;
+        return <div className="text-sm text-gray-500 px-4 py-2">No topics for this subject</div>;
     }
 
     return (

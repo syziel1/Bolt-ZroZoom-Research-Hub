@@ -45,6 +45,9 @@ export type Topic = {
   order_index: number | null;
 };
 
+// TopicRow is an alias for Topic used when working with database rows
+export type TopicRow = Topic;
+
 export type TopicNode = Topic & {
   children: TopicNode[];
 };

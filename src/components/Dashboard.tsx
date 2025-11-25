@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
-import { supabase, Resource, Subject, Level } from '../lib/supabase';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { supabase, Resource, Subject, Level, TopicNode } from '../lib/supabase';
 import { useTopics } from '../hooks/useTopics';
 import { Sidebar } from './Sidebar';
 import { ResourceCard } from './ResourceCard';
@@ -98,6 +98,21 @@ export function Dashboard() {
     setSelectedResource(null);
   };
 
+  // Helper to flatten tree and find topic names by IDs
+  const findTopicNames = useCallback((nodes: TopicNode[], ids: string[]): string[] => {
+    let names: string[] = [];
+    for (const node of nodes) {
+      if (ids.includes(node.id)) names.push(node.name);
+      if (node.children) names = [...names, ...findTopicNames(node.children, ids)];
+    }
+    return names;
+  }, []);
+
+  // Memoize selected topic names to avoid recalculating on every filter iteration
+  const selectedTopicNames = useMemo(() => {
+    return findTopicNames(topicNodes, selectedTopics);
+  }, [topicNodes, selectedTopics, findTopicNames]);
+
   const filteredResources = resources.filter((resource) => {
     if (selectedSubject) {
       const subject = subjects.find((s) => s.subject_id === selectedSubject);
@@ -107,19 +122,7 @@ export function Dashboard() {
     }
 
     if (selectedTopics.length > 0) {
-      // Helper to flatten tree to find names
-      const findTopicNames = (nodes: TopicNode[], ids: string[]): string[] => {
-        let names: string[] = [];
-        for (const node of nodes) {
-          if (ids.includes(node.id)) names.push(node.name);
-          if (node.children) names = [...names, ...findTopicNames(node.children, ids)];
-        }
-        return names;
-      };
-
-      const resourceTopics = findTopicNames(topicNodes, selectedTopics);
-
-      const hasMatchingTopic = resourceTopics.some((topicName) =>
+      const hasMatchingTopic = selectedTopicNames.some((topicName) =>
         resource.topic_names?.includes(topicName)
       );
       if (!hasMatchingTopic) return false;
