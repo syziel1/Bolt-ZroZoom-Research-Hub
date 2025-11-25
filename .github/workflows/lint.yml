@@ -26,10 +26,21 @@ jobs:
         with:
           fetch-depth: 0 # Pobierz całą historię, potrzebne do Super-Lintera
 
-      # Krok 2: Uruchomienie Super-Lintera
+      # Krok 2: Uruchomienie Super-Lintera (tylko dla innych plików)
       - name: Run Super-Linter
-        uses: github/super-linter@v6 # Używamy gotowej akcji od GitHuba
+        uses: github/super-linter@v6
         env:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VALIDATE_ALL_CODEBASE: 'false' # Sprawdzaj tylko zmienione pliki w PR
+          VALIDATE_ALL_CODEBASE: 'false'
+          VALIDATE_TYPESCRIPT_ES: 'false'
+          VALIDATE_TYPESCRIPT_STANDARD: 'false'
+          VALIDATE_TSX: 'false'
+
+      # Krok 3: Instalacja zależności
+      - name: Install dependencies
+        run: npm ci
+
+      # Krok 4: Uruchomienie lokalnego lintera (ESLint)
+      - name: Run local lint
+        run: npm run lint
