@@ -4,15 +4,13 @@ All notable changes to this project will be documented in this file.
 The project follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-### Added
+**Added**
 - ThumbnailUploader component for drag & drop image uploads.
 - `uploadResourceThumbnail` logic in the service layer.
 - Image display handling in `ResourceCard`.
-- Supabase: `resource-thumbnails` bucket (public).
-- Supabase: `thumbnail_path` column in `resources` table.
 
 ## [1.1.0] - 2025-11-25
-### Added
+**Added**
 - Landing Page: public home with hero section, stats, and subject tiles.
 - Guest Mode: browse the database without logging in.
 - Admin Panel: GUI for managing subjects, topics, and levels.
@@ -24,7 +22,7 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 - `ResourceDetailModal`: added role-based access (edit only for author or admin).
 
 ## [1.0.0] - 2025-11-24 (MVP)
-### Added
+**Added**
 - Core: Supabase integration (auth, database).
 - Dashboard: main view with client-side filtering by subject, topic, and level.
 - Resources: adding links (YouTube, articles) with automatic author attribution.
@@ -33,6 +31,6 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 - Architecture: SQL views (`v_resources_full`) for read optimization.
 
 ## [0.1.0] - 2025-11-20
-### Added
+**Added**
 - Project initialization with Vite + React + TypeScript + Tailwind.
 - Database schema design (Entity Relationship Diagram).

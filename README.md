@@ -238,6 +238,9 @@ Aplikacja jest w pełni responsywna:
 - [`technical.md`](./technical.md) - Szczegółowa dokumentacja techniczna
 - [`docs/specyfikacja_bazy_szkola_przyszlosci.md`](./docs/specyfikacja_bazy_szkola_przyszlosci.md) - Specyfikacja bazy danych
 - [`docs/prompt_codex_resource_thumbnails.md`](./docs/prompt_codex_resource_thumbnails.md) - Dokumentacja miniatur
+- [`Changelog.md`](./Changelog.md) - Historia zmian
+- [`ROADMAP.md`](./ROADMAP.md) - Plan rozwoju
+- [`LICENSE`](./LICENSE) - Licencja MIT
 
 ### Komponenty
 

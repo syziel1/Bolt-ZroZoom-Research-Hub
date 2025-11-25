@@ -11,7 +11,7 @@ on:
     branches:
       - main # Celującego w 'main'
 
-# Jakie zadania (joby) ma wykonać?
+# Jakie zadania (jobs) ma wykonać?
 jobs:
   # Nazwa naszego zadania (to jest nazwa "status check")
   lint-code:
@@ -39,5 +39,5 @@ jobs:
           VALIDATE_TSX: false # Wyłącz - conflict with eslint.config.js
           VALIDATE_TYPESCRIPT_ES: false # Wyłącz - conflict with eslint.config.js
           VALIDATE_TYPESCRIPT_STANDARD: false # Wyłącz - parser issues
-          VALIDATE_JSON: false # Wyłącz - conflict with eslint.config.js
+#          VALIDATE_JSON: false # Wyłącz - conflict with eslint.config.js
 
