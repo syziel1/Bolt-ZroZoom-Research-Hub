@@ -40,8 +40,12 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
         if (error) throw error;
       }
       onSuccess();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred');
+      }
     } finally {
       setLoading(false);
     }
@@ -143,6 +147,24 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
           >
             {isLogin ? "Nie masz konta? Zarejestruj się" : 'Masz już konto? Zaloguj się'}
           </button>
+
+          {import.meta.env.DEV && (
+            <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+              <div className="text-xs font-bold text-yellow-800 uppercase mb-2">
+                🚧 Developer Mode Only
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail('test@zrozoomai.pl');
+                  setPassword('123TesT456');
+                }}
+                className="w-full bg-yellow-100 text-yellow-800 py-2 px-4 rounded border border-yellow-300 hover:bg-yellow-200 text-sm font-medium transition-colors"
+              >
+                Auto-fill Test User
+              </button>
+            </div>
+          )}
         </form>
       </div>
     </div>
