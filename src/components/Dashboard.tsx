@@ -108,7 +108,7 @@ export function Dashboard() {
 
     if (selectedTopics.length > 0) {
       // Helper to flatten tree to find names
-      const findTopicNames = (nodes: any[], ids: string[]): string[] => {
+      const findTopicNames = (nodes: TopicNode[], ids: string[]): string[] => {
         let names: string[] = [];
         for (const node of nodes) {
           if (ids.includes(node.id)) names.push(node.name);
