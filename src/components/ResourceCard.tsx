@@ -3,10 +3,13 @@ import { Resource } from '../lib/supabase';
 import { getThumbnailUrl } from '../lib/storage';
 import { Video, FileText, Presentation, Beaker, Wrench, Star, ExternalLink, ImageIcon } from 'lucide-react';
 
+export type ResourceCardVariant = 'default' | 'hero' | 'list';
+
 type ResourceCardProps = {
   resource: Resource;
   onTopicClick?: (topicName: string) => void;
   onCardClick?: (resource: Resource) => void;
+  variant?: ResourceCardVariant;
 };
 
 const typeIcons: Record<string, React.ElementType> = {
@@ -19,7 +22,7 @@ const typeIcons: Record<string, React.ElementType> = {
   tool: Wrench,
 };
 
-export function ResourceCard({ resource, onTopicClick, onCardClick }: ResourceCardProps) {
+export function ResourceCard({ resource, onTopicClick, onCardClick, variant = 'default' }: ResourceCardProps) {
   const Icon = typeIcons[resource.type] || FileText;
   const thumbnailUrl = getThumbnailUrl(resource.thumbnail_path);
 
@@ -51,6 +54,117 @@ export function ResourceCard({ resource, onTopicClick, onCardClick }: ResourceCa
     e.stopPropagation();
   };
 
+  if (variant === 'hero') {
+    return (
+      <div
+        onClick={() => onCardClick?.(resource)}
+        className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-200 cursor-pointer flex flex-col h-full overflow-hidden group"
+      >
+        <div className="w-full h-48 sm:h-56 bg-gray-100 relative overflow-hidden">
+          {thumbnailUrl ? (
+            <img
+              src={thumbnailUrl}
+              alt={resource.title}
+              className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+            />
+          ) : (
+            <div className="h-full w-full flex items-center justify-center text-gray-400 bg-gradient-to-br from-gray-50 to-gray-100">
+              <ImageIcon size={48} />
+            </div>
+          )}
+          <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-lg shadow-sm">
+            <Icon size={20} className="text-blue-600" />
+          </div>
+        </div>
+
+        <div className="p-6 flex flex-col flex-1">
+          <div className="mb-4">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700">
+                {resource.subject_name}
+              </span>
+              {resource.level_names?.[0] && (
+                <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-700">
+                  {resource.level_names[0]}
+                </span>
+              )}
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+              {resource.title}
+            </h3>
+            {resource.description && (
+              <p className="text-gray-600 text-sm line-clamp-2 mb-4">
+                {resource.description}
+              </p>
+            )}
+          </div>
+
+          <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <Star
+                size={16}
+                className={`${getRatingColor(overallRating)} ${hasRatings ? 'fill-current' : ''}`}
+              />
+              <span className="text-sm font-medium text-gray-700">
+                {hasRatings ? overallRating?.toFixed(1) : '-'}
+              </span>
+            </div>
+            <div className="text-sm text-gray-500">
+              {resource.contributor_nick}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (variant === 'list') {
+    return (
+      <div
+        onClick={() => onCardClick?.(resource)}
+        className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 border border-gray-200 cursor-pointer flex gap-4 items-center"
+      >
+        <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">
+          {thumbnailUrl ? (
+            <img src={thumbnailUrl} alt={resource.title} className="w-full h-full object-cover" />
+          ) : (
+            <div className="h-full w-full flex items-center justify-center text-gray-400">
+              <ImageIcon size={20} />
+            </div>
+          )}
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <Icon size={16} className="text-blue-600" />
+            <h3 className="font-semibold text-gray-900 truncate">
+              {resource.title}
+            </h3>
+          </div>
+          <div className="flex items-center gap-3 text-sm text-gray-500">
+            <span>{resource.subject_name}</span>
+            <span>•</span>
+            <div className="flex items-center gap-1">
+              <Star size={14} className={hasRatings ? "text-yellow-400 fill-current" : "text-gray-300"} />
+              <span>{hasRatings ? overallRating?.toFixed(1) : 'Brak ocen'}</span>
+            </div>
+          </div>
+        </div>
+
+        <a
+          href={resource.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={handleLinkClick}
+          className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+        >
+          <ExternalLink size={20} />
+        </a>
+      </div>
+    );
+  }
+
+  // Default variant
   return (
     <div
       onClick={() => onCardClick?.(resource)}
