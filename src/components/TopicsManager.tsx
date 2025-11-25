@@ -342,6 +342,7 @@ export function TopicsManager() {
                                                     onClick={() => handleMove(topic.id, 'up')}
                                                     disabled={index === 0}
                                                     className="p-1 text-gray-600 hover:text-gray-900 disabled:opacity-30"
+                                                    aria-label="Przesuń w górę"
                                                 >
                                                     <ChevronUp size={16} />
                                                 </button>
@@ -349,6 +350,7 @@ export function TopicsManager() {
                                                     onClick={() => handleMove(topic.id, 'down')}
                                                     disabled={index === topics.length - 1}
                                                     className="p-1 text-gray-600 hover:text-gray-900 disabled:opacity-30"
+                                                    aria-label="Przesuń w dół"
                                                 >
                                                     <ChevronDown size={16} />
                                                 </button>
@@ -384,12 +386,14 @@ export function TopicsManager() {
                                                     <button
                                                         onClick={() => handleEdit(topic.id)}
                                                         className="text-green-600 hover:text-green-900"
+                                                        aria-label="Zapisz"
                                                     >
                                                         <Save size={16} />
                                                     </button>
                                                     <button
                                                         onClick={cancelEdit}
                                                         className="text-gray-600 hover:text-gray-900"
+                                                        aria-label="Anuluj"
                                                     >
                                                         <X size={16} />
                                                     </button>
@@ -399,12 +403,14 @@ export function TopicsManager() {
                                                     <button
                                                         onClick={() => startEdit(topic)}
                                                         className="text-blue-600 hover:text-blue-900"
+                                                        aria-label="Edytuj temat"
                                                     >
                                                         <Edit size={16} />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDeleteClick(topic.id, topic.name)}
                                                         className="text-red-600 hover:text-red-900"
+                                                        aria-label="Usuń temat"
                                                     >
                                                         <Trash2 size={16} />
                                                     </button>
