@@ -1,8 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
-import { generateSlug } from '../lib/utils';
-import { Plus, Edit, Trash2, ChevronUp, ChevronDown, Save, X } from 'lucide-react';
+import { Plus, Save, X } from 'lucide-react';
 import { ConfirmationModal } from './ConfirmationModal';
+import { useEntityManager } from '../hooks/useEntityManager';
+import { useOrderManagement } from '../hooks/useOrderManagement';
+import { EntityFormFields } from './shared/EntityFormFields';
+import { EntityTable } from './shared/EntityTable';
+import { OrderButtons } from './shared/OrderButtons';
+import { ActionButtons } from './shared/ActionButtons';
 
 type Topic = {
     id: string;
@@ -18,18 +23,11 @@ type Subject = {
 };
 
 export function TopicsManager() {
-    const [topics, setTopics] = useState<Topic[]>([]);
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [selectedSubjectId, setSelectedSubjectId] = useState<string>('');
-    const [loading, setLoading] = useState(true);
-    const [editingId, setEditingId] = useState<string | null>(null);
-    const [isAdding, setIsAdding] = useState(false);
-    const [formData, setFormData] = useState({ name: '', slug: '', subject_id: '' });
-    const [error, setError] = useState('');
-    const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
+    const [subjectsLoading, setSubjectsLoading] = useState(true);
 
-
-
+    // Load subjects for the dropdown
     const loadSubjects = useCallback(async () => {
         try {
             const { data, error } = await supabase
@@ -39,30 +37,15 @@ export function TopicsManager() {
 
             if (error) throw error;
             setSubjects(data || []);
+
+            // Auto-select first subject if none selected
+            if (data && data.length > 0 && !selectedSubjectId) {
+                setSelectedSubjectId(data[0].id);
+            }
         } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'An unknown error occurred');
+            console.error('Error loading subjects:', err);
         } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    const loadTopics = useCallback(async () => {
-        if (!selectedSubjectId) return;
-
-        setLoading(true);
-        try {
-            const { data, error } = await supabase
-                .from('topics')
-                .select('*')
-                .eq('subject_id', selectedSubjectId)
-                .order('order_index');
-
-            if (error) throw error;
-            setTopics(data || []);
-        } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'An unknown error occurred');
-        } finally {
-            setLoading(false);
+            setSubjectsLoading(false);
         }
     }, [selectedSubjectId]);
 
@@ -70,156 +53,48 @@ export function TopicsManager() {
         loadSubjects();
     }, [loadSubjects]);
 
-    useEffect(() => {
-        if (selectedSubjectId) {
-            loadTopics();
-        }
-    }, [selectedSubjectId, loadTopics]);
+    const {
+        entities: topics,
+        error,
+        setError,
+        formData,
+        setFormData,
+        editingId,
+        isAdding,
+        setIsAdding,
+        deleteConfirm,
+        setDeleteConfirm,
+        handleAdd,
+        handleEdit,
+        handleDeleteClick,
+        handleDeleteConfirm,
+        startEdit,
+        cancelEdit,
+        loadEntities,
+    } = useEntityManager<Topic>({
+        tableName: 'topics',
+        dependencyCheck: {
+            table: 'resource_topics',
+            column: 'topic_id',
+            errorMessage: (name, count) => `Nie można usunąć tematu "${name}" - ma przypisane zasoby (${count})`,
+        },
+        filterBy: {
+            column: 'subject_id',
+            value: selectedSubjectId,
+        },
+        additionalFields: ['subject_id'],
+    });
 
-    useEffect(() => {
-        if (subjects.length > 0 && !selectedSubjectId) {
-            setSelectedSubjectId(subjects[0].id);
-        }
-    }, [subjects, selectedSubjectId]);
+    const { handleMove } = useOrderManagement<Topic>({
+        rpcFunctionName: 'swap_topics_order',
+        idParam1Name: 'topic1_id',
+        idParam2Name: 'topic2_id',
+        entities: topics,
+        onError: setError,
+        onReload: loadEntities,
+    });
 
-    const handleAdd = async () => {
-        setError('');
-        if (!formData.name.trim()) {
-            setError('Nazwa jest wymagana');
-            return;
-        }
-
-        try {
-            const slug = formData.slug ? generateSlug(formData.slug) : generateSlug(formData.name);
-            const maxOrder = Math.max(...topics.map(t => t.order_index), -1);
-
-            const { error } = await supabase
-                .from('topics')
-                .insert({
-                    name: formData.name.trim(),
-                    slug,
-                    subject_id: selectedSubjectId,
-                    order_index: maxOrder + 1
-                });
-
-            if (error) throw error;
-
-            setFormData({ name: '', slug: '', subject_id: '' });
-            setIsAdding(false);
-            loadTopics();
-        } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'An unknown error occurred');
-        }
-    };
-
-    const handleEdit = async (id: string) => {
-        setError('');
-        if (!formData.name.trim()) {
-            setError('Nazwa jest wymagana');
-            return;
-        }
-
-        try {
-            const slug = formData.slug ? generateSlug(formData.slug) : generateSlug(formData.name);
-
-            const { error } = await supabase
-                .from('topics')
-                .update({
-                    name: formData.name.trim(),
-                    slug,
-                    subject_id: formData.subject_id || selectedSubjectId
-                })
-                .eq('id', id);
-
-            if (error) throw error;
-
-            setEditingId(null);
-            setFormData({ name: '', slug: '', subject_id: '' });
-            loadTopics();
-        } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'An unknown error occurred');
-        }
-    };
-
-    const handleDeleteClick = (id: string, name: string) => {
-        setDeleteConfirm({ id, name });
-    };
-
-    const handleDeleteConfirm = async () => {
-        if (!deleteConfirm) return;
-
-        const { id, name } = deleteConfirm;
-        setDeleteConfirm(null);
-        setError('');
-
-        try {
-            // Check if topic has resources
-            const { count } = await supabase
-                .from('resource_topics')
-                .select('*', { count: 'exact', head: true })
-                .eq('topic_id', id);
-
-            if (count && count > 0) {
-                setError(`Nie można usunąć tematu "${name}" - ma przypisane zasoby (${count})`);
-                return;
-            }
-
-            const { error } = await supabase
-                .from('topics')
-                .delete()
-                .eq('id', id);
-
-            if (error) throw error;
-            loadTopics();
-        } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'An unknown error occurred');
-        }
-    };
-
-    const handleMove = async (id: string, direction: 'up' | 'down') => {
-        setError('');
-        const index = topics.findIndex(t => t.id === id);
-        if (index === -1) return;
-        if (direction === 'up' && index === 0) return;
-        if (direction === 'down' && index === topics.length - 1) return;
-
-        const swapIndex = direction === 'up' ? index - 1 : index + 1;
-        const topic1 = topics[index];
-        const topic2 = topics[swapIndex];
-
-        try {
-            // Use atomic RPC function to swap order indices
-            const { error } = await supabase.rpc('swap_topics_order', {
-                topic1_id: topic1.id,
-                topic2_id: topic2.id
-            });
-
-            if (error) {
-                setError(`Nie udało się przesunąć tematu: ${error.message}`);
-                return;
-            }
-
-            // Reload topics to reflect the change
-            loadTopics();
-        } catch (err: unknown) {
-            setError(`Wystąpił błąd podczas przesuwania tematu: ${err instanceof Error ? err.message : 'Nieznany błąd'}`);
-            loadTopics(); // Reload to ensure UI is in sync with database
-        }
-    };
-
-    const startEdit = (topic: Topic) => {
-        setEditingId(topic.id);
-        setFormData({ name: topic.name, slug: topic.slug, subject_id: topic.subject_id });
-        setIsAdding(false);
-    };
-
-    const cancelEdit = () => {
-        setEditingId(null);
-        setIsAdding(false);
-        setFormData({ name: '', slug: '', subject_id: '' });
-    };
-
-    if (loading && subjects.length === 0) {
+    if (subjectsLoading) {
         return <div className="text-center py-8">Ładowanie...</div>;
     }
 
@@ -263,157 +138,90 @@ export function TopicsManager() {
             {isAdding && selectedSubjectId && (
                 <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                     <h3 className="font-semibold mb-3">Nowy Temat</h3>
-                    <div className="space-y-3">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Nazwa *</label>
-                            <input
-                                type="text"
-                                value={formData.name}
-                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                placeholder="np. Algebra"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Slug (opcjonalnie)
-                            </label>
-                            <input
-                                type="text"
-                                value={formData.slug}
-                                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                placeholder="np. algebra"
-                            />
-                        </div>
-                        <div className="flex gap-2">
-                            <button
-                                onClick={handleAdd}
-                                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center gap-2"
-                            >
-                                <Save size={16} />
-                                Zapisz
-                            </button>
-                            <button
-                                onClick={cancelEdit}
-                                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 flex items-center gap-2"
-                            >
-                                <X size={16} />
-                                Anuluj
-                            </button>
-                        </div>
+                    <EntityFormFields
+                        formData={formData}
+                        onChange={setFormData}
+                        namePlaceholder="np. Algebra"
+                        slugPlaceholder="np. algebra"
+                    />
+                    <div className="flex gap-2 mt-3">
+                        <button
+                            onClick={handleAdd}
+                            className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center gap-2"
+                        >
+                            <Save size={16} />
+                            Zapisz
+                        </button>
+                        <button
+                            onClick={cancelEdit}
+                            className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 flex items-center gap-2"
+                        >
+                            <X size={16} />
+                            Anuluj
+                        </button>
                     </div>
                 </div>
             )}
 
             {selectedSubjectId && (
-                <div className="bg-white rounded-lg shadow overflow-hidden">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kolejność</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nazwa</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Slug</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Akcje</th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {topics.length === 0 ? (
-                                <tr>
-                                    <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
-                                        Brak tematów dla tego przedmiotu
-                                    </td>
-                                </tr>
-                            ) : (
-                                topics.map((topic, index) => (
-                                    <tr key={topic.id}>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="flex gap-1">
-                                                <button
-                                                    onClick={() => handleMove(topic.id, 'up')}
-                                                    disabled={index === 0}
-                                                    className="p-1 text-gray-600 hover:text-gray-900 disabled:opacity-30"
-                                                    aria-label="Przesuń w górę"
-                                                >
-                                                    <ChevronUp size={16} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleMove(topic.id, 'down')}
-                                                    disabled={index === topics.length - 1}
-                                                    className="p-1 text-gray-600 hover:text-gray-900 disabled:opacity-30"
-                                                    aria-label="Przesuń w dół"
-                                                >
-                                                    <ChevronDown size={16} />
-                                                </button>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            {editingId === topic.id ? (
-                                                <input
-                                                    type="text"
-                                                    value={formData.name}
-                                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                                    className="w-full px-2 py-1 border border-gray-300 rounded"
-                                                />
-                                            ) : (
-                                                <span className="text-sm font-medium text-gray-900">{topic.name}</span>
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            {editingId === topic.id ? (
-                                                <input
-                                                    type="text"
-                                                    value={formData.slug}
-                                                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                                                    className="w-full px-2 py-1 border border-gray-300 rounded"
-                                                />
-                                            ) : (
-                                                <span className="text-sm text-gray-500">{topic.slug}</span>
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            {editingId === topic.id ? (
-                                                <div className="flex gap-2 justify-end">
-                                                    <button
-                                                        onClick={() => handleEdit(topic.id)}
-                                                        className="text-green-600 hover:text-green-900"
-                                                        aria-label="Zapisz"
-                                                    >
-                                                        <Save size={16} />
-                                                    </button>
-                                                    <button
-                                                        onClick={cancelEdit}
-                                                        className="text-gray-600 hover:text-gray-900"
-                                                        aria-label="Anuluj"
-                                                    >
-                                                        <X size={16} />
-                                                    </button>
-                                                </div>
-                                            ) : (
-                                                <div className="flex gap-2 justify-end">
-                                                    <button
-                                                        onClick={() => startEdit(topic)}
-                                                        className="text-blue-600 hover:text-blue-900"
-                                                        aria-label="Edytuj temat"
-                                                    >
-                                                        <Edit size={16} />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDeleteClick(topic.id, topic.name)}
-                                                        className="text-red-600 hover:text-red-900"
-                                                        aria-label="Usuń temat"
-                                                    >
-                                                        <Trash2 size={16} />
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                <EntityTable
+                    entities={topics}
+                    columns={[
+                        {
+                            key: 'name',
+                            label: 'Nazwa',
+                            render: (entity, isEditing, formData, onFormChange) =>
+                                isEditing ? (
+                                    <input
+                                        type="text"
+                                        value={formData.name}
+                                        onChange={(e) => onFormChange({ ...formData, name: e.target.value })}
+                                        className="w-full px-2 py-1 border border-gray-300 rounded"
+                                    />
+                                ) : (
+                                    <span className="text-sm font-medium text-gray-900">{entity.name}</span>
+                                ),
+                        },
+                        {
+                            key: 'slug',
+                            label: 'Slug',
+                            render: (entity, isEditing, formData, onFormChange) =>
+                                isEditing ? (
+                                    <input
+                                        type="text"
+                                        value={formData.slug}
+                                        onChange={(e) => onFormChange({ ...formData, slug: e.target.value })}
+                                        className="w-full px-2 py-1 border border-gray-300 rounded"
+                                    />
+                                ) : (
+                                    <span className="text-sm text-gray-500">{entity.slug}</span>
+                                ),
+                        },
+                    ]}
+                    editingId={editingId}
+                    formData={formData}
+                    onFormChange={setFormData}
+                    renderOrderButtons={(topic, index) => (
+                        <OrderButtons
+                            onMoveUp={() => handleMove(topic.id, 'up')}
+                            onMoveDown={() => handleMove(topic.id, 'down')}
+                            canMoveUp={index > 0}
+                            canMoveDown={index < topics.length - 1}
+                        />
+                    )}
+                    renderActionButtons={(topic) => (
+                        <ActionButtons
+                            mode={editingId === topic.id ? 'edit' : 'view'}
+                            onEdit={() => startEdit(topic)}
+                            onDelete={() => handleDeleteClick(topic.id, topic.name)}
+                            onSave={() => handleEdit(topic.id)}
+                            onCancel={cancelEdit}
+                            editLabel="Edytuj temat"
+                            deleteLabel="Usuń temat"
+                        />
+                    )}
+                    emptyMessage="Brak tematów dla tego przedmiotu"
+                />
             )}
 
             <ConfirmationModal

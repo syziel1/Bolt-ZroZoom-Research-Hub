@@ -183,9 +183,28 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
         if (levelsError) throw levelsError;
       }
 
+      // Upload thumbnail if file selected
       if (thumbnailFile) {
-        setUploading(true);
-        await uploadResourceThumbnail(resourceId, thumbnailFile);
+        try {
+          setUploading(true);
+          console.log('Starting thumbnail upload for resource:', resourceId);
+          console.log('File details:', {
+            name: thumbnailFile.name,
+            size: thumbnailFile.size,
+            type: thumbnailFile.type
+          });
+
+          const result = await uploadResourceThumbnail(resourceId, thumbnailFile);
+          console.log('Thumbnail upload successful:', result);
+          setSuccessMessage('Miniatura została przesłana pomyślnie.');
+        } catch (uploadError) {
+          console.error('Thumbnail upload failed:', uploadError);
+          const errorMessage = uploadError instanceof Error ? uploadError.message : 'Nie udało się przesłać miniatury.';
+          setError(`Błąd miniaturki: ${errorMessage}`);
+          // Don't throw - allow resource to be saved even if thumbnail fails
+        } finally {
+          setUploading(false);
+        }
       }
 
       setSuccessMessage(initialData ? 'Zasób został zaktualizowany.' : 'Zasób został zapisany.');
@@ -193,6 +212,7 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
       onSuccess();
       onCancel();
     } catch (err: unknown) {
+      console.error('Resource save error:', err);
       setError(err instanceof Error ? err.message : 'Wystąpił błąd podczas zapisu.');
     } finally {
       setUploading(false);
