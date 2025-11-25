@@ -1,0 +1,6 @@
+{
+    "driver": "postgres",
+    "rules": {
+        "my-sql-invalid-create-option": "off"
+    }
+}
