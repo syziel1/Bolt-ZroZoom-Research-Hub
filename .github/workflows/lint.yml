@@ -26,7 +26,6 @@ jobs:
         with:
           fetch-depth: 0 # Pobierz całą historię, potrzebne do Super-Lintera
 
-      # Krok 2: Uruchomienie Super-Lintera (tylko dla innych plików)
       - name: Run Super-Linter
         uses: github/super-linter@v6
         env:
@@ -36,6 +35,7 @@ jobs:
           VALIDATE_TYPESCRIPT_ES: 'false'
           VALIDATE_TYPESCRIPT_STANDARD: 'false'
           VALIDATE_TSX: 'false'
+          JSCPD_CONFIG_FILE: '.jscpd.json'
 
       # Krok 3: Instalacja zależności
       - name: Install dependencies
