@@ -53,13 +53,15 @@ export function Dashboard() {
         supabase.from('v_resources_full').select('*'),
         supabase.from('v_subjects_basic').select('*').order('order_index'),
         supabase.from('levels').select('*').order('order_index'),
-        supabase.from('topics').select('id', { count: 'exact', head: true }),
+        supabase.from('topics').select('*', { count: 'exact', head: true }),
       ]);
 
       if (resourcesRes.data) setResources(resourcesRes.data);
       if (subjectsRes.data) setSubjects(subjectsRes.data);
       if (levelsRes.data) setLevels(levelsRes.data);
-      setTotalTopicsCount(topicsCountRes.count ?? 0);
+      if (!topicsCountRes.error && topicsCountRes.count !== null) {
+        setTotalTopicsCount(topicsCountRes.count);
+      }
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
