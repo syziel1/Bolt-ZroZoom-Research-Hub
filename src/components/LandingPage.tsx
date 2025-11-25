@@ -29,7 +29,7 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
     try {
       const [resourcesCount, subjectsData, levelsCount, latestResourcesData] = await Promise.all([
         supabase.from('v_resources_full').select('*', { count: 'exact', head: true }),
-        supabase.from('v_subjects_basic').select('*').order('order_index'),
+        supabase.from('v_subjects_basic').select('*').order('resources_count', { ascending: false }),
         supabase.from('levels').select('*', { count: 'exact', head: true }),
         supabase
           .from('v_resources_full')
