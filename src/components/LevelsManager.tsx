@@ -33,8 +33,8 @@ export function LevelsManager() {
 
             if (error) throw error;
             setLevels(data || []);
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'An unknown error occurred');
         } finally {
             setLoading(false);
         }
@@ -85,8 +85,8 @@ export function LevelsManager() {
             setFormData({ name: '', slug: '' });
             setIsAdding(false);
             loadLevels();
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'An unknown error occurred');
         }
     };
 
@@ -113,8 +113,8 @@ export function LevelsManager() {
             setEditingId(null);
             setFormData({ name: '', slug: '' });
             loadLevels();
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'An unknown error occurred');
         }
     };
 
@@ -145,8 +145,8 @@ export function LevelsManager() {
                 setError(`Nie można usunąć poziomu "${name}" - ma przypisane zasoby (${count})`);
                 return;
             }
-        } catch (err: any) {
-            setError(`Błąd podczas sprawdzania zasobów przypisanych do poziomu "${name}": ${err.message}`);
+        } catch (err: unknown) {
+            setError(`Błąd podczas sprawdzania zasobów przypisanych do poziomu "${name}": ${err instanceof Error ? err.message : 'Nieznany błąd'}`);
             return;
         }
 
@@ -162,8 +162,8 @@ export function LevelsManager() {
                 return;
             }
             loadLevels();
-        } catch (err: any) {
-            setError(`Błąd podczas usuwania poziomu "${name}": ${err.message}`);
+        } catch (err: unknown) {
+            setError(`Błąd podczas usuwania poziomu "${name}": ${err instanceof Error ? err.message : 'Nieznany błąd'}`);
         }
     };
 
@@ -192,8 +192,8 @@ export function LevelsManager() {
 
             // Reload levels to reflect the change
             loadLevels();
-        } catch (err: any) {
-            setError(err.message || 'Wystąpił błąd podczas zmiany kolejności poziomów.');
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Wystąpił błąd podczas zmiany kolejności poziomów.');
             loadLevels(); // Reload to ensure UI is in sync with database
         }
     };

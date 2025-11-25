@@ -33,6 +33,8 @@ export type TopicNode = Topic & {
   children: TopicNode[];
 };
 
+export type TopicRow = Topic;
+
 export type Level = {
   id: string;
   name: string;

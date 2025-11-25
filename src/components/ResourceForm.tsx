@@ -112,8 +112,8 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel }: 
       resetForm();
       onSuccess();
       onCancel();
-    } catch (err: any) {
-      setError(err.message || 'Wystąpił błąd podczas zapisu.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Wystąpił błąd podczas zapisu.');
     } finally {
       setUploading(false);
       setLoading(false);

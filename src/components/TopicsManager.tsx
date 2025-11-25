@@ -49,8 +49,8 @@ export function TopicsManager() {
             if (data && data.length > 0 && !selectedSubjectId) {
                 setSelectedSubjectId(data[0].id);
             }
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'An unknown error occurred');
         } finally {
             setLoading(false);
         }
@@ -69,8 +69,8 @@ export function TopicsManager() {
 
             if (error) throw error;
             setTopics(data || []);
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'An unknown error occurred');
         } finally {
             setLoading(false);
         }
@@ -116,8 +116,8 @@ export function TopicsManager() {
             setFormData({ name: '', slug: '', subject_id: '' });
             setIsAdding(false);
             loadTopics();
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'An unknown error occurred');
         }
     };
 
@@ -145,8 +145,8 @@ export function TopicsManager() {
             setEditingId(null);
             setFormData({ name: '', slug: '', subject_id: '' });
             loadTopics();
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'An unknown error occurred');
         }
     };
 
@@ -180,8 +180,8 @@ export function TopicsManager() {
 
             if (error) throw error;
             loadTopics();
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'An unknown error occurred');
         }
     };
 
@@ -210,8 +210,8 @@ export function TopicsManager() {
 
             // Reload topics to reflect the change
             loadTopics();
-        } catch (err: any) {
-            setError(`Wystąpił błąd podczas przesuwania tematu: ${err.message}`);
+        } catch (err: unknown) {
+            setError(`Wystąpił błąd podczas przesuwania tematu: ${err instanceof Error ? err.message : 'Nieznany błąd'}`);
             loadTopics(); // Reload to ensure UI is in sync with database
         }
     };

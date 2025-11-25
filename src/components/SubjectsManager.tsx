@@ -34,8 +34,8 @@ export function SubjectsManager() {
 
             if (error) throw error;
             setSubjects(data || []);
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'An unknown error occurred');
         } finally {
             setLoading(false);
         }
@@ -87,8 +87,8 @@ export function SubjectsManager() {
             setFormData({ name: '', slug: '' });
             setIsAdding(false);
             loadSubjects();
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'An unknown error occurred');
         }
     };
 
@@ -115,8 +115,8 @@ export function SubjectsManager() {
             setEditingId(null);
             setFormData({ name: '', slug: '' });
             loadSubjects();
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'An unknown error occurred');
         }
     };
 
@@ -158,8 +158,8 @@ export function SubjectsManager() {
                 return;
             }
             loadSubjects();
-        } catch (err: any) {
-            setError(`Nieoczekiwany błąd: ${err.message}`);
+        } catch (err: unknown) {
+            setError(`Nieoczekiwany błąd: ${err instanceof Error ? err.message : 'Nieznany błąd'}`);
         }
     };
 
@@ -188,8 +188,8 @@ export function SubjectsManager() {
 
             // Reload subjects to reflect the change
             loadSubjects();
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'An unknown error occurred');
             loadSubjects(); // Reload to ensure UI is in sync with database
         }
     };
