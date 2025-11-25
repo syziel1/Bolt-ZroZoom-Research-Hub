@@ -9,7 +9,7 @@ permissions:
 on:
   pull_request: # Oraz przy każdym otwarciu/aktualizacji Pull Requesta
     branches:
-      - main # Celującego w 'main'
+      - main # Celujących w 'main'
 
 # Jakie zadania (jobs) ma wykonać?
 jobs:
