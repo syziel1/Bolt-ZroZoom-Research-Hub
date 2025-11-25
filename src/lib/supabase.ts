@@ -45,7 +45,7 @@ export type Topic = {
   order_index: number | null;
 };
 
-// Alias for Topic - used when working with raw database rows
+// Alias for Topic type - used for compatibility with legacy code
 export type TopicRow = Topic;
 
 export type TopicNode = Topic & {

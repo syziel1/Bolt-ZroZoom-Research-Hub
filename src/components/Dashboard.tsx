@@ -121,9 +121,10 @@ export function Dashboard() {
 
     if (selectedTopics.length > 0) {
       // Use memoized map for O(1) lookups instead of tree traversal
-      const selectedTopicNames = selectedTopics
-        .map((id) => topicIdToNameMap.get(id))
-        .filter((name): name is string => name !== undefined);
+      const selectedTopicNames = selectedTopics.flatMap((id) => {
+        const name = topicIdToNameMap.get(id);
+        return name ? [name] : [];
+      });
 
       const hasMatchingTopic = selectedTopicNames.some((topicName) =>
         resource.topic_names?.includes(topicName)
