@@ -37,7 +37,7 @@ function TopicItem({ node, selectedTopics, onTopicToggle, level = 0 }: TopicItem
                     {hasChildren && (
                         <button
                             onClick={handleToggle}
-                            className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                            className="text-gray-500 hover:text-gray-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded"
                             aria-label={isExpanded ? `Collapse ${node.name}` : `Expand ${node.name}`}
                             aria-expanded={isExpanded}
                         >
