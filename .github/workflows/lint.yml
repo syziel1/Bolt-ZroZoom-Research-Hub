@@ -33,9 +33,3 @@ jobs:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_ALL_CODEBASE: 'false' # Sprawdzaj tylko zmienione pliki w PR
-          VALIDATE_JSCPD: false # Wyłącz sprawdzanie duplikatów kodu
-          VALIDATE_CSS: false # Wyłącz sprawdzanie CSS
-          VALIDATE_JAVASCRIPT_STANDARD: false # Wyłącz sprawdzanie standardów JS
-#          VALIDATE_TSX: false # Wyłącz - conflict with eslint.config.js
-#          VALIDATE_TYPESCRIPT_ES: false # Wyłącz - conflict with eslint.config.js
-#          VALIDATE_TYPESCRIPT_STANDARD: false # Wyłącz - parser issues
