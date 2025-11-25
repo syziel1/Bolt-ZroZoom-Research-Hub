@@ -139,6 +139,42 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
         </div>
       </section>
 
+      <section id="latest-resources" className="py-20 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-block bg-blue-50 p-3 rounded-full mb-4">
+              <TrendingUp size={32} className="text-blue-600" />
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Ostatnio dodane materiały
+            </h2>
+            <p className="text-lg text-gray-600">Odkryj najnowsze zasoby dodane przez społeczność</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {latestResources.map((resource) => (
+              <ResourceCard key={resource.id} resource={resource} variant="hero" />
+            ))}
+          </div>
+
+          {latestResources.length === 0 && (
+            <div className="text-center py-12 text-gray-500">
+              <p>Brak dostępnych zasobów</p>
+            </div>
+          )}
+
+          <div className="text-center mt-12">
+            <button
+              onClick={onBrowseAsGuest}
+              className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-all hover:scale-105 shadow-lg inline-flex items-center gap-2"
+            >
+              Przeglądaj materiały jako gość
+              <ArrowRight size={20} />
+            </button>
+          </div>
+        </div>
+      </section>
+
       <section className="py-20 px-4 bg-gray-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
@@ -174,42 +210,6 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
               <p>Brak dostępnych przedmiotów</p>
             </div>
           )}
-        </div>
-      </section>
-
-      <section id="latest-resources" className="py-20 px-4 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="inline-block bg-blue-50 p-3 rounded-full mb-4">
-              <TrendingUp size={32} className="text-blue-600" />
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Ostatnio dodane materiały
-            </h2>
-            <p className="text-lg text-gray-600">Odkryj najnowsze zasoby dodane przez społeczność</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {latestResources.map((resource) => (
-              <ResourceCard key={resource.id} resource={resource} variant="hero" />
-            ))}
-          </div>
-
-          {latestResources.length === 0 && (
-            <div className="text-center py-12 text-gray-500">
-              <p>Brak dostępnych zasobów</p>
-            </div>
-          )}
-
-          <div className="text-center mt-12">
-            <button
-              onClick={onBrowseAsGuest}
-              className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-all hover:scale-105 shadow-lg inline-flex items-center gap-2"
-            >
-              Przeglądaj materiały jako gość
-              <ArrowRight size={20} />
-            </button>
-          </div>
         </div>
       </section>
 
