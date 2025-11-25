@@ -29,9 +29,9 @@ export function useTopics(subjectId: string | null) {
 
                 const tree = buildTopicTree(data as TopicRow[]);
                 setTopics(tree);
-            } catch (err: any) {
+            } catch (err: unknown) {
                 console.error('Error fetching topics:', err);
-                setError(err.message);
+                setError(err instanceof Error ? err.message : 'An unknown error occurred');
             } finally {
                 setLoading(false);
             }
