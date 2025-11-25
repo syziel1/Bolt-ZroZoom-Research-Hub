@@ -391,7 +391,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
           onClose={() => setIsModalOpen(false)}
           onSuccess={loadData}
           subjects={subjects}
-          topics={topicNodes}
+          topics={topics}
           levels={levels}
         />
       )}
