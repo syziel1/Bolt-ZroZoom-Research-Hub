@@ -10,6 +10,8 @@ export function useTopics(subjectId: string | null) {
     useEffect(() => {
         if (!subjectId) {
             setTopics([]);
+            setLoading(false);
+            setError(null);
             return;
         }
 
