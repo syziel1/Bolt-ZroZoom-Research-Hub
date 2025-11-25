@@ -37,7 +37,5 @@ jobs:
           VALIDATE_CSS: false # Wyłącz sprawdzanie CSS
           VALIDATE_JAVASCRIPT_STANDARD: false # Wyłącz sprawdzanie standardów JS
           VALIDATE_TSX: false # Wyłącz - conflict with eslint.config.js
-          VALIDATE_TYPESCRIPT_ES: false # Wyłącz - conflict with eslint.config.js
+#          VALIDATE_TYPESCRIPT_ES: false # Wyłącz - conflict with eslint.config.js
           VALIDATE_TYPESCRIPT_STANDARD: false # Wyłącz - parser issues
-#          VALIDATE_JSON: false # Wyłącz - conflict with eslint.config.js
-
