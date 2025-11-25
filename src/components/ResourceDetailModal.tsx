@@ -7,6 +7,7 @@ type ResourceDetailModalProps = {
   onClose: () => void;
   resource: Resource | null;
   onResourceUpdated: () => void;
+  isGuestMode?: boolean;
 };
 
 type Rating = {
@@ -36,7 +37,7 @@ const typeIcons: Record<string, any> = {
   tool: Wrench,
 };
 
-export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdated }: ResourceDetailModalProps) {
+export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdated, isGuestMode = false }: ResourceDetailModalProps) {
   const [ratings, setRatings] = useState<Rating[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -54,12 +55,14 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
 
   useEffect(() => {
     if (isOpen && resource) {
-      loadUserData();
+      if (!isGuestMode) {
+        loadUserData();
+        checkUserRating();
+      }
       loadRatings();
       loadComments();
-      checkUserRating();
     }
-  }, [isOpen, resource]);
+  }, [isOpen, resource, isGuestMode]);
 
   const loadUserData = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -301,7 +304,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                 <Star className="text-yellow-500 fill-yellow-500" size={20} />
                 Oceny ({ratings.length})
               </h4>
-              {!userHasRated && (
+              {!isGuestMode && !userHasRated && (
                 <button
                   onClick={() => setShowRatingForm(!showRatingForm)}
                   className="text-blue-600 hover:text-blue-800 text-sm font-medium"
@@ -398,12 +401,14 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                 <MessageSquare size={20} />
                 Komentarze ({comments.length})
               </h4>
-              <button
-                onClick={() => setShowCommentForm(!showCommentForm)}
-                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-              >
-                {showCommentForm ? 'Anuluj' : 'Dodaj komentarz'}
-              </button>
+              {!isGuestMode && (
+                <button
+                  onClick={() => setShowCommentForm(!showCommentForm)}
+                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                >
+                  {showCommentForm ? 'Anuluj' : 'Dodaj komentarz'}
+                </button>
+              )}
             </div>
 
             {showCommentForm && (

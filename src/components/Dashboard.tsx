@@ -5,9 +5,15 @@ import { ResourceCard } from './ResourceCard';
 import { AddResourceModal } from './AddResourceModal';
 import { ResourceDetailModal } from './ResourceDetailModal';
 import { AdminPanel } from './AdminPanel';
-import { Plus, LogOut, Loader, Library, BookOpen, Hash, Settings, Menu } from 'lucide-react';
+import { Plus, LogOut, Loader, Library, BookOpen, Hash, Settings, Menu, ArrowLeft } from 'lucide-react';
 
-export function Dashboard() {
+type DashboardProps = {
+  isGuestMode?: boolean;
+  onNavigateToAuth?: () => void;
+  onBackToLanding?: () => void;
+};
+
+export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLanding }: DashboardProps = {}) {
   const [resources, setResources] = useState<Resource[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -26,8 +32,10 @@ export function Dashboard() {
 
   useEffect(() => {
     loadData();
-    loadUserProfile();
-  }, []);
+    if (!isGuestMode) {
+      loadUserProfile();
+    }
+  }, [isGuestMode]);
 
   const loadUserProfile = async () => {
     const {
@@ -223,38 +231,77 @@ export function Dashboard() {
               </div>
             </div>
             <div className="flex items-center gap-2 md:gap-4">
-              <span className="text-sm text-gray-600 hidden md:inline">Witaj, {userNick}</span>
-              {isAdmin && (
-                <button
-                  onClick={() => setShowAdminPanel(true)}
-                  className="bg-purple-600 text-white px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-purple-700 flex items-center gap-2"
-                  title="Panel Administracyjny"
-                >
-                  <Settings size={20} />
-                  <span className="hidden lg:inline">Panel Admina</span>
-                </button>
+              {isGuestMode ? (
+                <>
+                  <button
+                    onClick={onBackToLanding}
+                    className="text-gray-600 hover:text-gray-900 flex items-center gap-2"
+                    title="Powrót do strony głównej"
+                  >
+                    <ArrowLeft size={20} />
+                    <span className="hidden lg:inline">Powrót</span>
+                  </button>
+                  <button
+                    onClick={onNavigateToAuth}
+                    className="bg-blue-600 text-white px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
+                  >
+                    <span>Zaloguj się</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <span className="text-sm text-gray-600 hidden md:inline">Witaj, {userNick}</span>
+                  {isAdmin && (
+                    <button
+                      onClick={() => setShowAdminPanel(true)}
+                      className="bg-purple-600 text-white px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-purple-700 flex items-center gap-2"
+                      title="Panel Administracyjny"
+                    >
+                      <Settings size={20} />
+                      <span className="hidden lg:inline">Panel Admina</span>
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setIsModalOpen(true)}
+                    className="bg-blue-600 text-white px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
+                    title="Dodaj zasób"
+                  >
+                    <Plus size={20} />
+                    <span className="hidden sm:inline">Dodaj zasób</span>
+                  </button>
+                  <button
+                    onClick={handleSignOut}
+                    className="text-gray-600 hover:text-gray-900 flex items-center gap-2"
+                    title="Wyloguj się"
+                  >
+                    <LogOut size={20} />
+                    <span className="hidden lg:inline">Wyloguj się</span>
+                  </button>
+                </>
               )}
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="bg-blue-600 text-white px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
-                title="Dodaj zasób"
-              >
-                <Plus size={20} />
-                <span className="hidden sm:inline">Dodaj zasób</span>
-              </button>
-              <button
-                onClick={handleSignOut}
-                className="text-gray-600 hover:text-gray-900 flex items-center gap-2"
-                title="Wyloguj się"
-              >
-                <LogOut size={20} />
-                <span className="hidden lg:inline">Wyloguj się</span>
-              </button>
             </div>
           </div>
         </header>
 
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
+          {isGuestMode && (
+            <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-1">
+                  <h3 className="font-semibold text-blue-900 mb-1">Przeglądasz jako gość</h3>
+                  <p className="text-sm text-blue-700">
+                    Zaloguj się, aby dodawać własne materiały, oceniać zasoby i mieć dostęp do dodatkowych funkcji.
+                  </p>
+                </div>
+                <button
+                  onClick={onNavigateToAuth}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm whitespace-nowrap"
+                >
+                  Zaloguj się
+                </button>
+              </div>
+            </div>
+          )}
           {loading ? (
             <div className="flex items-center justify-center h-64">
               <Loader className="animate-spin text-blue-600" size={48} />
@@ -339,20 +386,23 @@ export function Dashboard() {
         </main>
       </div>
 
-      <AddResourceModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSuccess={loadData}
-        subjects={subjects}
-        topics={topics}
-        levels={levels}
-      />
+      {!isGuestMode && (
+        <AddResourceModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSuccess={loadData}
+          subjects={subjects}
+          topics={topics}
+          levels={levels}
+        />
+      )}
 
       <ResourceDetailModal
         isOpen={isDetailModalOpen}
         onClose={handleCloseDetailModal}
         resource={selectedResource}
         onResourceUpdated={loadData}
+        isGuestMode={isGuestMode}
       />
     </div>
   );
