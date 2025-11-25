@@ -8,10 +8,10 @@
 - [Funkcjonalności](#-funkcjonalności)
 - [Stack technologiczny](#-stack-technologiczny)
 - [Instalacja](#-instalacja)
-- [Konfiguracja](#-konfiguracja)
+- [Konfiguracja](#%EF%B8%8F-konfiguracja)
 - [Uruchomienie](#-uruchomienie)
 - [Struktura projektu](#-struktura-projektu)
-- [Baza danych](#-baza-danych)
+- [Baza danych](#%EF%B8%8F-baza-danych)
 - [Developer Tools](#-developer-tools)
 - [Dokumentacja](#-dokumentacja)
 
@@ -63,7 +63,7 @@ ZroZoom Research Hub to platforma do gromadzenia, organizowania i udostępniania
 ## 📦 Instalacja
 
 ### Wymagania
-- Node.js 18+ 
+- Node.js 18+
 - npm lub yarn
 - Konto Supabase (darmowe)
 
@@ -154,7 +154,7 @@ npm run typecheck
 
 ## 📁 Struktura projektu
 
-```
+```text
 Bolt-ZroZoom-Research-Hub/
 ├── src/
 │   ├── components/          # Komponenty React
