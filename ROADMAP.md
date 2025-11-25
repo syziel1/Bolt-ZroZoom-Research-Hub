@@ -27,7 +27,7 @@ Ten dokument opisuje plany rozwoju platformy ZroZoom Research Hub. Cele podzielo
 
 🟣 **Faza 4: Szkoła Przyszłości (Wizja Long‑term)**
 **Cel:** Przekształcenie bazy linków w platformę edukacyjną.
-- [ ] **Ścieżki Nauki (Learning Paths):** Możliwość tworzenia playlisty (playlists) (np. „Przygotowanie do matury z matematyki w 30 dni”).
+- [ ] **Ścieżki Nauki (Learning Paths):** Możliwość tworzenia ścieżki nauki (learning paths) (np. „Przygotowanie do matury z matematyki w 30 dni”).
 - [ ] **Moduł Mentorski:** Możliwość umawiania konsultacji z ekspertami.
 - [ ] **Integracja z LMS:** Eksport ocen i postępów.
 
