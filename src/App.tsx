@@ -60,7 +60,7 @@ function App() {
   }
 
   if (view === 'auth') {
-    return <AuthForm onSuccess={() => { }} onBack={handleBackToLanding} />;
+    return <AuthForm onSuccess={() => setView('dashboard')} onBack={handleBackToLanding} />;
   }
 
   if (view === 'browse') {
