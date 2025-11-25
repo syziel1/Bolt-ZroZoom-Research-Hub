@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { generateSlug } from '../lib/utils';
 import { Plus, Edit, Trash2, ChevronUp, ChevronDown, Save, X } from 'lucide-react';
 import { ConfirmationModal } from './ConfirmationModal';
 
@@ -39,21 +40,6 @@ export function SubjectsManager() {
         } finally {
             setLoading(false);
         }
-    };
-
-    const generateSlug = (name: string) => {
-        return name
-            .toLowerCase()
-            .replace(/ą/g, 'a')
-            .replace(/ć/g, 'c')
-            .replace(/ę/g, 'e')
-            .replace(/ł/g, 'l')
-            .replace(/ń/g, 'n')
-            .replace(/ó/g, 'o')
-            .replace(/ś/g, 's')
-            .replace(/ź|ż/g, 'z')
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-|-$/g, '');
     };
 
     const handleAdd = async () => {
