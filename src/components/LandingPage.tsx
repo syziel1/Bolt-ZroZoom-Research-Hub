@@ -215,7 +215,7 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
 
       <section className="py-20 px-4 bg-gradient-to-br from-blue-600 to-blue-700 text-white">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6"><Gotowi></Gotowi> do nauki?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">Gotowi do nauki?</h2>
           <p className="text-xl mb-8 text-blue-100">
             Dołącz do społeczności uczących się i odkryj tysiące sprawdzonych materiałów edukacyjnych
           </p>
