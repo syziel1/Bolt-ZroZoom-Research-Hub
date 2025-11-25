@@ -34,33 +34,49 @@ export const uploadResourceThumbnail = async (
   resourceId: string,
   file: File,
 ): Promise<UploadResult> => {
+  console.log('[uploadResourceThumbnail] Starting upload', { resourceId, fileName: file.name });
+
   const validationError = validateThumbnailFile(file);
   if (validationError) {
+    console.error('[uploadResourceThumbnail] Validation failed:', validationError);
     throw new Error(validationError);
   }
 
   const ext = getExtensionFromType(file.type);
   const path = `${THUMBNAIL_FOLDER}/${resourceId}.${ext}`;
+  console.log('[uploadResourceThumbnail] Upload path:', path);
 
-  const { error: uploadError } = await supabase.storage
-    .from(THUMBNAIL_BUCKET)
-    .upload(path, file, { upsert: true });
+  try {
+    const { error: uploadError } = await supabase.storage
+      .from(THUMBNAIL_BUCKET)
+      .upload(path, file, { upsert: true });
 
-  if (uploadError) {
-    throw new Error(uploadError.message);
+    if (uploadError) {
+      console.error('[uploadResourceThumbnail] Storage upload error:', uploadError);
+      throw new Error(`Upload failed: ${uploadError.message}`);
+    }
+    console.log('[uploadResourceThumbnail] File uploaded successfully');
+
+    const { error: updateError } = await supabase
+      .from('resources')
+      .update({ thumbnail_path: path })
+      .eq('id', resourceId);
+
+    if (updateError) {
+      console.error('[uploadResourceThumbnail] Database update error:', updateError);
+      throw new Error(`Database update failed: ${updateError.message}`);
+    }
+    console.log('[uploadResourceThumbnail] Database updated successfully');
+
+    const publicUrl = getThumbnailUrl(path) as string;
+    console.log('[uploadResourceThumbnail] Complete. Public URL:', publicUrl);
+
+    return {
+      path,
+      publicUrl,
+    };
+  } catch (error) {
+    console.error('[uploadResourceThumbnail] Unexpected error:', error);
+    throw error;
   }
-
-  const { error: updateError } = await supabase
-    .from('resources')
-    .update({ thumbnail_path: path })
-    .eq('id', resourceId);
-
-  if (updateError) {
-    throw new Error(updateError.message);
-  }
-
-  return {
-    path,
-    publicUrl: getThumbnailUrl(path) as string,
-  };
 };

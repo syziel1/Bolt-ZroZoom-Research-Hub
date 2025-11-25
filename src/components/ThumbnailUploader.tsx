@@ -95,9 +95,8 @@ export function ThumbnailUploader({ onFileSelect, previewUrl, disabled, uploadin
   return (
     <div className="space-y-2">
       <div
-        className={`relative border-2 border-dashed rounded-lg p-4 transition-colors ${
-          isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-gray-50'
-        } ${disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`}
+        className={`relative border-2 border-dashed rounded-lg p-4 transition-colors ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-gray-50'
+          } ${disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`}
         onClick={() => !disabled && fileInputRef.current?.click()}
         onPaste={onPaste}
         onDragOver={onDragOver}
@@ -131,7 +130,10 @@ export function ThumbnailUploader({ onFileSelect, previewUrl, disabled, uploadin
             <div className="flex items-center gap-2 mt-2">
               <button
                 type="button"
-                onClick={() => fileInputRef.current?.click()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  fileInputRef.current?.click();
+                }}
                 disabled={disabled}
                 className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400"
               >
