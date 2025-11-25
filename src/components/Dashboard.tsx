@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { supabase, Resource, Subject, Level, TopicNode } from '../lib/supabase';
+import { supabase, Resource, Subject, Level, TopicNode, Topic } from '../lib/supabase';
 import { useTopics } from '../hooks/useTopics';
 import { Sidebar } from './Sidebar';
 import { ResourceCard } from './ResourceCard';
@@ -18,6 +18,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
   const [resources, setResources] = useState<Resource[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [levels, setLevels] = useState<Level[]>([]);
+  const [allTopics, setAllTopics] = useState<Topic[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const { topics: topicNodes, loading: topicsLoading } = useTopics(selectedSubject);
@@ -56,15 +57,17 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
   const loadData = async () => {
     setLoading(true);
     try {
-      const [resourcesRes, subjectsRes, levelsRes] = await Promise.all([
+      const [resourcesRes, subjectsRes, levelsRes, topicsRes] = await Promise.all([
         supabase.from('v_resources_full').select('*'),
         supabase.from('v_subjects_basic').select('*').order('order_index'),
         supabase.from('levels').select('*').order('order_index'),
+        supabase.from('topics').select('*').order('order_index'),
       ]);
 
       if (resourcesRes.data) setResources(resourcesRes.data);
       if (subjectsRes.data) setSubjects(subjectsRes.data);
       if (levelsRes.data) setLevels(levelsRes.data);
+      if (topicsRes.data) setAllTopics(topicsRes.data);
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
@@ -87,6 +90,11 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
     setSelectedLevels((prev) =>
       prev.includes(levelId) ? prev.filter((id) => id !== levelId) : [...prev, levelId]
     );
+  };
+
+  const handleSubjectChange = (subjectId: string | null) => {
+    setSelectedSubject(subjectId);
+    setSelectedTopics([]); // Clear selected topics when subject changes
   };
 
   const handleTopicClick = (topicName: string) => {
@@ -217,7 +225,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
         selectedSubject={selectedSubject}
         selectedTopics={selectedTopics}
         selectedLevels={selectedLevels}
-        onSubjectChange={setSelectedSubject}
+        onSubjectChange={handleSubjectChange}
         onTopicToggle={handleTopicToggle}
         onLevelToggle={handleLevelToggle}
         isOpen={isSidebarOpen}
@@ -404,7 +412,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
           onClose={handleCloseAddModal}
           onSuccess={loadData}
           subjects={subjects}
-          topics={topicNodes}
+          topics={allTopics}
           levels={levels}
           initialData={editingResource}
         />
