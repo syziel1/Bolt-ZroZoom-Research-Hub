@@ -32,6 +32,13 @@ function TopicItem({ node, selectedTopics, onTopicToggle, level = 0 }: TopicItem
                     }`}
                 style={{ marginLeft: `${level * 16}px` }}
                 onClick={() => onTopicToggle(node.id)}
+                tabIndex={0}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        onTopicToggle(node.id);
+                    }
+                }}
             >
                 <div className="flex-shrink-0 w-4 h-4 flex items-center justify-center">
                     {hasChildren && (
