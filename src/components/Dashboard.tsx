@@ -571,7 +571,8 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
             <div className="text-center text-sm text-gray-600">
               <p className="mb-2">ZroZoom Hub - Szkoła Przyszłości z AI</p>
               <p className="text-xs text-gray-500">
-                Platforma do współdzielenia zasobów edukacyjnych © {new Date().getFullYear()}
+                Szkoła Przyszłości AI - ZroZoom Hub - Twoja baza wiedzy edukacyjnej<br></br>
+                © {new Date().getFullYear()} Sylwester Zieliński. All rights reserved
               </p>
             </div>
           </footer>
