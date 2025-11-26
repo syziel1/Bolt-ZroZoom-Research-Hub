@@ -36,8 +36,13 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
     const observerCallback = (entries: IntersectionObserverEntry[]) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          entry.target.classList.add('animate-fade-in-up');
-          entry.target.classList.remove('opacity-0');
+          const element = entry.target as HTMLElement;
+          if (!element.dataset.animated) {
+            element.classList.add('animate-fade-in-up');
+            element.classList.remove('opacity-0');
+            element.dataset.animated = 'true';
+            observer.unobserve(element);
+          }
         }
       });
     };
@@ -48,25 +53,23 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
     const subjectCards = document.querySelectorAll('.subject-card-animate');
 
     resourceCards.forEach((card, index) => {
-      (card as HTMLElement).style.animationDelay = `${index * 0.1}s`;
-      observer.observe(card);
+      const element = card as HTMLElement;
+      if (!element.dataset.animated) {
+        element.style.animationDelay = `${index * 0.1}s`;
+        observer.observe(element);
+      }
     });
 
     subjectCards.forEach((card, index) => {
-      (card as HTMLElement).style.animationDelay = `${index * 0.1}s`;
-      observer.observe(card);
+      const element = card as HTMLElement;
+      if (!element.dataset.animated) {
+        element.style.animationDelay = `${index * 0.1}s`;
+        observer.observe(element);
+      }
     });
 
     return () => observer.disconnect();
-  }, [latestResources, subjects]);
-
-  useEffect(() => {
-    if (latestResources.length > 0) {
-      const resourceIds = latestResources.map(r => r.id);
-      loadResourceTopics(resourceIds);
-      loadResourceLevels(resourceIds);
-    }
-  }, [latestResources]);
+  }, [latestResources.length, subjects.length]);
 
   const loadLandingPageData = async () => {
     setLoading(true);
@@ -89,7 +92,6 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
 
       if (subjectsData.data) setSubjects(subjectsData.data);
 
-      // Get one latest resource per subject
       if (allResourcesData.data) {
         const resourcesBySubject = new Map<string, Resource>();
         allResourcesData.data.forEach((resource: Resource) => {
@@ -97,52 +99,50 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
             resourcesBySubject.set(resource.subject_id, resource);
           }
         });
-        setLatestResources(Array.from(resourcesBySubject.values()));
+        const latestResourcesList = Array.from(resourcesBySubject.values());
+
+        if (latestResourcesList.length > 0) {
+          const resourceIds = latestResourcesList.map(r => r.id);
+          const [topicsData, levelsData] = await Promise.all([
+            supabase
+              .from('v_resource_topics')
+              .select('resource_id, topic_id, topic_name, topic_slug, parent_topic_id, subject_slug')
+              .in('resource_id', resourceIds),
+            supabase
+              .from('v_resource_levels')
+              .select('resource_id, levels')
+              .in('resource_id', resourceIds),
+          ]);
+
+          if (topicsData.data) {
+            const topicsMap = new Map<string, ResourceTopic[]>();
+            topicsData.data.forEach((item: any) => {
+              const { resource_id, ...topicData } = item;
+              if (!topicsMap.has(resource_id)) {
+                topicsMap.set(resource_id, []);
+              }
+              topicsMap.get(resource_id)!.push(topicData);
+            });
+            setResourceTopics(topicsMap);
+          }
+
+          if (levelsData.data) {
+            const levelsMap = new Map<string, ResourceLevel[]>();
+            levelsData.data.forEach((item: any) => {
+              if (item.levels && Array.isArray(item.levels)) {
+                levelsMap.set(item.resource_id, item.levels);
+              }
+            });
+            setResourceLevels(levelsMap);
+          }
+        }
+
+        setLatestResources(latestResourcesList);
       }
     } catch (error) {
       console.error('Error loading landing page data:', error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const loadResourceTopics = async (resourceIds: string[]) => {
-    if (resourceIds.length === 0) return;
-
-    const { data } = await supabase
-      .from('v_resource_topics')
-      .select('resource_id, topic_id, topic_name, topic_slug, parent_topic_id, subject_slug')
-      .in('resource_id', resourceIds);
-
-    if (data) {
-      const topicsMap = new Map<string, ResourceTopic[]>();
-      data.forEach((item: any) => {
-        const { resource_id, ...topicData } = item;
-        if (!topicsMap.has(resource_id)) {
-          topicsMap.set(resource_id, []);
-        }
-        topicsMap.get(resource_id)!.push(topicData);
-      });
-      setResourceTopics(topicsMap);
-    }
-  };
-
-  const loadResourceLevels = async (resourceIds: string[]) => {
-    if (resourceIds.length === 0) return;
-
-    const { data } = await supabase
-      .from('v_resource_levels')
-      .select('resource_id, levels')
-      .in('resource_id', resourceIds);
-
-    if (data) {
-      const levelsMap = new Map<string, ResourceLevel[]>();
-      data.forEach((item: any) => {
-        if (item.levels && Array.isArray(item.levels)) {
-          levelsMap.set(item.resource_id, item.levels);
-        }
-      });
-      setResourceLevels(levelsMap);
     }
   };
 
