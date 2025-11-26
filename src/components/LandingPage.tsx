@@ -215,6 +215,7 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
                   topics={resourceTopics.get(resource.id) || []}
                   levels={resourceLevels.get(resource.id) || []}
                   variant="hero"
+                  onCardClick={(res) => onBrowseAsGuest(res.subject_id)}
                 />
               </div>
             ))}
