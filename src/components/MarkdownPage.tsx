@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
 type MarkdownPageProps = {
     fileName: string;
-    onBack: () => void;
+    onBack?: () => void;
 };
 
 export function MarkdownPage({ fileName, onBack }: MarkdownPageProps) {
+    const navigate = useNavigate();
     const [content, setContent] = useState('');
     const [loading, setLoading] = useState(true);
 
@@ -84,7 +86,7 @@ export function MarkdownPage({ fileName, onBack }: MarkdownPageProps) {
         <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-md p-8">
                 <button
-                    onClick={onBack}
+                    onClick={() => onBack ? onBack() : navigate('/')}
                     className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8 transition-colors"
                 >
                     <ArrowLeft size={20} />

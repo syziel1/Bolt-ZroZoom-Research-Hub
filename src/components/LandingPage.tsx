@@ -1,16 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase, Resource, Subject, ResourceTopic, ResourceLevel } from '../lib/supabase';
 import { ResourceCard } from './ResourceCard';
 import { Navigation } from './Navigation';
 import { BookOpen, Library, Layers, TrendingUp, Award, Sparkles, ArrowRight, Calculator, Globe, Clock, Languages, Code, Palette, Dumbbell, Music, Microscope, Atom, Beaker, ChevronDown, ShieldCheck, Users, Search } from 'lucide-react';
-
-type LandingPageProps = {
-  onNavigateToAuth: () => void;
-  onBrowseAsGuest: (subjectId?: string) => void;
-  onNavigateToAbout?: () => void;
-  onNavigateToPrivacy?: () => void;
-  onSearch?: (query: string) => void;
-};
 
 type Stats = {
   topicsCount: number;
@@ -18,7 +11,8 @@ type Stats = {
   levelsCount: number;
 };
 
-export function LandingPage({ onNavigateToAuth, onBrowseAsGuest, onNavigateToAbout, onNavigateToPrivacy, onSearch }: LandingPageProps) {
+export function LandingPage() {
+  const navigate = useNavigate();
   const [stats, setStats] = useState<Stats>({ topicsCount: 0, subjectsCount: 0, levelsCount: 0 });
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [latestResources, setLatestResources] = useState<Resource[]>([]);
@@ -29,8 +23,8 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest, onNavigateToAbo
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (onSearch && searchQuery.trim()) {
-      onSearch(searchQuery.trim());
+    if (searchQuery.trim()) {
+      navigate(`/zasoby?q=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
 
@@ -194,7 +188,7 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest, onNavigateToAbo
 
   return (
     <div className="min-h-screen bg-white">
-      <Navigation onNavigateToAuth={onNavigateToAuth} onScrollToSubjects={scrollToSubjects} onBrowseAsGuest={() => onBrowseAsGuest()} />
+      <Navigation onNavigateToAuth={() => navigate('/auth')} onScrollToSubjects={scrollToSubjects} onBrowseAsGuest={() => navigate('/zasoby')} />
       <section className="relative min-h-[70vh] bg-gradient-to-br from-violet-600 via-purple-600 to-violet-700 flex items-center justify-center px-4 pt-24 pb-12 overflow-hidden">
         <div className="max-w-6xl w-full text-center relative z-10">
           <div className="mb-8">
@@ -334,7 +328,12 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest, onNavigateToAbo
                   topics={resourceTopics.get(resource.id) || []}
                   levels={resourceLevels.get(resource.id) || []}
                   variant="hero"
-                  onCardClick={(res) => onBrowseAsGuest(res.subject_id)}
+                  onCardClick={(res) => {
+                    const subject = subjects.find(s => s.subject_id === res.subject_id);
+                    if (subject) {
+                      navigate(`/zasoby/${subject.subject_slug}`);
+                    }
+                  }}
                 />
               </div>
             ))}
@@ -389,7 +388,7 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest, onNavigateToAbo
               return (
                 <div
                   key={subject.subject_id}
-                  onClick={() => onBrowseAsGuest(subject.subject_id)}
+                  onClick={() => navigate(`/zasoby/${subject.subject_slug}`)}
                   className={`bg-gradient-to-br ${gradient} p-6 rounded-lg shadow-lg hover:shadow-2xl transition-all hover:scale-105 cursor-pointer group`}
                 >
                   <div className="flex items-center gap-4">
@@ -427,7 +426,7 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest, onNavigateToAbo
             Dołącz do społeczności uczących się i odkryj sprawdzone materiały edukacyjne
           </p>
           <button
-            onClick={onNavigateToAuth}
+            onClick={() => navigate('/auth')}
             className="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-50 transition-all hover:scale-105 shadow-lg inline-flex items-center gap-2"
           >
             Zarejestruj się teraz
@@ -440,8 +439,8 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest, onNavigateToAbo
         <div className="max-w-6xl mx-auto">
           <p className="mb-2">Szkoła Przyszłości z AI - Twoja baza wiedzy edukacyjnej</p>
           <div className="flex justify-center gap-4 mb-2 text-sm">
-            <button onClick={onNavigateToAbout} className="hover:text-white transition-colors">O nas</button>
-            <button onClick={onNavigateToPrivacy} className="hover:text-white transition-colors">Polityka Prywatności</button>
+            <button onClick={() => navigate('/o-nas')} className="hover:text-white transition-colors">O nas</button>
+            <button onClick={() => navigate('/polityka-prywatnosci')} className="hover:text-white transition-colors">Polityka Prywatności</button>
           </div>
           <p className="text-sm">&copy; {new Date().getFullYear()} Sylwester Zieliński. All rights reserved</p>
         </div>

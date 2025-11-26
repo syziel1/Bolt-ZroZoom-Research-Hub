@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { supabase, Resource, Subject, Level, TopicNode, Topic, ResourceTopic, ResourceLevel } from '../lib/supabase';
 import { useTopics } from '../hooks/useTopics';
 import { Sidebar } from './Sidebar';
@@ -10,26 +11,24 @@ import { Plus, LogOut, Loader, Settings, Menu, ArrowLeft, ChevronLeft, ChevronRi
 
 type DashboardProps = {
   isGuestMode?: boolean;
-  onNavigateToAuth?: () => void;
-  onBackToLanding?: () => void;
-  initialSubject?: string | null;
-  initialSearchQuery?: string;
-  onNavigateToAbout?: () => void;
-  onNavigateToPrivacy?: () => void;
 };
 
-export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLanding, initialSubject = null, initialSearchQuery = '', onNavigateToAbout, onNavigateToPrivacy }: DashboardProps) {
+export function Dashboard({ isGuestMode = false }: DashboardProps) {
+  const navigate = useNavigate();
+  const { subjectSlug } = useParams<{ subjectSlug?: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const [resources, setResources] = useState<Resource[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [levels, setLevels] = useState<Level[]>([]);
   const [allTopics, setAllTopics] = useState<Topic[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedSubject, setSelectedSubject] = useState<string | null>(initialSubject);
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const { topics: topicNodes, loading: topicsLoading } = useTopics(selectedSubject);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
+  const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
@@ -42,6 +41,26 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
   const [resourceLevels, setResourceLevels] = useState<Map<string, ResourceLevel[]>>(new Map());
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 12;
+
+  // Read search query from URL params
+  useEffect(() => {
+    const query = searchParams.get('q');
+    if (query) {
+      setSearchQuery(query);
+    }
+  }, [searchParams]);
+
+  // Map subjectSlug to subject ID
+  useEffect(() => {
+    if (subjectSlug && subjects.length > 0) {
+      const subject = subjects.find(s => s.subject_slug === subjectSlug);
+      if (subject) {
+        setSelectedSubject(subject.subject_id);
+      }
+    } else if (!subjectSlug) {
+      setSelectedSubject(null);
+    }
+  }, [subjectSlug, subjects]);
 
   const loadUserProfile = useCallback(async () => {
     const {
@@ -305,7 +324,14 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
   };
 
   const handleSubjectChange = (subjectId: string | null) => {
-    setSelectedSubject(subjectId);
+    if (subjectId) {
+      const subject = subjects.find(s => s.subject_id === subjectId);
+      if (subject) {
+        navigate(`/zasoby/${subject.subject_slug}`);
+      }
+    } else {
+      navigate('/zasoby');
+    }
     setSelectedTopics([]); // Clear selected topics when subject changes
   };
 
@@ -495,7 +521,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
               {isGuestMode ? (
                 <>
                   <button
-                    onClick={onBackToLanding}
+                    onClick={() => navigate('/')}
                     className="text-gray-600 hover:text-gray-900 flex items-center gap-2"
                     title="Powrót do strony głównej"
                   >
@@ -503,7 +529,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
                     <span className="hidden lg:inline">Powrót</span>
                   </button>
                   <button
-                    onClick={onNavigateToAuth}
+                    onClick={() => navigate('/auth')}
                     className="bg-blue-600 text-white px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
                   >
                     <span>Zaloguj się</span>
@@ -551,7 +577,15 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
                 type="text"
                 placeholder="Szukaj w tytułach i opisach..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  const query = e.target.value;
+                  setSearchQuery(query);
+                  if (query) {
+                    setSearchParams({ q: query });
+                  } else {
+                    setSearchParams({});
+                  }
+                }}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
@@ -569,7 +603,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
                   </p>
                 </div>
                 <button
-                  onClick={onNavigateToAuth}
+                  onClick={() => navigate('/auth')}
                   className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm whitespace-nowrap"
                 >
                   Zarejestruj się
@@ -686,8 +720,8 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
             <div className="text-center text-sm text-gray-600">
               <p className="mb-2">Szkoła Przyszłości z AI - Twoja baza wiedzy edukacyjnej</p>
               <div className="flex justify-center gap-4 mb-2 text-xs text-gray-500">
-                <button onClick={onNavigateToAbout} className="hover:text-gray-700 transition-colors">O nas</button>
-                <button onClick={onNavigateToPrivacy} className="hover:text-gray-700 transition-colors">Polityka Prywatności</button>
+                <button onClick={() => navigate('/o-nas')} className="hover:text-gray-700 transition-colors">O nas</button>
+                <button onClick={() => navigate('/polityka-prywatnosci')} className="hover:text-gray-700 transition-colors">Polityka Prywatności</button>
               </div>
               <p className="text-xs text-gray-500">
                 © {new Date().getFullYear()} Sylwester Zieliński. All rights reserved

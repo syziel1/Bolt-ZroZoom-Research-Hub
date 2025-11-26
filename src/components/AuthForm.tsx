@@ -1,13 +1,15 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { LogIn, UserPlus, ArrowLeft } from 'lucide-react';
 
 type AuthFormProps = {
-  onSuccess: () => void;
+  onSuccess?: () => void;
   onBack?: () => void;
 };
 
 export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -59,7 +61,11 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
         });
         if (error) throw error;
       }
-      onSuccess();
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
@@ -74,9 +80,9 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
-        {onBack && (
+        {(onBack || true) && (
           <button
-            onClick={onBack}
+            onClick={() => onBack ? onBack() : navigate('/')}
             className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
           >
             <ArrowLeft size={20} />
