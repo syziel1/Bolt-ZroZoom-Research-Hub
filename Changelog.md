@@ -9,6 +9,13 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 - `uploadResourceThumbnail` logic in the service layer.
 - Image display handling in `ResourceCard`.
 
+## [1.2.0] - 2025-11-26
+**Added**
+- Pagination in Dashboard (client-side).
+- Card Variants: Hero (large), List (compact), and Default.
+- Language filtering support.
+- Enhanced `ResourceCard` with thumbnail support and new variants.
+
 ## [1.1.0] - 2025-11-25
 **Added**
 - Landing Page: public home with hero section, stats, and subject tiles.
