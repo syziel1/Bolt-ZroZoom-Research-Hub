@@ -68,7 +68,7 @@ export function Navigation({ onNavigateToAuth, onScrollToSubjects, onBrowseAsGue
                   : 'bg-gray-900 text-white hover:bg-gray-800'
               }`}
             >
-              Przeglądaj materiały jako gość
+              Przeglądaj jako gość
               <ArrowRight size={18} />
             </button>
             <button
@@ -125,7 +125,7 @@ export function Navigation({ onNavigateToAuth, onScrollToSubjects, onBrowseAsGue
                   : 'bg-gray-900 text-white hover:bg-gray-800'
               }`}
             >
-              Przeglądaj materiały jako gość
+              Przeglądaj jako gość
               <ArrowRight size={18} />
             </button>
             <button
