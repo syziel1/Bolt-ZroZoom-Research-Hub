@@ -302,34 +302,34 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
       <section className="py-12 px-4 bg-gray-50">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-            <div className="bg-white p-4 rounded-xl shadow-md border border-gray-100">
-              <div className="flex items-center justify-center mb-3">
-                <div className="bg-blue-50 p-2 rounded-full">
-                  <BookOpen size={24} className="text-blue-600" />
-                </div>
+            <div className="bg-white p-4 rounded-xl shadow-md border border-gray-100 flex items-center gap-4">
+              <div className="bg-blue-50 p-3 rounded-full flex-shrink-0">
+                <BookOpen size={28} className="text-blue-600" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-1">{stats.topicsCount}</div>
-              <div className="text-gray-600 text-sm">Tematów</div>
+              <div>
+                <div className="text-3xl font-bold text-gray-900">{stats.topicsCount}</div>
+                <div className="text-gray-600 text-sm">Tematów</div>
+              </div>
             </div>
 
-            <div className="bg-white p-4 rounded-xl shadow-md border border-gray-100">
-              <div className="flex items-center justify-center mb-3">
-                <div className="bg-green-50 p-2 rounded-full">
-                  <Layers size={24} className="text-green-600" />
-                </div>
+            <div className="bg-white p-4 rounded-xl shadow-md border border-gray-100 flex items-center gap-4">
+              <div className="bg-green-50 p-3 rounded-full flex-shrink-0">
+                <Layers size={28} className="text-green-600" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-1">{stats.subjectsCount}</div>
-              <div className="text-gray-600 text-sm">Przedmiotów</div>
+              <div>
+                <div className="text-3xl font-bold text-gray-900">{stats.subjectsCount}</div>
+                <div className="text-gray-600 text-sm">Przedmiotów</div>
+              </div>
             </div>
 
-            <div className="bg-white p-4 rounded-xl shadow-md border border-gray-100">
-              <div className="flex items-center justify-center mb-3">
-                <div className="bg-purple-50 p-2 rounded-full">
-                  <Award size={24} className="text-purple-600" />
-                </div>
+            <div className="bg-white p-4 rounded-xl shadow-md border border-gray-100 flex items-center gap-4">
+              <div className="bg-purple-50 p-3 rounded-full flex-shrink-0">
+                <Award size={28} className="text-purple-600" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-1">{stats.levelsCount}</div>
-              <div className="text-gray-600 text-sm">Poziomów</div>
+              <div>
+                <div className="text-3xl font-bold text-gray-900">{stats.levelsCount}</div>
+                <div className="text-gray-600 text-sm">Poziomów</div>
+              </div>
             </div>
           </div>
         </div>
