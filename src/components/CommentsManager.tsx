@@ -11,7 +11,11 @@ type Comment = {
     resource_title: string;
 };
 
-export function CommentsManager() {
+type CommentsManagerProps = {
+    onCommentDeleted?: () => void;
+};
+
+export function CommentsManager({ onCommentDeleted }: CommentsManagerProps) {
     const [comments, setComments] = useState<Comment[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -75,6 +79,10 @@ export function CommentsManager() {
 
             setDeleteConfirm(null);
             loadComments();
+
+            if (onCommentDeleted) {
+                onCommentDeleted();
+            }
         } catch (err) {
             console.error('Error deleting comment:', err);
             setError('Nie udało się usunąć komentarza.');

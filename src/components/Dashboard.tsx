@@ -410,7 +410,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
             </div>
           </div>
         </div>
-        <AdminPanel userRole={userRole} requireAdmin={true} />
+        <AdminPanel userRole={userRole} requireAdmin={true} onDataChange={loadData} />
       </div>
     );
   }
