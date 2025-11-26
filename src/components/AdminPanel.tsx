@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { SubjectsManager } from './SubjectsManager';
-import { TopicsManager } from './TopicsManager';
+import { TopicTreeManager } from './TopicTreeManager';
 import { LevelsManager } from './LevelsManager';
 import { CommentsManager } from './CommentsManager';
 import { Settings, BookOpen, Tag, BarChart3, MessageSquare } from 'lucide-react';
@@ -65,7 +65,7 @@ export function AdminPanel({ userRole, requireAdmin }: AdminPanelProps) {
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {activeTab === 'subjects' && <SubjectsManager />}
-                {activeTab === 'topics' && <TopicsManager />}
+                {activeTab === 'topics' && <TopicTreeManager />}
                 {activeTab === 'levels' && <LevelsManager />}
                 {activeTab === 'comments' && <CommentsManager />}
             </div>
