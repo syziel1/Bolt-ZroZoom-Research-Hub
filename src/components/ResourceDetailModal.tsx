@@ -295,12 +295,12 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
 
         <div className="p-6">
           <div className="flex items-start gap-6 mb-6">
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 w-80 aspect-video bg-gradient-to-br from-gray-100 to-gray-50 rounded-lg border border-gray-200 shadow-sm flex items-center justify-center overflow-hidden">
               {thumbnailUrl ? (
                 <img
                   src={thumbnailUrl}
                   alt={resource.title}
-                  className="w-80 aspect-video object-cover rounded-lg border border-gray-200 shadow-sm"
+                  className="w-full h-full object-contain"
                 />
               ) : (
                 <div className="bg-blue-50 p-6 rounded-lg flex items-center justify-center">

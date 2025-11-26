@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { X } from 'lucide-react';
 import { supabase, Subject, Topic, Level, Resource } from '../lib/supabase';
-import { uploadResourceThumbnail } from '../lib/storage';
+import { uploadResourceThumbnail, getThumbnailUrl } from '../lib/storage';
 import { ThumbnailUploader } from './ThumbnailUploader';
 import { buildTopicTree } from '../utils/topicTree';
 import { TopicTree } from './TopicTree';
@@ -26,7 +26,7 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
   const [language, setLanguage] = useState(initialData?.language || 'pl');
   const [aiGenerated, setAiGenerated] = useState(initialData?.ai_generated || false);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
-  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(initialData?.thumbnail_url || null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(getThumbnailUrl(initialData?.thumbnail_path) || null);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
@@ -54,7 +54,7 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
     setSubjectId(initialData?.subject_id || '');
     setLanguage(initialData?.language || 'pl');
     setAiGenerated(initialData?.ai_generated || false);
-    setThumbnailPreview(initialData?.thumbnail_url || null);
+    setThumbnailPreview(getThumbnailUrl(initialData?.thumbnail_path) || null);
     setThumbnailFile(null);
     setSelectedTopics([]);
     setSelectedLevels([]);

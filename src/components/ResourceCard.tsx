@@ -62,15 +62,15 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
         onClick={() => onCardClick?.(resource)}
         className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-200 cursor-pointer flex flex-col h-full overflow-hidden group"
       >
-        <div className="w-full h-48 sm:h-56 bg-gray-100 relative overflow-hidden">
+        <div className="w-full h-48 sm:h-56 bg-gradient-to-br from-gray-100 to-gray-50 relative overflow-hidden flex items-center justify-center">
           {thumbnailUrl ? (
             <img
               src={thumbnailUrl}
               alt={resource.title}
-              className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+              className="w-full h-full object-contain transform group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
-            <div className="h-full w-full flex items-center justify-center text-gray-400 bg-gradient-to-br from-gray-50 to-gray-100">
+            <div className="h-full w-full flex items-center justify-center text-gray-400">
               <ImageIcon size={48} />
             </div>
           )}
@@ -163,9 +163,9 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
         onClick={() => onCardClick?.(resource)}
         className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 border border-gray-200 cursor-pointer flex gap-4 items-center"
       >
-        <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">
+        <div className="w-16 h-16 rounded-lg overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 flex-shrink-0 border border-gray-200 flex items-center justify-center">
           {thumbnailUrl ? (
-            <img src={thumbnailUrl} alt={resource.title} className="w-full h-full object-cover" />
+            <img src={thumbnailUrl} alt={resource.title} className="w-full h-full object-contain" />
           ) : (
             <div className="h-full w-full flex items-center justify-center text-gray-400">
               <ImageIcon size={20} />
@@ -228,11 +228,11 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
       className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6 border border-gray-200 cursor-pointer flex flex-col h-full"
     >
       <div className="flex items-start gap-4 mb-4">
-        <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">
+        <div className="w-24 h-24 rounded-lg overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 flex-shrink-0 border border-gray-200 flex items-center justify-center">
           {thumbnailUrl ? (
-            <img src={thumbnailUrl} alt="Miniatura zasobu" className="w-full h-full object-cover" />
+            <img src={thumbnailUrl} alt="Miniatura zasobu" className="w-full h-full object-contain" />
           ) : (
-            <div className="h-full w-full flex items-center justify-center text-gray-400 bg-gradient-to-br from-gray-50 to-gray-100">
+            <div className="h-full w-full flex items-center justify-center text-gray-400">
               <ImageIcon size={32} />
             </div>
           )}
