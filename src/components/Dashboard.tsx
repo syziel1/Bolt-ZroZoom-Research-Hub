@@ -40,6 +40,7 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
   const [resourceTopics, setResourceTopics] = useState<Map<string, ResourceTopic[]>>(new Map());
   const [resourceLevels, setResourceLevels] = useState<Map<string, ResourceLevel[]>>(new Map());
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortBy, setSortBy] = useState<'newest' | 'rating' | 'popular' | 'alphabetical'>('newest');
   const ITEMS_PER_PAGE = 12;
 
   // Read search query from URL params
@@ -426,10 +427,48 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
     setCurrentPage(1);
   }, [selectedSubject, selectedTopics, selectedLevels, selectedLanguages]);
 
+  // Sort filtered resources
+  const sortedResources = useMemo(() => {
+    const sorted = [...filteredResources];
+
+    switch (sortBy) {
+      case 'newest':
+        return sorted.sort((a, b) => {
+          const dateA = new Date(a.created_at || 0).getTime();
+          const dateB = new Date(b.created_at || 0).getTime();
+          return dateB - dateA; // Newest first
+        });
+
+      case 'rating':
+        return sorted.sort((a, b) => {
+          const avgA = a.avg_usefulness && a.avg_correctness
+            ? (a.avg_usefulness + a.avg_correctness) / 2
+            : 0;
+          const avgB = b.avg_usefulness && b.avg_correctness
+            ? (b.avg_usefulness + b.avg_correctness) / 2
+            : 0;
+          return avgB - avgA; // Highest rating first
+        });
+
+      case 'popular':
+        return sorted.sort((a, b) => {
+          const popularityA = (a.ratings_count || 0) + (a.comments_count || 0);
+          const popularityB = (b.ratings_count || 0) + (b.comments_count || 0);
+          return popularityB - popularityA; // Most popular first
+        });
+
+      case 'alphabetical':
+        return sorted.sort((a, b) => a.title.localeCompare(b.title, 'pl'));
+
+      default:
+        return sorted;
+    }
+  }, [filteredResources, sortBy]);
+
   const indexOfLastResource = currentPage * ITEMS_PER_PAGE;
   const indexOfFirstResource = indexOfLastResource - ITEMS_PER_PAGE;
-  const currentResources = filteredResources.slice(indexOfFirstResource, indexOfLastResource);
-  const totalPages = Math.ceil(filteredResources.length / ITEMS_PER_PAGE);
+  const currentResources = sortedResources.slice(indexOfFirstResource, indexOfLastResource);
+  const totalPages = Math.ceil(sortedResources.length / ITEMS_PER_PAGE);
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
@@ -640,6 +679,29 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
             </div>
           ) : (
             <>
+              {/* Sorting dropdown */}
+              {hasActiveFilters && filteredResources.length > 0 && (
+                <div className="mb-4 flex items-center justify-between">
+                  <p className="text-sm text-gray-600">
+                    Znaleziono {filteredResources.length} {filteredResources.length === 1 ? 'zasób' : filteredResources.length < 5 ? 'zasoby' : 'zasobów'}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <label htmlFor="sort" className="text-sm text-gray-600">Sortuj:</label>
+                    <select
+                      id="sort"
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                      className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="newest">Najnowsze</option>
+                      <option value="rating">Najlepiej oceniane</option>
+                      <option value="popular">Najpopularniejsze</option>
+                      <option value="alphabetical">Alfabetycznie (A-Z)</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+
               {!hasActiveFilters && recentlyAddedResources.length > 0 && (
                 <div className="mb-8">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">Ostatnio dodane</h2>
@@ -663,7 +725,7 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
                   {hasActiveFilters ? 'Wyniki filtrowania' : 'Wszystkie zasoby'}
                 </h2>
                 <p className="text-sm text-gray-600">
-                  Wyświetlanie zasobów {filteredResources.length > 0 ? indexOfFirstResource + 1 : 0}-{Math.min(indexOfLastResource, filteredResources.length)} spośród {filteredResources.length} znalezionych materiałów
+                  Wyświetlanie zasobów {sortedResources.length > 0 ? indexOfFirstResource + 1 : 0}-{Math.min(indexOfLastResource, sortedResources.length)} spośród {sortedResources.length} znalezionych materiałów
                 </p>
               </div>
 

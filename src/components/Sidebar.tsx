@@ -42,6 +42,21 @@ export function Sidebar({
   const [levelsExpanded, setLevelsExpanded] = useState(true);
   const [languagesExpanded, setLanguagesExpanded] = useState(true);
 
+  // Map language codes to full names
+  const getLanguageName = (code: string): string => {
+    const languageMap: Record<string, string> = {
+      'pl': 'Polski',
+      'en': 'Angielski',
+      'de': 'Niemiecki',
+      'fr': 'Francuski',
+      'es': 'Hiszpański',
+      'it': 'Włoski',
+      'ru': 'Rosyjski',
+      'uk': 'Ukraiński',
+    };
+    return languageMap[code.toLowerCase()] || code;
+  };
+
   // filteredTopics logic removed as it's handled by useTopics in parent
 
   return (
@@ -62,7 +77,7 @@ export function Sidebar({
       `}>
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900">Filtry</h2>
+            <h2 className="text-xl font-bold text-gray-900">Czego szukasz?</h2>
             <button
               onClick={onClose}
               className="md:hidden text-gray-500 hover:text-gray-700"
@@ -72,7 +87,7 @@ export function Sidebar({
           </div>
 
           <div className="mb-6">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Przedmiot</h3>
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Wybierz przedmiot</h3>
             <div className="space-y-2">
               <button
                 onClick={() => {
@@ -110,7 +125,7 @@ export function Sidebar({
                 onClick={() => setTopicsExpanded(!topicsExpanded)}
                 className="flex items-center justify-between w-full text-sm font-semibold text-gray-700 mb-3"
               >
-                <span>Tematy</span>
+                <span>Wybierz interesujący Cię temat</span>
                 {topicsExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
               </button>
               {topicsExpanded && (
@@ -134,7 +149,7 @@ export function Sidebar({
               onClick={() => setLevelsExpanded(!levelsExpanded)}
               className="flex items-center justify-between w-full text-sm font-semibold text-gray-700 mb-3"
             >
-              <span>Poziomy</span>
+              <span>Wybierz poziomy</span>
               {levelsExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
             </button>
             {levelsExpanded && (
@@ -162,7 +177,7 @@ export function Sidebar({
               onClick={() => setLanguagesExpanded(!languagesExpanded)}
               className="flex items-center justify-between w-full text-sm font-semibold text-gray-700 mb-3"
             >
-              <span>Język</span>
+              <span>Wybierz język</span>
               {languagesExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
             </button>
             {languagesExpanded && (
@@ -178,7 +193,7 @@ export function Sidebar({
                       onChange={() => onLanguageToggle(language)}
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700 uppercase">{language}</span>
+                    <span className="text-sm text-gray-700">{getLanguageName(language)}</span>
                   </label>
                 ))}
               </div>

@@ -235,8 +235,8 @@ export function LandingPage() {
               {mottos[currentMottoIndex]}
             </p>
             <p className="text-lg md:text-xl text-violet-50 max-w-2xl mx-auto animate-fade-in-up mb-8" style={{ animationDelay: '0.5s', opacity: 0 }}>
-              Odkryj materiały edukacyjne, pogrupowane według tematów i poziomów.
-              Ucz się efektywniej z zasobów wybranych przez społeczność.
+              Odkrywaj materiały edukacyjne, pogrupowane według tematów i poziomów.
+              Ucz się efektywniej z zasobów polecanych przez społeczność.
             </p>
 
             <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-12 animate-fade-in-up relative z-20" style={{ animationDelay: '0.6s', opacity: 0 }}>
@@ -452,7 +452,7 @@ export function LandingPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Gotowi do nauki?</h2>
           <p className="text-xl mb-8 text-blue-100">
-            Dołącz do społeczności uczących się i odkryj sprawdzone materiały edukacyjne
+            Dołącz do społeczności uczących się i odkrywaj sprawdzone materiały edukacyjne
           </p>
           <button
             onClick={() => navigate('/auth')}
