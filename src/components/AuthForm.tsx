@@ -20,13 +20,20 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
     const base = fullName || email.split('@')[0];
     if (!base) return;
 
-    const generated = base
+    let generated = base
       .toLowerCase()
       .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
       .trim()
       .replace(/[^a-z0-9\s-]/g, '') // Remove special chars
       .replace(/\s+/g, '-')         // Replace spaces with hyphens
-      .replace(/-+/g, '-');         // Remove duplicate hyphens
+      .replace(/-+/g, '-')          // Remove duplicate hyphens
+      .replace(/^-+|-+$/g, '');     // Remove leading/trailing hyphens
+
+    // If the generated nick is empty or contains only invalid characters,
+    // provide a fallback value based on the current timestamp
+    if (!generated || generated.length === 0) {
+      generated = `user-${Date.now().toString(36)}`;
+    }
 
     setNick(generated);
   };
