@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase, Resource, Subject, ResourceTopic, ResourceLevel } from '../lib/supabase';
 import { ResourceCard } from './ResourceCard';
 import { Navigation } from './Navigation';
-import { BookOpen, Library, Layers, TrendingUp, Award, Sparkles, ArrowRight, Calculator, TestTube, Globe, Clock, Languages, Code, Palette, Dumbbell, Music, Microscope, Atom, Beaker } from 'lucide-react';
+import { BookOpen, Library, Layers, TrendingUp, Award, Sparkles, ArrowRight, Calculator, Globe, Clock, Languages, Code, Palette, Dumbbell, Music, Microscope, Atom, Beaker } from 'lucide-react';
 
 type LandingPageProps = {
   onNavigateToAuth: () => void;
@@ -144,11 +144,6 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
     } finally {
       setLoading(false);
     }
-  };
-
-  const scrollToResources = () => {
-    const element = document.getElementById('latest-resources');
-    element?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const scrollToSubjects = () => {

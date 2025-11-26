@@ -24,10 +24,6 @@ export function Navigation({ onNavigateToAuth, onScrollToSubjects, onBrowseAsGue
     ? 'bg-white shadow-lg'
     : 'bg-white/10 backdrop-blur-md';
 
-  const textClasses = isScrolled
-    ? 'text-gray-900'
-    : 'text-white';
-
   const logoTextClasses = isScrolled
     ? 'text-violet-600'
     : 'text-white';
@@ -51,33 +47,30 @@ export function Navigation({ onNavigateToAuth, onScrollToSubjects, onBrowseAsGue
           <div className="hidden md:flex items-center gap-4">
             <button
               onClick={onScrollToSubjects}
-              className={`px-6 py-2 rounded-lg font-semibold transition-all hover:scale-105 flex items-center gap-2 ${
-                isScrolled
+              className={`px-6 py-2 rounded-lg font-semibold transition-all hover:scale-105 flex items-center gap-2 ${isScrolled
                   ? 'text-violet-600 hover:bg-violet-50'
                   : 'text-white hover:bg-white/10'
-              }`}
+                }`}
             >
               Wybierz przedmiot
               <BookOpen size={18} />
             </button>
             <button
               onClick={onBrowseAsGuest}
-              className={`px-6 py-2 rounded-lg font-semibold transition-all hover:scale-105 shadow-md flex items-center gap-2 ${
-                isScrolled
+              className={`px-6 py-2 rounded-lg font-semibold transition-all hover:scale-105 shadow-md flex items-center gap-2 ${isScrolled
                   ? 'bg-gray-800 text-white hover:bg-gray-900'
                   : 'bg-gray-900 text-white hover:bg-gray-800'
-              }`}
+                }`}
             >
               Przeglądaj jako gość
               <ArrowRight size={18} />
             </button>
             <button
               onClick={onNavigateToAuth}
-              className={`px-6 py-2 rounded-lg font-semibold transition-all hover:scale-105 shadow-md flex items-center gap-2 ${
-                isScrolled
+              className={`px-6 py-2 rounded-lg font-semibold transition-all hover:scale-105 shadow-md flex items-center gap-2 ${isScrolled
                   ? 'bg-violet-600 text-white hover:bg-violet-700'
                   : 'bg-white text-violet-600 hover:bg-violet-50'
-              }`}
+                }`}
             >
               Zaloguj się
               <ArrowRight size={18} />
@@ -86,11 +79,10 @@ export function Navigation({ onNavigateToAuth, onScrollToSubjects, onBrowseAsGue
 
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className={`md:hidden p-2 rounded-lg transition-colors ${
-              isScrolled
+            className={`md:hidden p-2 rounded-lg transition-colors ${isScrolled
                 ? 'text-gray-900 hover:bg-gray-100'
                 : 'text-white hover:bg-white/10'
-            }`}
+              }`}
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -105,11 +97,10 @@ export function Navigation({ onNavigateToAuth, onScrollToSubjects, onBrowseAsGue
                 onScrollToSubjects();
                 setIsMobileMenuOpen(false);
               }}
-              className={`w-full px-6 py-3 rounded-lg font-semibold transition-all text-center flex items-center justify-center gap-2 ${
-                isScrolled
+              className={`w-full px-6 py-3 rounded-lg font-semibold transition-all text-center flex items-center justify-center gap-2 ${isScrolled
                   ? 'text-violet-600 hover:bg-violet-50 bg-violet-50'
                   : 'text-white hover:bg-white/10 bg-white/5'
-              }`}
+                }`}
             >
               Wybierz przedmiot
               <BookOpen size={18} />
@@ -119,11 +110,10 @@ export function Navigation({ onNavigateToAuth, onScrollToSubjects, onBrowseAsGue
                 onBrowseAsGuest();
                 setIsMobileMenuOpen(false);
               }}
-              className={`w-full px-6 py-3 rounded-lg font-semibold transition-all shadow-md flex items-center justify-center gap-2 ${
-                isScrolled
+              className={`w-full px-6 py-3 rounded-lg font-semibold transition-all shadow-md flex items-center justify-center gap-2 ${isScrolled
                   ? 'bg-gray-800 text-white hover:bg-gray-900'
                   : 'bg-gray-900 text-white hover:bg-gray-800'
-              }`}
+                }`}
             >
               Przeglądaj jako gość
               <ArrowRight size={18} />
@@ -133,11 +123,10 @@ export function Navigation({ onNavigateToAuth, onScrollToSubjects, onBrowseAsGue
                 onNavigateToAuth();
                 setIsMobileMenuOpen(false);
               }}
-              className={`w-full px-6 py-3 rounded-lg font-semibold transition-all shadow-md flex items-center justify-center gap-2 ${
-                isScrolled
+              className={`w-full px-6 py-3 rounded-lg font-semibold transition-all shadow-md flex items-center justify-center gap-2 ${isScrolled
                   ? 'bg-violet-600 text-white hover:bg-violet-700'
                   : 'bg-white text-violet-600 hover:bg-violet-50'
-              }`}
+                }`}
             >
               Zaloguj się
               <ArrowRight size={18} />
