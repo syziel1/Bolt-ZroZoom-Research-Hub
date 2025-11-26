@@ -31,7 +31,7 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
 
     // If the generated nick is empty or contains only invalid characters,
     // provide a fallback value based on the current timestamp
-    if (!generated || generated.length === 0) {
+    if (!generated) {
       generated = `user-${Date.now().toString(36)}`;
     }
 
