@@ -569,9 +569,8 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
 
           <footer className="mt-12 pt-8 border-t border-gray-200">
             <div className="text-center text-sm text-gray-600">
-              <p className="mb-2">ZroZoom Hub - Szkoła Przyszłości z AI</p>
+              <p className="mb-2">Szkoła Przyszłości AI - ZroZoom Hub - Twoja baza wiedzy edukacyjnej</p>
               <p className="text-xs text-gray-500">
-                Szkoła Przyszłości AI - ZroZoom Hub - Twoja baza wiedzy edukacyjnej<br></br>
                 © {new Date().getFullYear()} Sylwester Zieliński. All rights reserved
               </p>
             </div>
