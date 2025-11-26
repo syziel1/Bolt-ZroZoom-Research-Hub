@@ -74,9 +74,6 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
               <ImageIcon size={48} />
             </div>
           )}
-          <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-lg shadow-sm">
-            <Icon size={20} className="text-blue-600" />
-          </div>
         </div>
 
         <div className="p-6 flex flex-col flex-1">
@@ -142,9 +139,17 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
                   </div>
                 )}
               </div>
-              <div className="text-sm text-gray-500">
-                {resource.contributor_nick}
-              </div>
+              <a
+                href={resource.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={handleLinkClick}
+                className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+              >
+                <Icon size={16} />
+                Otwórz
+                <ExternalLink size={14} />
+              </a>
             </div>
           </div>
         </div>
@@ -169,12 +174,9 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
         </div>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <Icon size={16} className="text-blue-600" />
-            <h3 className="font-semibold text-gray-900 truncate">
-              {resource.title}
-            </h3>
-          </div>
+          <h3 className="font-semibold text-gray-900 truncate mb-1">
+            {resource.title}
+          </h3>
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-3 text-sm text-gray-500">
               <span>{resource.subject_name}</span>
@@ -209,10 +211,11 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
           target="_blank"
           rel="noopener noreferrer"
           onClick={handleLinkClick}
-          className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
-          aria-label={`Open ${resource.title}`}
+          className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex-shrink-0"
         >
-          <ExternalLink size={20} />
+          <Icon size={16} />
+          Otwórz
+          <ExternalLink size={14} />
         </a>
       </div>
     );
@@ -235,17 +238,10 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-start gap-2">
-            <div className="bg-blue-50 p-2 rounded-lg">
-              <Icon size={20} className="text-blue-600" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">
-                {resource.title}
-              </h3>
-              <p className="text-sm text-gray-600">{resource.subject_name}</p>
-            </div>
-          </div>
+          <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">
+            {resource.title}
+          </h3>
+          <p className="text-sm text-gray-600">{resource.subject_name}</p>
         </div>
       </div>
 
@@ -313,16 +309,14 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
           </div>
         )}
 
-        <div className="text-xs text-gray-500 truncate max-w-[120px]">
-          przez {resource.contributor_nick}
-        </div>
         <a
           href={resource.url}
           target="_blank"
           rel="noopener noreferrer"
           onClick={handleLinkClick}
-          className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm ml-auto"
+          className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium ml-auto"
         >
+          <Icon size={16} />
           Otwórz
           <ExternalLink size={14} />
         </a>
