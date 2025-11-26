@@ -18,6 +18,8 @@ function AppRoutes({ session }: { session: Session | null }) {
       } />
       <Route path="/zasoby" element={<Dashboard isGuestMode={true} />} />
       <Route path="/zasoby/:subjectSlug" element={<Dashboard isGuestMode={true} />} />
+      <Route path="/zasoby/:subjectSlug/:topicSlug" element={<Dashboard isGuestMode={true} />} />
+      <Route path="/zasoby/:subjectSlug/:topicSlug/:subtopicSlug" element={<Dashboard isGuestMode={true} />} />
       <Route path="/o-nas" element={<MarkdownPage fileName="about.md" />} />
       <Route path="/polityka-prywatnosci" element={<MarkdownPage fileName="privacy.md" />} />
 

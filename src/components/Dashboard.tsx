@@ -15,7 +15,7 @@ type DashboardProps = {
 
 export function Dashboard({ isGuestMode = false }: DashboardProps) {
   const navigate = useNavigate();
-  const { subjectSlug } = useParams<{ subjectSlug?: string }>();
+  const { subjectSlug, topicSlug, subtopicSlug } = useParams<{ subjectSlug?: string; topicSlug?: string; subtopicSlug?: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [resources, setResources] = useState<Resource[]>([]);
@@ -61,6 +61,27 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
       setSelectedSubject(null);
     }
   }, [subjectSlug, subjects]);
+
+  // Map topicSlug/subtopicSlug to topic IDs
+  useEffect(() => {
+    if (allTopics.length > 0 && subjectSlug) {
+      if (subtopicSlug) {
+        const topic = allTopics.find(t => t.slug === subtopicSlug);
+        if (topic) {
+          // We found the subtopic, select it
+          // We might also want to expand its parent, but selectedTopics handles selection
+          setSelectedTopics([topic.id]);
+        }
+      } else if (topicSlug) {
+        const topic = allTopics.find(t => t.slug === topicSlug);
+        if (topic) {
+          setSelectedTopics([topic.id]);
+        }
+      } else {
+        setSelectedTopics([]);
+      }
+    }
+  }, [subjectSlug, topicSlug, subtopicSlug, allTopics]);
 
   const loadUserProfile = useCallback(async () => {
     const {
@@ -270,45 +291,24 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
   };
 
   const handleTopicToggle = (topicId: string) => {
-    setSelectedTopics((prev) => {
-      const isCurrentlySelected = prev.includes(topicId);
+    // Navigate to the topic URL instead of just toggling state
+    const topic = allTopics.find(t => t.id === topicId);
+    if (!topic || !selectedSubject) return;
 
-      // Helper function to collect all descendant topic IDs
-      const getAllDescendantIds = (nodes: TopicNode[], parentId: string): string[] => {
-        let ids: string[] = [];
-        for (const node of nodes) {
-          if (node.id === parentId) {
-            // Found the parent, collect all its children recursively
-            const collectChildren = (n: TopicNode): string[] => {
-              let childIds = [n.id];
-              if (n.children) {
-                n.children.forEach(child => {
-                  childIds = [...childIds, ...collectChildren(child)];
-                });
-              }
-              return childIds;
-            };
-            ids = collectChildren(node);
-            break;
-          }
-          if (node.children) {
-            ids = getAllDescendantIds(node.children, parentId);
-            if (ids.length > 0) break;
-          }
-        }
-        return ids;
-      };
+    const subject = subjects.find(s => s.subject_id === selectedSubject);
+    if (!subject) return;
 
-      if (isCurrentlySelected) {
-        // Deselect this topic and all its descendants
-        const idsToRemove = getAllDescendantIds(topicNodes, topicId);
-        return prev.filter(id => !idsToRemove.includes(id));
-      } else {
-        // Select this topic and all its descendants
-        const idsToAdd = getAllDescendantIds(topicNodes, topicId);
-        return [...new Set([...prev, ...idsToAdd])];
+    // Check if it's a subtopic
+    if (topic.parent_topic_id) {
+      const parentTopic = allTopics.find(t => t.id === topic.parent_topic_id);
+      if (parentTopic) {
+        navigate(`/zasoby/${subject.subject_slug}/${parentTopic.slug}/${topic.slug}`);
+        return;
       }
-    });
+    }
+
+    // It's a main topic
+    navigate(`/zasoby/${subject.subject_slug}/${topic.slug}`);
   };
 
   const handleLevelToggle = (levelId: string) => {
