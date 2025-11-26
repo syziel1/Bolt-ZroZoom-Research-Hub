@@ -29,9 +29,11 @@ ZroZoom Research Hub to platforma do gromadzenia, organizowania i udostępniania
 
 ### Dla wszystkich użytkowników
 - 📚 Przeglądanie zasobów edukacyjnych
-- 🔍 Filtrowanie po przedmiotach, tematach i poziomach
+- 🔍 Filtrowanie po przedmiotach, tematach, poziomach i języku
 - 📊 Wyświetlanie statystyk i ocen materiałów
 - 🌳 Hierarchiczne drzewo tematów
+- 📑 Paginacja wyników wyszukiwania
+- 🃏 Różne widoki kart (Hero, Lista, Siatka)
 
 ### Dla zalogowanych użytkowników
 - ➕ Dodawanie nowych zasobów
@@ -256,7 +258,7 @@ Formularz logowania i rejestracji z integracją Supabase Auth.
 Główny widok aplikacji z:
 - Statystykami (liczba zasobów, przedmiotów, tematów)
 - Sekcją "Ostatnio dodane"
-- Listą wszystkich zasobów z filtrowaniem
+- Listą wszystkich zasobów z filtrowaniem i paginacją
 
 #### Sidebar
 Boczne menu z filtrami:
@@ -265,7 +267,7 @@ Boczne menu z filtrami:
 - Poziomy trudności
 
 #### ResourceCard
-Karta pojedynczego zasobu wyświetlająca:
+Karta pojedynczego zasobu dostępna w trzech wariantach (Hero, List, Default), wyświetlająca:
 - Tytuł i opis
 - Przedmiot
 - Tematy (max 3 widoczne)

@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { X } from 'lucide-react';
 import { supabase, Subject, Topic, Level, Resource } from '../lib/supabase';
-import { uploadResourceThumbnail } from '../lib/storage';
+import { uploadResourceThumbnail, getThumbnailUrl } from '../lib/storage';
 import { ThumbnailUploader } from './ThumbnailUploader';
+import { buildTopicTree } from '../utils/topicTree';
+import { TopicTree } from './TopicTree';
 
 type ResourceFormProps = {
   subjects: Subject[];
@@ -24,13 +26,24 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
   const [language, setLanguage] = useState(initialData?.language || 'pl');
   const [aiGenerated, setAiGenerated] = useState(initialData?.ai_generated || false);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
-  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(initialData?.thumbnail_url || null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(getThumbnailUrl(initialData?.thumbnail_path) || null);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
   const filteredTopics = useMemo(() => (subjectId ? topics.filter((t) => t.subject_id === subjectId) : []), [subjectId, topics]);
+  const topicTree = useMemo(() => buildTopicTree(filteredTopics), [filteredTopics]);
+
+  const handleTopicToggle = (topicId: string) => {
+    setSelectedTopics(prev => {
+      if (prev.includes(topicId)) {
+        return prev.filter(id => id !== topicId);
+      } else {
+        return [...prev, topicId];
+      }
+    });
+  };
 
   // Update state when initialData changes (e.g., switching from add to edit mode)
   useEffect(() => {
@@ -41,7 +54,7 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
     setSubjectId(initialData?.subject_id || '');
     setLanguage(initialData?.language || 'pl');
     setAiGenerated(initialData?.ai_generated || false);
-    setThumbnailPreview(initialData?.thumbnail_url || null);
+    setThumbnailPreview(getThumbnailUrl(initialData?.thumbnail_path) || null);
     setThumbnailFile(null);
     setSelectedTopics([]);
     setSelectedLevels([]);
@@ -322,27 +335,12 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Tematy (opcjonalnie)
           </label>
-          <div className="border border-gray-300 rounded-md p-3 max-h-40 overflow-y-auto space-y-2">
-            {filteredTopics.map((topic) => (
-              <label
-                key={topic.id}
-                className="flex items-center gap-2 cursor-pointer"
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedTopics.includes(topic.id)}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setSelectedTopics([...selectedTopics, topic.id]);
-                    } else {
-                      setSelectedTopics(selectedTopics.filter((id) => id !== topic.id));
-                    }
-                  }}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="text-sm text-gray-700">{topic.name}</span>
-              </label>
-            ))}
+          <div className="border border-gray-300 rounded-md p-3 max-h-60 overflow-y-auto">
+            <TopicTree
+              nodes={topicTree}
+              selectedTopics={selectedTopics}
+              onTopicToggle={handleTopicToggle}
+            />
           </div>
         </div>
       )}

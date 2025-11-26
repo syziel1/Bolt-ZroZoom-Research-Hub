@@ -7,12 +7,15 @@ type SidebarProps = {
   subjects: Subject[];
   topicNodes: TopicNode[];
   levels: Level[];
+  languages: string[];
   selectedSubject: string | null;
   selectedTopics: string[];
   selectedLevels: string[];
+  selectedLanguages: string[];
   onSubjectChange: (subjectId: string | null) => void;
   onTopicToggle: (topicId: string) => void;
   onLevelToggle: (levelId: string) => void;
+  onLanguageToggle: (language: string) => void;
   isOpen: boolean;
   onClose: () => void;
   isLoading?: boolean;
@@ -22,18 +25,22 @@ export function Sidebar({
   subjects,
   topicNodes,
   levels,
+  languages,
   selectedSubject,
   selectedTopics,
   selectedLevels,
+  selectedLanguages,
   onSubjectChange,
   onTopicToggle,
   onLevelToggle,
+  onLanguageToggle,
   isOpen,
   onClose,
   isLoading = false,
 }: SidebarProps) {
   const [topicsExpanded, setTopicsExpanded] = useState(true);
   const [levelsExpanded, setLevelsExpanded] = useState(true);
+  const [languagesExpanded, setLanguagesExpanded] = useState(true);
 
   // filteredTopics logic removed as it's handled by useTopics in parent
 
@@ -91,10 +98,7 @@ export function Sidebar({
                     : 'text-gray-700 hover:bg-gray-50'
                     }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <span>{subject.subject_name}</span>
-                    <span className="text-xs text-gray-500">({subject.resources_count})</span>
-                  </div>
+                  {subject.subject_name}
                 </button>
               ))}
             </div>
@@ -147,6 +151,34 @@ export function Sidebar({
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
                     <span className="text-sm text-gray-700">{level.name}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="mb-6">
+            <button
+              onClick={() => setLanguagesExpanded(!languagesExpanded)}
+              className="flex items-center justify-between w-full text-sm font-semibold text-gray-700 mb-3"
+            >
+              <span>Język</span>
+              {languagesExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+            </button>
+            {languagesExpanded && (
+              <div className="space-y-2">
+                {languages.map((language) => (
+                  <label
+                    key={language}
+                    className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-50 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedLanguages.includes(language)}
+                      onChange={() => onLanguageToggle(language)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700 uppercase">{language}</span>
                   </label>
                 ))}
               </div>
