@@ -6,7 +6,7 @@ import { ResourceCard } from './ResourceCard';
 import { AddResourceModal } from './AddResourceModal';
 import { ResourceDetailModal } from './ResourceDetailModal';
 import { AdminPanel } from './AdminPanel';
-import { Plus, LogOut, Loader, Library, BookOpen, Hash, Settings, Menu, ArrowLeft } from 'lucide-react';
+import { Plus, LogOut, Loader, Library, BookOpen, Hash, Settings, Menu, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 
 type DashboardProps = {
   isGuestMode?: boolean;
@@ -35,6 +35,8 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [resourceTopics, setResourceTopics] = useState<Map<string, ResourceTopic[]>>(new Map());
   const [resourceLevels, setResourceLevels] = useState<Map<string, ResourceLevel[]>>(new Map());
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 12;
 
   const loadUserProfile = useCallback(async () => {
     const {
@@ -269,11 +271,9 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
     }
 
     if (selectedLevels.length > 0) {
-      const resourceLevels = levels
-        .filter((l) => selectedLevels.includes(l.id))
-        .map((l) => l.name);
-      const hasMatchingLevel = resourceLevels.some((levelName) =>
-        resource.level_names?.includes(levelName)
+      const currentResourceLevels = resourceLevels.get(resource.id) || [];
+      const hasMatchingLevel = currentResourceLevels.some((level) =>
+        selectedLevels.includes(level.id)
       );
       if (!hasMatchingLevel) return false;
     }
@@ -286,6 +286,25 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
 
     return true;
   });
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedSubject, selectedTopics, selectedLevels, selectedLanguages]);
+
+  const indexOfLastResource = currentPage * ITEMS_PER_PAGE;
+  const indexOfFirstResource = indexOfLastResource - ITEMS_PER_PAGE;
+  const currentResources = filteredResources.slice(indexOfFirstResource, indexOfLastResource);
+  const totalPages = Math.ceil(filteredResources.length / ITEMS_PER_PAGE);
+
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+    // Scroll to top of the list or top of the page
+    const mainContent = document.querySelector('main');
+    if (mainContent) {
+      mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   const languages = useMemo(() => {
     const langs = new Set(resources.map((r) => r.language).filter(Boolean));
@@ -511,12 +530,12 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
                   {hasActiveFilters ? 'Wyniki filtrowania' : 'Wszystkie zasoby'}
                 </h2>
                 <p className="text-sm text-gray-600">
-                  Wyświetlanie {filteredResources.length} z {resources.length} zasobów
+                  Wyświetlanie zasobów {filteredResources.length > 0 ? indexOfFirstResource + 1 : 0}-{Math.min(indexOfLastResource, filteredResources.length)} spośród {filteredResources.length} znalezionych materiałów
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                {filteredResources.map((resource) => (
+                {currentResources.map((resource) => (
                   <ResourceCard
                     key={resource.id}
                     resource={resource}
@@ -527,6 +546,57 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
                   />
                 ))}
               </div>
+
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-2 mt-8 pb-4">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+
+                  <div className="flex gap-1 overflow-x-auto max-w-[200px] sm:max-w-none no-scrollbar">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                      // Show first, last, current, and surrounding pages
+                      if (
+                        page === 1 ||
+                        page === totalPages ||
+                        (page >= currentPage - 1 && page <= currentPage + 1)
+                      ) {
+                        return (
+                          <button
+                            key={page}
+                            onClick={() => handlePageChange(page)}
+                            className={`w-10 h-10 rounded-md flex-shrink-0 flex items-center justify-center text-sm font-medium transition-colors
+                              ${currentPage === page
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                              }`}
+                          >
+                            {page}
+                          </button>
+                        );
+                      } else if (
+                        page === currentPage - 2 ||
+                        page === currentPage + 2
+                      ) {
+                        return <span key={page} className="w-10 h-10 flex items-center justify-center text-gray-400">...</span>;
+                      }
+                      return null;
+                    })}
+                  </div>
+
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+              )}
 
               {filteredResources.length === 0 && (
                 <div className="text-center py-12 text-gray-500">
