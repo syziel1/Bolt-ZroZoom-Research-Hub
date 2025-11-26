@@ -59,6 +59,11 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
   const [deleteResourceConfirm, setDeleteResourceConfirm] = useState(false);
   const [topics, setTopics] = useState<ResourceTopic[]>([]);
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [savedRatingData, setSavedRatingData] = useState<{
+    usefulness: number;
+    correctness: number;
+    difficulty: number;
+  } | null>(null);
 
 
 
@@ -90,11 +95,15 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
 
       setUserHasRated(!!data);
       if (data) {
-        setRatingData({
+        const ratingValues = {
           usefulness: data.rating_usefulness,
           correctness: data.rating_correctness,
           difficulty: data.difficulty_match || 3,
-        });
+        };
+        setRatingData(ratingValues);
+        setSavedRatingData(ratingValues);
+      } else {
+        setSavedRatingData(null);
       }
     }
   }, [resource]);
@@ -169,6 +178,20 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     }
   }, [isOpen, resource, isGuestMode, loadUserData, checkUserRating, loadRatings, loadComments, loadTopics]);
 
+  const defaultRatingData = { usefulness: 5, correctness: 5, difficulty: 3 };
+
+  const handleToggleRatingForm = (show: boolean) => {
+    if (show) {
+      // When opening the form, populate with saved values or defaults
+      setRatingData(savedRatingData || defaultRatingData);
+      setShowRatingForm(true);
+    } else {
+      // When closing the form, reset to saved values or defaults
+      setRatingData(savedRatingData || defaultRatingData);
+      setShowRatingForm(false);
+    }
+  };
+
   const handleSubmitRating = async () => {
     if (!resource || !currentUserId) return;
 
@@ -186,6 +209,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     if (!error) {
       setShowRatingForm(false);
       setUserHasRated(true);
+      setSavedRatingData({ ...ratingData });
       loadRatings();
       onResourceUpdated();
     }
@@ -415,7 +439,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
               </h4>
               {!isGuestMode && !userHasRated && (
                 <button
-                  onClick={() => setShowRatingForm(!showRatingForm)}
+                  onClick={() => handleToggleRatingForm(!showRatingForm)}
                   className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                 >
                   {showRatingForm ? 'Anuluj' : (userHasRated ? 'Edytuj ocenę' : 'Dodaj ocenę')}
@@ -472,6 +496,14 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                   >
                     {submitting ? 'Wysyłanie...' : (userHasRated ? 'Zaktualizuj ocenę' : 'Wyślij ocenę')}
                   </button>
+                  {userHasRated && (
+                    <button
+                      onClick={() => handleToggleRatingForm(false)}
+                      className="w-full mt-2 bg-gray-200 text-gray-700 py-2 rounded-md hover:bg-gray-300"
+                    >
+                      Anuluj
+                    </button>
+                  )}
                 </div>
               </div>
             )}
@@ -480,7 +512,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
               <p className="text-sm text-gray-600 mb-4">
                 Twoja ocena została zapisana.
                 <button
-                  onClick={() => setShowRatingForm(true)}
+                  onClick={() => handleToggleRatingForm(true)}
                   className="text-blue-600 hover:text-blue-800 ml-1 underline"
                 >
                   Edytuj
