@@ -40,6 +40,8 @@ const typeIcons: Record<string, React.ElementType> = {
   tool: Wrench,
 };
 
+const DEFAULT_RATING_DATA = { usefulness: 5, correctness: 5, difficulty: 3 };
+
 export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdated, isGuestMode = false, onEdit }: ResourceDetailModalProps) {
   const [ratings, setRatings] = useState<Rating[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -47,11 +49,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
   const [currentUserRole, setCurrentUserRole] = useState<string>('student');
   const [showRatingForm, setShowRatingForm] = useState(false);
   const [showCommentForm, setShowCommentForm] = useState(false);
-  const [ratingData, setRatingData] = useState({
-    usefulness: 5,
-    correctness: 5,
-    difficulty: 3,
-  });
+  const [ratingData, setRatingData] = useState(DEFAULT_RATING_DATA);
   const [commentText, setCommentText] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [userHasRated, setUserHasRated] = useState(false);
@@ -178,16 +176,14 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     }
   }, [isOpen, resource, isGuestMode, loadUserData, checkUserRating, loadRatings, loadComments, loadTopics]);
 
-  const defaultRatingData = { usefulness: 5, correctness: 5, difficulty: 3 };
-
   const handleToggleRatingForm = (show: boolean) => {
     if (show) {
       // When opening the form, populate with saved values or defaults
-      setRatingData(savedRatingData || defaultRatingData);
+      setRatingData(savedRatingData || DEFAULT_RATING_DATA);
       setShowRatingForm(true);
     } else {
       // When closing the form, reset to saved values or defaults
-      setRatingData(savedRatingData || defaultRatingData);
+      setRatingData(savedRatingData || DEFAULT_RATING_DATA);
       setShowRatingForm(false);
     }
   };
@@ -442,7 +438,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                   onClick={() => handleToggleRatingForm(!showRatingForm)}
                   className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                 >
-                  {showRatingForm ? 'Anuluj' : (userHasRated ? 'Edytuj ocenę' : 'Dodaj ocenę')}
+                  {showRatingForm ? 'Anuluj' : 'Dodaj ocenę'}
                 </button>
               )}
             </div>
