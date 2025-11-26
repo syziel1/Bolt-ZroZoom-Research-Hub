@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { supabase, Resource, ResourceTopic } from '../lib/supabase';
-import { X, Star, MessageSquare, Edit, Trash2, ExternalLink, Video, FileText, Presentation, Beaker, Wrench } from 'lucide-react';
+import { getThumbnailUrl } from '../lib/storage';
+import { X, Star, MessageSquare, Edit, Trash2, ExternalLink, Video, FileText, Presentation, Beaker, Wrench, User, Globe, Calendar, Sparkles } from 'lucide-react';
 import { ConfirmationModal } from './ConfirmationModal';
 
 type ResourceDetailModalProps = {
@@ -247,6 +248,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
   if (!isOpen || !resource) return null;
 
   const Icon = typeIcons[resource.type] || FileText;
+  const thumbnailUrl = getThumbnailUrl(resource.thumbnail_path);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -262,23 +264,67 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
         </div>
 
         <div className="p-6">
-          <div className="flex items-start gap-4 mb-6">
-            <div className="bg-blue-50 p-3 rounded-lg">
-              <Icon size={32} className="text-blue-600" />
+          <div className="flex items-start gap-6 mb-6">
+            <div className="flex-shrink-0">
+              {thumbnailUrl ? (
+                <img
+                  src={thumbnailUrl}
+                  alt={resource.title}
+                  className="w-40 h-auto object-cover rounded-lg border border-gray-200 shadow-sm"
+                />
+              ) : (
+                <div className="bg-blue-50 p-6 rounded-lg flex items-center justify-center">
+                  <Icon size={48} className="text-blue-600" />
+                </div>
+              )}
             </div>
             <div className="flex-1">
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
                 {resource.title}
               </h3>
-              <p className="text-sm text-gray-600 mb-2">{resource.subject_name}</p>
+
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-4">
+                <span className="px-2 py-1 bg-gray-100 rounded text-gray-700 font-medium">
+                  {resource.subject_name}
+                </span>
+
+                {resource.language && (
+                  <span className="flex items-center gap-1" title="Język">
+                    <Globe size={16} />
+                    {resource.language.toUpperCase()}
+                  </span>
+                )}
+
+                {resource.contributor_nick && (
+                  <span className="flex items-center gap-1" title="Dodane przez">
+                    <User size={16} />
+                    {resource.contributor_nick}
+                  </span>
+                )}
+
+                {resource.created_at && (
+                  <span className="flex items-center gap-1" title="Data dodania">
+                    <Calendar size={16} />
+                    {new Date(resource.created_at).toLocaleDateString()}
+                  </span>
+                )}
+
+                {resource.ai_generated && (
+                  <span className="flex items-center gap-1 px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs font-medium border border-purple-200">
+                    <Sparkles size={12} />
+                    AI
+                  </span>
+                )}
+              </div>
+
               <a
                 href={resource.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
               >
                 Otwórz zasób
-                <ExternalLink size={14} />
+                <ExternalLink size={16} />
               </a>
             </div>
             {canEdit && (
