@@ -126,10 +126,10 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
                 <div className="flex items-center gap-1.5">
                   <Star
                     size={16}
-                    className={`${getRatingColor(overallRating)} ${hasRatings ? 'fill-current' : ''}`}
+                    className={`text-yellow-400 ${hasRatings ? 'fill-current' : ''}`}
                   />
                   <span className="text-sm font-medium text-gray-700">
-                    {hasRatings ? overallRating?.toFixed(1) : '-'}
+                    {hasRatings ? overallRating?.toFixed(1) : 'Oceń jako pierwszy'}
                   </span>
                 </div>
                 {(resource.comments_count || 0) > 0 && (
