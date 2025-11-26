@@ -129,7 +129,7 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
                     className={`text-yellow-400 ${hasRatings ? 'fill-current' : ''}`}
                   />
                   <span className="text-sm font-medium text-gray-700">
-                    {hasRatings ? overallRating?.toFixed(1) : 'Oceń jako pierwszy'}
+                    {hasRatings ? overallRating?.toFixed(1) : 'Dodaj pierwszą ocenę'}
                   </span>
                 </div>
                 {(resource.comments_count || 0) > 0 && (
@@ -183,7 +183,7 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
               <span>•</span>
               <div className="flex items-center gap-1">
                 <Star size={14} className={`text-yellow-400 ${hasRatings ? 'fill-current' : ''}`} />
-                <span>{hasRatings ? overallRating?.toFixed(1) : 'Oceń jako pierwszy'}</span>
+                <span>{hasRatings ? overallRating?.toFixed(1) : 'Dodaj pierwszą ocenę'}</span>
               </div>
             </div>
             {topics.length > 0 && (
@@ -298,7 +298,7 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
               <span className="text-xs text-gray-500">({resource.ratings_count})</span>
             </div>
           ) : (
-            <span className="text-xs text-gray-500">Oceń jako pierwszy</span>
+            <span className="text-xs text-gray-500">Dodaj pierwszą ocenę</span>
           )}
         </div>
 
