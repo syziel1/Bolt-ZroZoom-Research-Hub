@@ -169,7 +169,7 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
 
   return (
     <div className="min-h-screen bg-white">
-      <Navigation onNavigateToAuth={onNavigateToAuth} onScrollToResources={scrollToResources} onScrollToSubjects={scrollToSubjects} />
+      <Navigation onNavigateToAuth={onNavigateToAuth} onScrollToResources={scrollToResources} onScrollToSubjects={scrollToSubjects} onBrowseAsGuest={() => onBrowseAsGuest()} />
       <section className="relative min-h-[70vh] bg-gradient-to-br from-violet-600 via-purple-600 to-violet-700 flex items-center justify-center px-4 pt-24 pb-12 overflow-hidden">
         <div className="max-w-6xl w-full text-center relative z-10">
           <div className="mb-8">
@@ -227,16 +227,6 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
               <p>Brak dostępnych zasobów</p>
             </div>
           )}
-
-          <div className="text-center mt-12">
-            <button
-              onClick={() => onBrowseAsGuest()}
-              className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-all hover:scale-105 shadow-lg inline-flex items-center gap-2"
-            >
-              Przeglądaj materiały jako gość
-              <ArrowRight size={20} />
-            </button>
-          </div>
         </div>
       </section>
 
