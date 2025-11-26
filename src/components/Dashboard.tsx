@@ -228,6 +228,11 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
 
       // Helper function to collect all descendant topic IDs
       const getAllDescendantIds = (nodes: TopicNode[], parentId: string): string[] => {
+        // Return empty array if topicNodes is not populated yet
+        if (!nodes || nodes.length === 0) {
+          return [parentId];
+        }
+
         let ids: string[] = [];
         for (const node of nodes) {
           if (node.id === parentId) {
