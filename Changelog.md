@@ -9,6 +9,14 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 - `uploadResourceThumbnail` logic in the service layer.
 - Image display handling in `ResourceCard`.
 
+## [1.3.0] - 2025-11-26
+**Added**
+- React Router DOM integration with declarative routing.
+- Client-side search functionality (filters by title and description).
+- URL-based navigation with query parameters (`?q=search`).
+- Protected routes and automatic redirects.
+- Markdown pages for About and Privacy Policy.
+
 ## [1.2.0] - 2025-11-26
 **Added**
 - Pagination in Dashboard (client-side).

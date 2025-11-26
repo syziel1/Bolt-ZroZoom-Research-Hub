@@ -33,7 +33,9 @@ ZroZoom Research Hub to platforma do gromadzenia, organizowania i udostępniania
 - 📊 Wyświetlanie statystyk i ocen materiałów
 - 🌳 Hierarchiczne drzewo tematów
 - 📑 Paginacja wyników wyszukiwania
+- 🔍 Wyszukiwanie pełnotekstowe (klient)
 - 🃏 Różne widoki kart (Hero, Lista, Siatka)
+- 🔗 Routing z URL parametrami
 
 ### Dla zalogowanych użytkowników
 - ➕ Dodawanie nowych zasobów
@@ -54,6 +56,7 @@ ZroZoom Research Hub to platforma do gromadzenia, organizowania i udostępniania
 - **Vite** - narzędzie budowania
 - **Tailwind CSS** - stylowanie
 - **Lucide React** - ikony
+- **React Router DOM** - routing i nawigacja
 
 ### Backend
 - **Supabase** - Backend-as-a-Service

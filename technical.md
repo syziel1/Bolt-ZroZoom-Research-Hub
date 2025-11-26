@@ -7,6 +7,7 @@ Minimalna dokumentacja techniczna dla repozytorium.
 ## 1. Architektura
 - **Backend / DB:** Supabase (PostgreSQL + Auth + RLS)
 - **Frontend:** Next.js / React (np. bolt.new) — czytelne API przez supabase-js
+- **Routing:** React Router DOM — deklaratywne routy, protected routes
 - **Publiczne odczytywanie:** materiały, tematy, poziomy, przedmioty
 - **Modyfikacje:** tylko zalogowani użytkownicy (z RLS)
 
