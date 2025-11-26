@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase, Resource, Subject, ResourceTopic, ResourceLevel } from '../lib/supabase';
 import { ResourceCard } from './ResourceCard';
 import { Navigation } from './Navigation';
-import { BookOpen, Library, Layers, TrendingUp, Award, Sparkles, ArrowRight } from 'lucide-react';
+import { BookOpen, Library, Layers, TrendingUp, Award, Sparkles, ArrowRight, Calculator, TestTube, Globe, Clock, Languages, Code, Palette, Dumbbell, Music, Microscope } from 'lucide-react';
 
 type LandingPageProps = {
   onNavigateToAuth: () => void;
@@ -169,7 +169,7 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
 
   return (
     <div className="min-h-screen bg-white">
-      <Navigation onNavigateToAuth={onNavigateToAuth} onScrollToResources={scrollToResources} onScrollToSubjects={scrollToSubjects} onBrowseAsGuest={() => onBrowseAsGuest()} />
+      <Navigation onNavigateToAuth={onNavigateToAuth} onScrollToSubjects={scrollToSubjects} onBrowseAsGuest={() => onBrowseAsGuest()} />
       <section className="relative min-h-[70vh] bg-gradient-to-br from-violet-600 via-purple-600 to-violet-700 flex items-center justify-center px-4 pt-24 pb-12 overflow-hidden">
         <div className="max-w-6xl w-full text-center relative z-10">
           <div className="mb-8">
@@ -249,6 +249,23 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
               ];
               const gradient = gradients[index % gradients.length];
 
+              const getSubjectIcon = (subjectName: string) => {
+                const name = subjectName.toLowerCase();
+                if (name.includes('matematyk')) return Calculator;
+                if (name.includes('fizyk') || name.includes('chemi')) return TestTube;
+                if (name.includes('geograf')) return Globe;
+                if (name.includes('histor')) return Clock;
+                if (name.includes('angielski') || name.includes('niemiecki') || name.includes('francuski') || name.includes('język')) return Languages;
+                if (name.includes('informatyk') || name.includes('programow')) return Code;
+                if (name.includes('plastyk') || name.includes('sztuk')) return Palette;
+                if (name.includes('wf') || name.includes('wychowanie fizyczne')) return Dumbbell;
+                if (name.includes('muzyk')) return Music;
+                if (name.includes('biologi')) return Microscope;
+                return BookOpen;
+              };
+
+              const SubjectIcon = getSubjectIcon(subject.subject_name);
+
               return (
                 <div
                   key={subject.subject_id}
@@ -257,7 +274,7 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
                 >
                   <div className="flex items-center gap-4">
                     <div className="bg-white/20 backdrop-blur-sm p-3 rounded-lg group-hover:bg-white/30 transition-colors">
-                      <BookOpen size={32} className="text-white" />
+                      <SubjectIcon size={32} className="text-white" />
                     </div>
                     <div className="flex-1">
                       <h3 className="text-xl font-semibold text-white">

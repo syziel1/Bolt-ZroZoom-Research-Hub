@@ -3,12 +3,11 @@ import { Library, Menu, X, ArrowRight, BookOpen } from 'lucide-react';
 
 type NavigationProps = {
   onNavigateToAuth: () => void;
-  onScrollToResources: () => void;
   onScrollToSubjects: () => void;
   onBrowseAsGuest: () => void;
 };
 
-export function Navigation({ onNavigateToAuth, onScrollToResources, onScrollToSubjects, onBrowseAsGuest }: NavigationProps) {
+export function Navigation({ onNavigateToAuth, onScrollToSubjects, onBrowseAsGuest }: NavigationProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -50,16 +49,6 @@ export function Navigation({ onNavigateToAuth, onScrollToResources, onScrollToSu
           </div>
 
           <div className="hidden md:flex items-center gap-4">
-            <button
-              onClick={onScrollToResources}
-              className={`px-6 py-2 rounded-lg font-semibold transition-all hover:scale-105 ${
-                isScrolled
-                  ? 'text-violet-600 hover:bg-violet-50'
-                  : 'text-white hover:bg-white/10'
-              }`}
-            >
-              Przeglądaj zasoby
-            </button>
             <button
               onClick={onScrollToSubjects}
               className={`px-6 py-2 rounded-lg font-semibold transition-all hover:scale-105 flex items-center gap-2 ${
@@ -111,19 +100,6 @@ export function Navigation({ onNavigateToAuth, onScrollToResources, onScrollToSu
       {isMobileMenuOpen && (
         <div className={`md:hidden border-t ${isScrolled ? 'border-gray-200 bg-white' : 'border-white/20 bg-white/10 backdrop-blur-md'}`}>
           <div className="px-4 py-4 space-y-3">
-            <button
-              onClick={() => {
-                onScrollToResources();
-                setIsMobileMenuOpen(false);
-              }}
-              className={`w-full px-6 py-3 rounded-lg font-semibold transition-all text-center ${
-                isScrolled
-                  ? 'text-violet-600 hover:bg-violet-50 bg-violet-50'
-                  : 'text-white hover:bg-white/10 bg-white/5'
-              }`}
-            >
-              Przeglądaj zasoby
-            </button>
             <button
               onClick={() => {
                 onScrollToSubjects();
