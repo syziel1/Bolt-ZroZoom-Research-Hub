@@ -469,7 +469,7 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
                 onClick={() => setShowAdminPanel(false)}
                 className="text-blue-600 hover:text-blue-800 flex items-center gap-2 text-sm md:text-base"
               >
-                <span className="hidden md:inline">Powrót do Dashboard</span>
+                <span className="hidden md:inline">Powrót do pulpitu</span>
                 <span className="md:hidden">Powrót</span>
               </button>
               <button

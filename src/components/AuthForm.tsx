@@ -64,7 +64,7 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
       if (onSuccess) {
         onSuccess();
       } else {
-        navigate('/dashboard');
+        navigate('/pulpit');
       }
     } catch (err) {
       if (err instanceof Error) {

@@ -14,7 +14,7 @@ function AppRoutes({ session }: { session: Session | null }) {
       {/* Public routes */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/auth" element={
-        session ? <Navigate to="/dashboard" replace /> : <AuthForm />
+        session ? <Navigate to="/pulpit" replace /> : <AuthForm />
       } />
       <Route path="/zasoby" element={<Dashboard isGuestMode={true} />} />
       <Route path="/zasoby/:subjectSlug" element={<Dashboard isGuestMode={true} />} />
@@ -22,7 +22,7 @@ function AppRoutes({ session }: { session: Session | null }) {
       <Route path="/polityka-prywatnosci" element={<MarkdownPage fileName="privacy.md" />} />
 
       {/* Protected routes */}
-      <Route path="/dashboard" element={
+      <Route path="/pulpit" element={
         session ? <Dashboard /> : <Navigate to="/auth" replace />
       } />
 
