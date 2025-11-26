@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { supabase, Resource } from '../lib/supabase';
+import { supabase, Resource, ResourceTopic } from '../lib/supabase';
 import { X, Star, MessageSquare, Edit, Trash2, ExternalLink, Video, FileText, Presentation, Beaker, Wrench } from 'lucide-react';
 import { ConfirmationModal } from './ConfirmationModal';
 
@@ -56,6 +56,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
   const [userHasRated, setUserHasRated] = useState(false);
   const [deleteCommentConfirm, setDeleteCommentConfirm] = useState<string | null>(null);
   const [deleteResourceConfirm, setDeleteResourceConfirm] = useState(false);
+  const [topics, setTopics] = useState<ResourceTopic[]>([]);
 
 
 
@@ -134,6 +135,18 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     }
   }, [resource]);
 
+  const loadTopics = useCallback(async () => {
+    if (!resource) return;
+    const { data } = await supabase
+      .from('v_resource_topics')
+      .select('topic_id, topic_name, topic_slug, parent_topic_id, subject_slug')
+      .eq('resource_id', resource.id);
+
+    if (data) {
+      setTopics(data);
+    }
+  }, [resource]);
+
   useEffect(() => {
     if (isOpen && resource) {
       if (!isGuestMode) {
@@ -142,8 +155,9 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
       }
       loadRatings();
       loadComments();
+      loadTopics();
     }
-  }, [isOpen, resource, isGuestMode, loadUserData, checkUserRating, loadRatings, loadComments]);
+  }, [isOpen, resource, isGuestMode, loadUserData, checkUserRating, loadRatings, loadComments, loadTopics]);
 
   const handleSubmitRating = async () => {
     if (!resource || !currentUserId || userHasRated) return;
@@ -303,14 +317,14 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                 </span>
               ))}
             </div>
-            {resource.topic_names && resource.topic_names.length > 0 && (
+            {topics.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {resource.topic_names.map((topic, idx) => (
+                {topics.map((topic) => (
                   <span
-                    key={idx}
+                    key={topic.topic_id}
                     className="px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded"
                   >
-                    {topic}
+                    {topic.topic_name}
                   </span>
                 ))}
               </div>

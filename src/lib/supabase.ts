@@ -40,3 +40,18 @@ export type Level = {
   name: string;
   slug: string;
 };
+
+export type ResourceTopic = {
+  topic_id: string;
+  topic_name: string;
+  topic_slug: string;
+  parent_topic_id: string | null;
+  subject_slug: string;
+};
+
+export type ResourceLevel = {
+  id: string;
+  name: string;
+  slug: string;
+  order_index: number;
+};

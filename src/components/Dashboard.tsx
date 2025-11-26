@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { supabase, Resource, Subject, Level, TopicNode, Topic } from '../lib/supabase';
+import { supabase, Resource, Subject, Level, TopicNode, Topic, ResourceTopic, ResourceLevel } from '../lib/supabase';
 import { useTopics } from '../hooks/useTopics';
 import { Sidebar } from './Sidebar';
 import { ResourceCard } from './ResourceCard';
@@ -33,6 +33,8 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
   const [userRole, setUserRole] = useState('');
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [resourceTopics, setResourceTopics] = useState<Map<string, ResourceTopic[]>>(new Map());
+  const [resourceLevels, setResourceLevels] = useState<Map<string, ResourceLevel[]>>(new Map());
 
   const loadUserProfile = useCallback(async () => {
     const {
@@ -92,12 +94,62 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
     }
   }, []);
 
+  const loadResourceTopics = useCallback(async (resourceIds: string[]) => {
+    if (resourceIds.length === 0) return;
+
+    const { data } = await supabase
+      .from('v_resource_topics')
+      .select('resource_id, topic_id, topic_name, topic_slug, parent_topic_id, subject_slug')
+      .in('resource_id', resourceIds);
+
+    if (data) {
+      const topicsMap = new Map<string, ResourceTopic[]>();
+      data.forEach((item: any) => {
+        const { resource_id, ...topicData } = item;
+        if (!topicsMap.has(resource_id)) {
+          topicsMap.set(resource_id, []);
+        }
+        topicsMap.get(resource_id)!.push(topicData);
+      });
+      setResourceTopics(topicsMap);
+    }
+  }, []);
+
+  const loadResourceLevels = useCallback(async (resourceIds: string[]) => {
+    if (resourceIds.length === 0) return;
+
+    const { data } = await supabase
+      .from('v_resource_levels')
+      .select('resource_id, levels')
+      .in('resource_id', resourceIds);
+
+    if (data) {
+      const levelsMap = new Map<string, ResourceLevel[]>();
+      data.forEach((item: any) => {
+        if (item.levels && Array.isArray(item.levels)) {
+          levelsMap.set(item.resource_id, item.levels);
+        }
+      });
+      setResourceLevels(levelsMap);
+    }
+  }, []);
+
   useEffect(() => {
-    loadData();
+    loadData().then(() => {
+      // Load topics after resources are loaded
+    });
     if (!isGuestMode) {
       loadUserProfile();
     }
   }, [isGuestMode, loadData, loadUserProfile]);
+
+  useEffect(() => {
+    if (resources.length > 0) {
+      const resourceIds = resources.map(r => r.id);
+      loadResourceTopics(resourceIds);
+      loadResourceLevels(resourceIds);
+    }
+  }, [resources, loadResourceTopics, loadResourceLevels]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -105,9 +157,45 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
   };
 
   const handleTopicToggle = (topicId: string) => {
-    setSelectedTopics((prev) =>
-      prev.includes(topicId) ? prev.filter((id) => id !== topicId) : [...prev, topicId]
-    );
+    setSelectedTopics((prev) => {
+      const isCurrentlySelected = prev.includes(topicId);
+
+      // Helper function to collect all descendant topic IDs
+      const getAllDescendantIds = (nodes: TopicNode[], parentId: string): string[] => {
+        let ids: string[] = [];
+        for (const node of nodes) {
+          if (node.id === parentId) {
+            // Found the parent, collect all its children recursively
+            const collectChildren = (n: TopicNode): string[] => {
+              let childIds = [n.id];
+              if (n.children) {
+                n.children.forEach(child => {
+                  childIds = [...childIds, ...collectChildren(child)];
+                });
+              }
+              return childIds;
+            };
+            ids = collectChildren(node);
+            break;
+          }
+          if (node.children) {
+            ids = getAllDescendantIds(node.children, parentId);
+            if (ids.length > 0) break;
+          }
+        }
+        return ids;
+      };
+
+      if (isCurrentlySelected) {
+        // Deselect this topic and all its descendants
+        const idsToRemove = getAllDescendantIds(topicNodes, topicId);
+        return prev.filter(id => !idsToRemove.includes(id));
+      } else {
+        // Select this topic and all its descendants
+        const idsToAdd = getAllDescendantIds(topicNodes, topicId);
+        return [...new Set([...prev, ...idsToAdd])];
+      }
+    });
   };
 
   const handleLevelToggle = (levelId: string) => {
@@ -171,10 +259,11 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
         return names;
       };
 
-      const resourceTopics = findTopicNames(topicNodes, selectedTopics);
+      const selectedTopicNames = findTopicNames(topicNodes, selectedTopics);
+      const currentResourceTopics = resourceTopics.get(resource.id) || [];
 
-      const hasMatchingTopic = resourceTopics.some((topicName) =>
-        resource.topic_names?.includes(topicName)
+      const hasMatchingTopic = selectedTopicNames.some((topicName) =>
+        currentResourceTopics.some(topic => topic.topic_name === topicName)
       );
       if (!hasMatchingTopic) return false;
     }
@@ -407,6 +496,8 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
                       <ResourceCard
                         key={resource.id}
                         resource={resource}
+                        topics={resourceTopics.get(resource.id) || []}
+                        levels={resourceLevels.get(resource.id) || []}
                         onTopicClick={handleTopicClick}
                         onCardClick={handleCardClick}
                       />
@@ -429,6 +520,8 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
                   <ResourceCard
                     key={resource.id}
                     resource={resource}
+                    topics={resourceTopics.get(resource.id) || []}
+                    levels={resourceLevels.get(resource.id) || []}
                     onTopicClick={handleTopicClick}
                     onCardClick={handleCardClick}
                   />

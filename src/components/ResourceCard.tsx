@@ -1,5 +1,5 @@
 import React from 'react';
-import { Resource } from '../lib/supabase';
+import { Resource, ResourceTopic, ResourceLevel } from '../lib/supabase';
 import { getThumbnailUrl } from '../lib/storage';
 import { Video, FileText, Presentation, Beaker, Wrench, Star, ExternalLink, ImageIcon, MessageSquare } from 'lucide-react';
 
@@ -7,6 +7,8 @@ export type ResourceCardVariant = 'default' | 'hero' | 'list';
 
 type ResourceCardProps = {
   resource: Resource;
+  topics?: ResourceTopic[];
+  levels?: ResourceLevel[];
   onTopicClick?: (topicName: string) => void;
   onCardClick?: (resource: Resource) => void;
   variant?: ResourceCardVariant;
@@ -22,7 +24,7 @@ const typeIcons: Record<string, React.ElementType> = {
   tool: Wrench,
 };
 
-export function ResourceCard({ resource, onTopicClick, onCardClick, variant = 'default' }: ResourceCardProps) {
+export function ResourceCard({ resource, topics = [], levels = [], onTopicClick, onCardClick, variant = 'default' }: ResourceCardProps) {
   const Icon = typeIcons[resource.type] || FileText;
   const thumbnailUrl = getThumbnailUrl(resource.thumbnail_path);
 
@@ -79,13 +81,18 @@ export function ResourceCard({ resource, onTopicClick, onCardClick, variant = 'd
 
         <div className="p-6 flex flex-col flex-1">
           <div className="mb-4">
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
               <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700">
                 {resource.subject_name}
               </span>
-              {resource.level_names?.[0] && (
-                <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-700">
-                  {resource.level_names[0]}
+              {levels.slice(0, 2).map((level) => (
+                <span key={level.id} className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-700">
+                  {level.name}
+                </span>
+              ))}
+              {resource.language && (
+                <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 uppercase border border-purple-100">
+                  {resource.language}
                 </span>
               )}
             </div>
@@ -100,32 +107,40 @@ export function ResourceCard({ resource, onTopicClick, onCardClick, variant = 'd
           </div>
 
           <div className="mt-auto pt-4 border-t border-gray-100 flex flex-col gap-3">
-            {resource.topic_names && resource.topic_names.length > 0 && (
+            {topics.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {resource.topic_names.slice(0, 3).map((topic, idx) => (
+                {topics.slice(0, 3).map((topic) => (
                   <span
-                    key={idx}
+                    key={topic.topic_id}
                     className="inline-block px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded"
                   >
-                    {topic}
+                    {topic.topic_name}
                   </span>
                 ))}
-                {resource.topic_names.length > 3 && (
+                {topics.length > 3 && (
                   <span className="text-xs text-gray-500 px-1">
-                    +{resource.topic_names.length - 3}
+                    +{topics.length - 3}
                   </span>
                 )}
               </div>
             )}
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <Star
-                  size={16}
-                  className={`${getRatingColor(overallRating)} ${hasRatings ? 'fill-current' : ''}`}
-                />
-                <span className="text-sm font-medium text-gray-700">
-                  {hasRatings ? overallRating?.toFixed(1) : '-'}
-                </span>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5">
+                  <Star
+                    size={16}
+                    className={`${getRatingColor(overallRating)} ${hasRatings ? 'fill-current' : ''}`}
+                  />
+                  <span className="text-sm font-medium text-gray-700">
+                    {hasRatings ? overallRating?.toFixed(1) : '-'}
+                  </span>
+                </div>
+                {(resource.comments_count || 0) > 0 && (
+                  <div className="flex items-center gap-1 text-sm text-gray-500">
+                    <MessageSquare size={16} />
+                    <span>{resource.comments_count}</span>
+                  </div>
+                )}
               </div>
               <div className="text-sm text-gray-500">
                 {resource.contributor_nick}
@@ -169,19 +184,19 @@ export function ResourceCard({ resource, onTopicClick, onCardClick, variant = 'd
                 <span>{hasRatings ? overallRating?.toFixed(1) : 'Brak ocen'}</span>
               </div>
             </div>
-            {resource.topic_names && resource.topic_names.length > 0 && (
+            {topics.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {resource.topic_names.slice(0, 3).map((topic, idx) => (
+                {topics.slice(0, 3).map((topic) => (
                   <span
-                    key={idx}
+                    key={topic.topic_id}
                     className="inline-block px-1.5 py-0.5 bg-gray-100 text-gray-600 text-xs rounded"
                   >
-                    {topic}
+                    {topic.topic_name}
                   </span>
                 ))}
-                {resource.topic_names.length > 3 && (
+                {topics.length > 3 && (
                   <span className="text-xs text-gray-400">
-                    +{resource.topic_names.length - 3}
+                    +{topics.length - 3}
                   </span>
                 )}
               </div>
@@ -241,12 +256,12 @@ export function ResourceCard({ resource, onTopicClick, onCardClick, variant = 'd
       )}
 
       <div className="flex flex-wrap gap-2 mb-4">
-        {resource.level_names?.map((level, idx) => (
+        {levels.map((level) => (
           <span
-            key={idx}
+            key={level.id}
             className="inline-block px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
           >
-            {level}
+            {level.name}
           </span>
         ))}
         {resource.language && (
@@ -256,20 +271,20 @@ export function ResourceCard({ resource, onTopicClick, onCardClick, variant = 'd
         )}
       </div>
 
-      {resource.topic_names && resource.topic_names.length > 0 && (
+      {topics.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-4">
-          {resource.topic_names.slice(0, 3).map((topic, idx) => (
+          {topics.slice(0, 3).map((topic) => (
             <button
-              key={idx}
-              onClick={(e) => handleTopicClick(e, topic)}
+              key={topic.topic_id}
+              onClick={(e) => handleTopicClick(e, topic.topic_name)}
               className="inline-block px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded hover:bg-blue-100 transition-colors cursor-pointer"
             >
-              {topic}
+              {topic.topic_name}
             </button>
           ))}
-          {resource.topic_names.length > 3 && (
+          {topics.length > 3 && (
             <span className="text-xs text-gray-500 px-2 py-1">
-              +{resource.topic_names.length - 3} więcej
+              +{topics.length - 3} więcej
             </span>
           )}
         </div>
