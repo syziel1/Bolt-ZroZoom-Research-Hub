@@ -4,10 +4,11 @@ import { supabase } from './lib/supabase';
 import { LandingPage } from './components/LandingPage';
 import { AuthForm } from './components/AuthForm';
 import { Dashboard } from './components/Dashboard';
+import { MarkdownPage } from './components/MarkdownPage';
 import { Loader } from 'lucide-react';
 
 
-type View = 'landing' | 'auth' | 'dashboard' | 'browse';
+type View = 'landing' | 'auth' | 'dashboard' | 'browse' | 'about' | 'privacy';
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -61,7 +62,10 @@ function App() {
   }
 
   if (session) {
-    return <Dashboard />;
+    return <Dashboard
+      onNavigateToAbout={() => setView('about')}
+      onNavigateToPrivacy={() => setView('privacy')}
+    />;
   }
 
   if (view === 'auth') {
@@ -69,10 +73,30 @@ function App() {
   }
 
   if (view === 'browse') {
-    return <Dashboard isGuestMode={true} onNavigateToAuth={handleNavigateToAuth} onBackToLanding={handleBackToLanding} initialSubject={initialSubject} />;
+    return <Dashboard
+      isGuestMode={true}
+      onNavigateToAuth={handleNavigateToAuth}
+      onBackToLanding={handleBackToLanding}
+      initialSubject={initialSubject}
+      onNavigateToAbout={() => setView('about')}
+      onNavigateToPrivacy={() => setView('privacy')}
+    />;
   }
 
-  return <LandingPage onNavigateToAuth={handleNavigateToAuth} onBrowseAsGuest={handleBrowseAsGuest} />;
+  if (view === 'about') {
+    return <MarkdownPage fileName="about.md" onBack={handleBackToLanding} />;
+  }
+
+  if (view === 'privacy') {
+    return <MarkdownPage fileName="privacy.md" onBack={handleBackToLanding} />;
+  }
+
+  return <LandingPage
+    onNavigateToAuth={handleNavigateToAuth}
+    onBrowseAsGuest={handleBrowseAsGuest}
+    onNavigateToAbout={() => setView('about')}
+    onNavigateToPrivacy={() => setView('privacy')}
+  />;
 }
 
 export default App;

@@ -157,7 +157,7 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
             description,
             subject_id: subjectId,
             contributor_id: user.id,
-            author: user.user_metadata?.nick || user.email?.split('@')[0] || 'Anonymous',
+            author: user.user_metadata?.nick || user.email?.split('@')[0] || 'Anonim',
             language,
             ai_generated: aiGenerated,
           })

@@ -117,7 +117,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     if (data) {
       setRatings(data.map(r => ({
         ...r,
-        author_nick: (r.author as unknown as { nick: string })?.nick || 'Unknown',
+        author_nick: (r.author as unknown as { nick: string })?.nick || 'Nieznany',
       })));
     }
   }, [resource]);
@@ -140,7 +140,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     if (data) {
       setComments(data.map(c => ({
         ...c,
-        author_nick: (c.author as unknown as { nick: string })?.nick || 'Unknown',
+        author_nick: (c.author as unknown as { nick: string })?.nick || 'Nieznany',
       })));
     }
   }, [resource]);
@@ -507,7 +507,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                 </div>
               ))}
               {ratings.length === 0 && (
-                <p className="text-sm text-gray-500">Brak ocen. Bądź pierwszy!</p>
+                <p className="text-sm text-gray-500">Brak ocen. Dodaj pierwszą ocenę!</p>
               )}
             </div>
           </div>

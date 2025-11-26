@@ -64,7 +64,7 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError('An unknown error occurred');
+        setError('Wystąpił nieznany błąd');
       }
     } finally {
       setLoading(false);
@@ -85,8 +85,8 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
         )}
 
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">ZroZoom Research Hub</h1>
-          <p className="text-gray-600 mt-2">Platforma zasobów edukacyjnych</p>
+          <h1 className="text-3xl font-bold text-gray-900">Szkoła Przyszłości z AI</h1>
+          <p className="text-gray-600 mt-2">Edukacja z wykorzystaniem sztucznej inteligencji</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">

@@ -13,9 +13,11 @@ type DashboardProps = {
   onNavigateToAuth?: () => void;
   onBackToLanding?: () => void;
   initialSubject?: string | null;
+  onNavigateToAbout?: () => void;
+  onNavigateToPrivacy?: () => void;
 };
 
-export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLanding, initialSubject = null }: DashboardProps) {
+export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLanding, initialSubject = null, onNavigateToAbout, onNavigateToPrivacy }: DashboardProps) {
   const [resources, setResources] = useState<Resource[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [levels, setLevels] = useState<Level[]>([]);
@@ -49,7 +51,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
         .select('nick, name, role')
         .eq('id', user.id)
         .single();
-      setUserNick(profile?.nick || user.email?.split('@')[0] || 'User');
+      setUserNick(profile?.nick || user.email?.split('@')[0] || 'Użytkownik');
       setUserName(profile?.name || '');
       setUserRole(profile?.role || '');
     }
@@ -417,7 +419,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
       <div className="min-h-screen bg-gray-50">
         <div className="bg-white border-b border-gray-200 px-4 md:px-8 py-4">
           <div className="flex items-center justify-between max-w-7xl mx-auto">
-            <h1 className="text-xl md:text-2xl font-bold text-gray-900">ZroZoom Hub</h1>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900">Szkoła Przyszłości z AI</h1>
             <div className="flex items-center gap-2 md:gap-4">
               <button
                 onClick={() => setShowAdminPanel(false)}
@@ -472,7 +474,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
                 <Menu size={24} />
               </button>
               <div>
-                <h1 className="text-xl md:text-2xl font-bold text-gray-900">Szkoła Przyszłości z AI - ZroZoom Hub</h1>
+                <h1 className="text-xl md:text-2xl font-bold text-gray-900">Szkoła Przyszłości z AI</h1>
                 <p className="text-xs md:text-sm text-gray-600 mt-1 hidden sm:block">
                   Odkrywaj i dziel się zasobami edukacyjnymi
                 </p>
@@ -657,7 +659,11 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
 
           <footer className="mt-12 pt-8 border-t border-gray-200">
             <div className="text-center text-sm text-gray-600">
-              <p className="mb-2">Szkoła Przyszłości AI - ZroZoom Hub - Twoja baza wiedzy edukacyjnej</p>
+              <p className="mb-2">Szkoła Przyszłości z AI - Twoja baza wiedzy edukacyjnej</p>
+              <div className="flex justify-center gap-4 mb-2 text-xs text-gray-500">
+                <button onClick={onNavigateToAbout} className="hover:text-gray-700 transition-colors">O nas</button>
+                <button onClick={onNavigateToPrivacy} className="hover:text-gray-700 transition-colors">Polityka Prywatności</button>
+              </div>
               <p className="text-xs text-gray-500">
                 © {new Date().getFullYear()} Sylwester Zieliński. All rights reserved
               </p>

@@ -7,6 +7,8 @@ import { BookOpen, Library, Layers, TrendingUp, Award, Sparkles, ArrowRight, Cal
 type LandingPageProps = {
   onNavigateToAuth: () => void;
   onBrowseAsGuest: (subjectId?: string) => void;
+  onNavigateToAbout?: () => void;
+  onNavigateToPrivacy?: () => void;
 };
 
 type Stats = {
@@ -15,7 +17,7 @@ type Stats = {
   levelsCount: number;
 };
 
-export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPageProps) {
+export function LandingPage({ onNavigateToAuth, onBrowseAsGuest, onNavigateToAbout, onNavigateToPrivacy }: LandingPageProps) {
   const [stats, setStats] = useState<Stats>({ topicsCount: 0, subjectsCount: 0, levelsCount: 0 });
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [latestResources, setLatestResources] = useState<Resource[]>([]);
@@ -193,7 +195,7 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
               Szkoła Przyszłości z AI
             </h1>
             <p className="text-2xl md:text-3xl lg:text-4xl text-violet-100 mb-6 max-w-3xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.4s', opacity: 0 }}>
-              ZroZoom AI Hub
+              Baza wiedzy i narzędzi
             </p>
             <p className="text-lg md:text-xl text-violet-50 max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.5s', opacity: 0 }}>
               Odkryj materiały edukacyjne, pogrupowane według tematów i poziomów.
@@ -362,7 +364,11 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
 
       <footer className="py-8 px-4 bg-gray-900 text-gray-400 text-center">
         <div className="max-w-6xl mx-auto">
-          <p className="mb-2">Szkoła Przyszłości AI - ZroZoom Hub - Twoja baza wiedzy edukacyjnej</p>
+          <p className="mb-2">Szkoła Przyszłości z AI - Twoja baza wiedzy edukacyjnej</p>
+          <div className="flex justify-center gap-4 mb-2 text-sm">
+            <button onClick={onNavigateToAbout} className="hover:text-white transition-colors">O nas</button>
+            <button onClick={onNavigateToPrivacy} className="hover:text-white transition-colors">Polityka Prywatności</button>
+          </div>
           <p className="text-sm">&copy; {new Date().getFullYear()} Sylwester Zieliński. All rights reserved</p>
         </div>
       </footer>
