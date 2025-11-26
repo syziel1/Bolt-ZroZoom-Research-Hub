@@ -1,38 +1,43 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { supabase, Resource, Subject, Level, TopicNode, Topic } from '../lib/supabase';
+import { supabase, Resource, Subject, Level, TopicNode, Topic, ResourceTopic, ResourceLevel } from '../lib/supabase';
 import { useTopics } from '../hooks/useTopics';
 import { Sidebar } from './Sidebar';
 import { ResourceCard } from './ResourceCard';
 import { AddResourceModal } from './AddResourceModal';
 import { ResourceDetailModal } from './ResourceDetailModal';
 import { AdminPanel } from './AdminPanel';
-import { Plus, LogOut, Loader, Library, BookOpen, Hash, Settings, Menu, ArrowLeft } from 'lucide-react';
+import { Plus, LogOut, Loader, Settings, Menu, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 
 type DashboardProps = {
   isGuestMode?: boolean;
   onNavigateToAuth?: () => void;
   onBackToLanding?: () => void;
+  initialSubject?: string | null;
 };
 
-export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLanding }: DashboardProps) {
+export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLanding, initialSubject = null }: DashboardProps) {
   const [resources, setResources] = useState<Resource[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [levels, setLevels] = useState<Level[]>([]);
   const [allTopics, setAllTopics] = useState<Topic[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(initialSubject);
   const { topics: topicNodes, loading: topicsLoading } = useTopics(selectedSubject);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
   const [userNick, setUserNick] = useState('');
+  const [userName, setUserName] = useState('');
   const [userRole, setUserRole] = useState('');
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-
+  const [resourceTopics, setResourceTopics] = useState<Map<string, ResourceTopic[]>>(new Map());
+  const [resourceLevels, setResourceLevels] = useState<Map<string, ResourceLevel[]>>(new Map());
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 12;
 
   const loadUserProfile = useCallback(async () => {
     const {
@@ -41,10 +46,11 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
     if (user) {
       const { data: profile } = await supabase
         .from('profiles')
-        .select('nick, role')
+        .select('nick, name, role')
         .eq('id', user.id)
         .single();
       setUserNick(profile?.nick || user.email?.split('@')[0] || 'User');
+      setUserName(profile?.name || '');
       setUserRole(profile?.role || '');
     }
   }, []);
@@ -52,14 +58,108 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const [resourcesRes, subjectsRes, levelsRes, topicsRes] = await Promise.all([
+      const [resourcesRes, subjectsRes, levelsRes, topicsRes, ratingsRes, commentsRes] = await Promise.all([
         supabase.from('v_resources_full').select('*'),
         supabase.from('v_subjects_basic').select('*').order('order_index'),
         supabase.from('levels').select('*').order('order_index'),
         supabase.from('topics').select('*').order('order_index'),
+        supabase.from('ratings').select('resource_id, rating_usefulness, rating_correctness'),
+        supabase.from('comments').select('resource_id')
       ]);
 
-      if (resourcesRes.data) setResources(resourcesRes.data);
+      if (resourcesRes.data) {
+        let resourcesData = resourcesRes.data;
+
+        // Calculate ratings stats
+        const ratingsStats = new Map<string, { count: number; sumUsefulness: number; sumCorrectness: number }>();
+        if (ratingsRes.data) {
+          // Define type for rating data
+          type RatingData = {
+            resource_id: string;
+            rating_usefulness: number;
+            rating_correctness: number;
+          };
+          (ratingsRes.data as RatingData[]).forEach((r) => {
+            if (!ratingsStats.has(r.resource_id)) {
+              ratingsStats.set(r.resource_id, { count: 0, sumUsefulness: 0, sumCorrectness: 0 });
+            }
+            const stats = ratingsStats.get(r.resource_id)!;
+            stats.count++;
+            stats.sumUsefulness += r.rating_usefulness;
+            stats.sumCorrectness += r.rating_correctness;
+          });
+        }
+
+        // Calculate comments counts
+        const commentsCounts = new Map<string, number>();
+        if (commentsRes.data) {
+          // Define type for comment data
+          type CommentData = {
+            resource_id: string;
+          };
+          (commentsRes.data as CommentData[]).forEach((c) => {
+            const count = commentsCounts.get(c.resource_id) || 0;
+            commentsCounts.set(c.resource_id, count + 1);
+          });
+        }
+
+        // Manual fetch of contributor nicks if missing or just to be safe
+        const contributorIds = [...new Set(resourcesData.map(r => r.contributor_id).filter(Boolean))];
+
+        if (contributorIds.length > 0) {
+          const { data: profiles } = await supabase
+            .from('profiles')
+            .select('id, nick')
+            .in('id', contributorIds);
+
+          if (profiles) {
+            const nickMap = new Map(profiles.map(p => [p.id, p.nick]));
+            resourcesData = resourcesData.map(r => {
+              const stats = ratingsStats.get(r.id);
+              const commentsCount = commentsCounts.get(r.id) || 0;
+
+              return {
+                ...r,
+                contributor_nick: r.contributor_nick || nickMap.get(r.contributor_id!) || 'Anonim',
+                ratings_count: stats ? stats.count : 0,
+                avg_usefulness: stats ? stats.sumUsefulness / stats.count : null,
+                avg_correctness: stats ? stats.sumCorrectness / stats.count : null,
+                comments_count: commentsCount
+              };
+            });
+          } else {
+            // Even if profiles fail, we still want to attach stats
+            resourcesData = resourcesData.map(r => {
+              const stats = ratingsStats.get(r.id);
+              const commentsCount = commentsCounts.get(r.id) || 0;
+
+              return {
+                ...r,
+                ratings_count: stats ? stats.count : 0,
+                avg_usefulness: stats ? stats.sumUsefulness / stats.count : null,
+                avg_correctness: stats ? stats.sumCorrectness / stats.count : null,
+                comments_count: commentsCount
+              };
+            });
+          }
+        } else {
+          // No contributors to fetch, but still attach stats
+          resourcesData = resourcesData.map(r => {
+            const stats = ratingsStats.get(r.id);
+            const commentsCount = commentsCounts.get(r.id) || 0;
+
+            return {
+              ...r,
+              ratings_count: stats ? stats.count : 0,
+              avg_usefulness: stats ? stats.sumUsefulness / stats.count : null,
+              avg_correctness: stats ? stats.sumCorrectness / stats.count : null,
+              comments_count: commentsCount
+            };
+          });
+        }
+
+        setResources(resourcesData);
+      }
       if (subjectsRes.data) setSubjects(subjectsRes.data);
       if (levelsRes.data) setLevels(levelsRes.data);
       if (topicsRes.data) setAllTopics(topicsRes.data);
@@ -70,12 +170,76 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
     }
   }, []);
 
+  const loadResourceTopics = useCallback(async (resourceIds: string[]) => {
+    if (resourceIds.length === 0) return;
+
+    const { data } = await supabase
+      .from('v_resource_topics')
+      .select('resource_id, topic_id, topic_name, topic_slug, parent_topic_id, subject_slug')
+      .in('resource_id', resourceIds);
+
+    if (data) {
+      // Define type for resource topic data
+      type ResourceTopicData = {
+        resource_id: string;
+        topic_id: string;
+        topic_name: string;
+        topic_slug: string;
+        parent_topic_id: string | null;
+        subject_slug: string;
+      };
+      const topicsMap = new Map<string, ResourceTopic[]>();
+      (data as ResourceTopicData[]).forEach((item) => {
+        const { resource_id, ...topicData } = item;
+        if (!topicsMap.has(resource_id)) {
+          topicsMap.set(resource_id, []);
+        }
+        topicsMap.get(resource_id)!.push(topicData);
+      });
+      setResourceTopics(topicsMap);
+    }
+  }, []);
+
+  const loadResourceLevels = useCallback(async (resourceIds: string[]) => {
+    if (resourceIds.length === 0) return;
+
+    const { data } = await supabase
+      .from('v_resource_levels')
+      .select('resource_id, levels')
+      .in('resource_id', resourceIds);
+
+    if (data) {
+      // Define type for resource level data
+      type ResourceLevelData = {
+        resource_id: string;
+        levels: ResourceLevel[];
+      };
+      const levelsMap = new Map<string, ResourceLevel[]>();
+      (data as ResourceLevelData[]).forEach((item) => {
+        if (item.levels && Array.isArray(item.levels)) {
+          levelsMap.set(item.resource_id, item.levels);
+        }
+      });
+      setResourceLevels(levelsMap);
+    }
+  }, []);
+
   useEffect(() => {
-    loadData();
+    loadData().then(() => {
+      // Load topics after resources are loaded
+    });
     if (!isGuestMode) {
       loadUserProfile();
     }
   }, [isGuestMode, loadData, loadUserProfile]);
+
+  useEffect(() => {
+    if (resources.length > 0) {
+      const resourceIds = resources.map(r => r.id);
+      loadResourceTopics(resourceIds);
+      loadResourceLevels(resourceIds);
+    }
+  }, [resources, loadResourceTopics, loadResourceLevels]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -83,14 +247,56 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
   };
 
   const handleTopicToggle = (topicId: string) => {
-    setSelectedTopics((prev) =>
-      prev.includes(topicId) ? prev.filter((id) => id !== topicId) : [...prev, topicId]
-    );
+    setSelectedTopics((prev) => {
+      const isCurrentlySelected = prev.includes(topicId);
+
+      // Helper function to collect all descendant topic IDs
+      const getAllDescendantIds = (nodes: TopicNode[], parentId: string): string[] => {
+        let ids: string[] = [];
+        for (const node of nodes) {
+          if (node.id === parentId) {
+            // Found the parent, collect all its children recursively
+            const collectChildren = (n: TopicNode): string[] => {
+              let childIds = [n.id];
+              if (n.children) {
+                n.children.forEach(child => {
+                  childIds = [...childIds, ...collectChildren(child)];
+                });
+              }
+              return childIds;
+            };
+            ids = collectChildren(node);
+            break;
+          }
+          if (node.children) {
+            ids = getAllDescendantIds(node.children, parentId);
+            if (ids.length > 0) break;
+          }
+        }
+        return ids;
+      };
+
+      if (isCurrentlySelected) {
+        // Deselect this topic and all its descendants
+        const idsToRemove = getAllDescendantIds(topicNodes, topicId);
+        return prev.filter(id => !idsToRemove.includes(id));
+      } else {
+        // Select this topic and all its descendants
+        const idsToAdd = getAllDescendantIds(topicNodes, topicId);
+        return [...new Set([...prev, ...idsToAdd])];
+      }
+    });
   };
 
   const handleLevelToggle = (levelId: string) => {
     setSelectedLevels((prev) =>
       prev.includes(levelId) ? prev.filter((id) => id !== levelId) : [...prev, levelId]
+    );
+  };
+
+  const handleLanguageToggle = (language: string) => {
+    setSelectedLanguages((prev) =>
+      prev.includes(language) ? prev.filter((l) => l !== language) : [...prev, language]
     );
   };
 
@@ -100,9 +306,6 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
   };
 
   const handleTopicClick = (topicName: string) => {
-    // Logic for clicking a topic on a card
-    // Since we don't have all topics loaded, we can't easily switch subject and select topic
-    // without fetching. For now, we'll log it.
     console.log('Topic clicked:', topicName);
   };
 
@@ -131,14 +334,12 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
 
   const filteredResources = resources.filter((resource) => {
     if (selectedSubject) {
-      const subject = subjects.find((s) => s.subject_id === selectedSubject);
-      if (subject && resource.subject_slug !== subject.subject_slug) {
+      if (resource.subject_id !== selectedSubject) {
         return false;
       }
     }
 
     if (selectedTopics.length > 0) {
-      // Helper to flatten tree to find names
       const findTopicNames = (nodes: TopicNode[], ids: string[]): string[] => {
         const names: string[] = [];
         for (const node of nodes) {
@@ -148,34 +349,56 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
         return names;
       };
 
-      const resourceTopics = findTopicNames(topicNodes, selectedTopics);
+      const selectedTopicNames = findTopicNames(topicNodes, selectedTopics);
+      const currentResourceTopics = resourceTopics.get(resource.id) || [];
 
-      const hasMatchingTopic = resourceTopics.some((topicName) =>
-        resource.topic_names?.includes(topicName)
+      const hasMatchingTopic = selectedTopicNames.some((topicName) =>
+        currentResourceTopics.some(topic => topic.topic_name === topicName)
       );
       if (!hasMatchingTopic) return false;
     }
 
     if (selectedLevels.length > 0) {
-      const resourceLevels = levels
-        .filter((l) => selectedLevels.includes(l.id))
-        .map((l) => l.name);
-      const hasMatchingLevel = resourceLevels.some((levelName) =>
-        resource.level_names?.includes(levelName)
+      const currentResourceLevels = resourceLevels.get(resource.id) || [];
+      const hasMatchingLevel = currentResourceLevels.some((level) =>
+        selectedLevels.includes(level.id)
       );
       if (!hasMatchingLevel) return false;
+    }
+
+    if (selectedLanguages.length > 0) {
+      if (!resource.language || !selectedLanguages.includes(resource.language)) {
+        return false;
+      }
     }
 
     return true;
   });
 
-  const stats = useMemo(() => {
-    return {
-      totalResources: resources.length,
-      totalSubjects: subjects.length,
-      totalTopics: 0, // Topics are now fetched per subject
-    };
-  }, [resources.length, subjects.length]);
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedSubject, selectedTopics, selectedLevels, selectedLanguages]);
+
+  const indexOfLastResource = currentPage * ITEMS_PER_PAGE;
+  const indexOfFirstResource = indexOfLastResource - ITEMS_PER_PAGE;
+  const currentResources = filteredResources.slice(indexOfFirstResource, indexOfLastResource);
+  const totalPages = Math.ceil(filteredResources.length / ITEMS_PER_PAGE);
+
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+    // Scroll to top of the list or top of the page
+    const mainContent = document.querySelector('main');
+    if (mainContent) {
+      mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const languages = useMemo(() => {
+    const langs = new Set(resources.map((r) => r.language).filter(Boolean));
+    return Array.from(langs) as string[];
+  }, [resources]);
+
 
   const recentlyAddedResources = useMemo(() => {
     const sorted = [...resources].sort((a, b) => {
@@ -186,7 +409,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
     return sorted.slice(0, 3);
   }, [resources]);
 
-  const hasActiveFilters = selectedSubject !== null || selectedTopics.length > 0 || selectedLevels.length > 0;
+  const hasActiveFilters = selectedSubject !== null || selectedTopics.length > 0 || selectedLevels.length > 0 || selectedLanguages.length > 0;
   const isAdmin = userRole === 'admin';
 
   if (showAdminPanel && isAdmin) {
@@ -194,7 +417,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
       <div className="min-h-screen bg-gray-50">
         <div className="bg-white border-b border-gray-200 px-4 md:px-8 py-4">
           <div className="flex items-center justify-between max-w-7xl mx-auto">
-            <h1 className="text-xl md:text-2xl font-bold text-gray-900">ZroZoom Research Hub</h1>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900">ZroZoom Hub</h1>
             <div className="flex items-center gap-2 md:gap-4">
               <button
                 onClick={() => setShowAdminPanel(false)}
@@ -213,7 +436,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
             </div>
           </div>
         </div>
-        <AdminPanel userRole={userRole} requireAdmin={true} />
+        <AdminPanel userRole={userRole} requireAdmin={true} onDataChange={loadData} />
       </div>
     );
   }
@@ -224,12 +447,15 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
         subjects={subjects}
         topicNodes={topicNodes}
         levels={levels}
+        languages={languages}
         selectedSubject={selectedSubject}
         selectedTopics={selectedTopics}
         selectedLevels={selectedLevels}
+        selectedLanguages={selectedLanguages}
         onSubjectChange={handleSubjectChange}
         onTopicToggle={handleTopicToggle}
         onLevelToggle={handleLevelToggle}
+        onLanguageToggle={handleLanguageToggle}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
         isLoading={topicsLoading}
@@ -246,7 +472,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
                 <Menu size={24} />
               </button>
               <div>
-                <h1 className="text-xl md:text-2xl font-bold text-gray-900">ZroZoom Research Hub</h1>
+                <h1 className="text-xl md:text-2xl font-bold text-gray-900">Szkoła Przyszłości z AI - ZroZoom Hub</h1>
                 <p className="text-xs md:text-sm text-gray-600 mt-1 hidden sm:block">
                   Odkrywaj i dziel się zasobami edukacyjnymi
                 </p>
@@ -272,7 +498,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
                 </>
               ) : (
                 <>
-                  <span className="text-sm text-gray-600 hidden md:inline">Witaj, {userNick}</span>
+                  <span className="text-sm text-gray-600 hidden md:inline">Witaj, {userName ? userName.split(' ')[0] : userNick}</span>
                   {isAdmin && (
                     <button
                       onClick={() => setShowAdminPanel(true)}
@@ -319,7 +545,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
                   onClick={onNavigateToAuth}
                   className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm whitespace-nowrap"
                 >
-                  Zaloguj się
+                  Zarejestruj się
                 </button>
               </div>
             </div>
@@ -330,46 +556,16 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
-                <div className="bg-white rounded-lg shadow-sm p-6 border-l-4 border-blue-500">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-3xl font-bold text-gray-900">{stats.totalResources}</p>
-                      <p className="text-sm text-gray-600 mt-1">Wszystkie zasoby</p>
-                    </div>
-                    <Library className="text-blue-500" size={32} />
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-lg shadow-sm p-6 border-l-4 border-blue-500">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-3xl font-bold text-gray-900">{stats.totalSubjects}</p>
-                      <p className="text-sm text-gray-600 mt-1">Przedmioty</p>
-                    </div>
-                    <BookOpen className="text-blue-500" size={32} />
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-lg shadow-sm p-6 border-l-4 border-blue-500">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-3xl font-bold text-gray-900">{stats.totalTopics}</p>
-                      <p className="text-sm text-gray-600 mt-1">Tematy</p>
-                    </div>
-                    <Hash className="text-blue-500" size={32} />
-                  </div>
-                </div>
-              </div>
-
               {!hasActiveFilters && recentlyAddedResources.length > 0 && (
                 <div className="mb-8">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">Ostatnio dodane</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                  <div className="grid gap-4 md:gap-6" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))' }}>
                     {recentlyAddedResources.map((resource) => (
                       <ResourceCard
                         key={resource.id}
                         resource={resource}
+                        topics={resourceTopics.get(resource.id) || []}
+                        levels={resourceLevels.get(resource.id) || []}
                         onTopicClick={handleTopicClick}
                         onCardClick={handleCardClick}
                       />
@@ -383,20 +579,73 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
                   {hasActiveFilters ? 'Wyniki filtrowania' : 'Wszystkie zasoby'}
                 </h2>
                 <p className="text-sm text-gray-600">
-                  Wyświetlanie {filteredResources.length} z {resources.length} zasobów
+                  Wyświetlanie zasobów {filteredResources.length > 0 ? indexOfFirstResource + 1 : 0}-{Math.min(indexOfLastResource, filteredResources.length)} spośród {filteredResources.length} znalezionych materiałów
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                {filteredResources.map((resource) => (
+              <div className="grid gap-4 md:gap-6" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))' }}>
+                {currentResources.map((resource) => (
                   <ResourceCard
                     key={resource.id}
                     resource={resource}
+                    topics={resourceTopics.get(resource.id) || []}
+                    levels={resourceLevels.get(resource.id) || []}
                     onTopicClick={handleTopicClick}
                     onCardClick={handleCardClick}
                   />
                 ))}
               </div>
+
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-2 mt-8 pb-4">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+
+                  <div className="flex gap-1 overflow-x-auto max-w-[200px] sm:max-w-none no-scrollbar">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                      // Show first, last, current, and surrounding pages
+                      if (
+                        page === 1 ||
+                        page === totalPages ||
+                        (page >= currentPage - 1 && page <= currentPage + 1)
+                      ) {
+                        return (
+                          <button
+                            key={page}
+                            onClick={() => handlePageChange(page)}
+                            className={`w-10 h-10 rounded-md flex-shrink-0 flex items-center justify-center text-sm font-medium transition-colors
+                              ${currentPage === page
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                              }`}
+                          >
+                            {page}
+                          </button>
+                        );
+                      } else if (
+                        page === currentPage - 2 ||
+                        page === currentPage + 2
+                      ) {
+                        return <span key={page} className="w-10 h-10 flex items-center justify-center text-gray-400">...</span>;
+                      }
+                      return null;
+                    })}
+                  </div>
+
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+              )}
 
               {filteredResources.length === 0 && (
                 <div className="text-center py-12 text-gray-500">
@@ -405,6 +654,15 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
               )}
             </>
           )}
+
+          <footer className="mt-12 pt-8 border-t border-gray-200">
+            <div className="text-center text-sm text-gray-600">
+              <p className="mb-2">Szkoła Przyszłości AI - ZroZoom Hub - Twoja baza wiedzy edukacyjnej</p>
+              <p className="text-xs text-gray-500">
+                © {new Date().getFullYear()} Sylwester Zieliński. All rights reserved
+              </p>
+            </div>
+          </footer>
         </main>
       </div>
 

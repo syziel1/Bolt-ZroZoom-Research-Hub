@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { supabase, Resource } from '../lib/supabase';
-import { X, Star, MessageSquare, Edit, Trash2, ExternalLink, Video, FileText, Presentation, Beaker, Wrench } from 'lucide-react';
+import { supabase, Resource, ResourceTopic } from '../lib/supabase';
+import { getThumbnailUrl } from '../lib/storage';
+import { X, Star, MessageSquare, Edit, Trash2, ExternalLink, Video, FileText, Presentation, Beaker, Wrench, User, Globe, Calendar, Sparkles } from 'lucide-react';
 import { ConfirmationModal } from './ConfirmationModal';
 
 type ResourceDetailModalProps = {
@@ -56,6 +57,8 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
   const [userHasRated, setUserHasRated] = useState(false);
   const [deleteCommentConfirm, setDeleteCommentConfirm] = useState<string | null>(null);
   const [deleteResourceConfirm, setDeleteResourceConfirm] = useState(false);
+  const [topics, setTopics] = useState<ResourceTopic[]>([]);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
 
 
 
@@ -80,11 +83,19 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     if (user) {
       const { data } = await supabase
         .from('ratings')
-        .select('id')
+        .select('*')
         .eq('resource_id', resource.id)
         .eq('author_id', user.id)
         .maybeSingle();
+
       setUserHasRated(!!data);
+      if (data) {
+        setRatingData({
+          usefulness: data.rating_usefulness,
+          correctness: data.rating_correctness,
+          difficulty: data.difficulty_match || 3,
+        });
+      }
     }
   }, [resource]);
 
@@ -134,6 +145,18 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     }
   }, [resource]);
 
+  const loadTopics = useCallback(async () => {
+    if (!resource) return;
+    const { data } = await supabase
+      .from('v_resource_topics')
+      .select('topic_id, topic_name, topic_slug, parent_topic_id, subject_slug')
+      .eq('resource_id', resource.id);
+
+    if (data) {
+      setTopics(data);
+    }
+  }, [resource]);
+
   useEffect(() => {
     if (isOpen && resource) {
       if (!isGuestMode) {
@@ -142,22 +165,23 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
       }
       loadRatings();
       loadComments();
+      loadTopics();
     }
-  }, [isOpen, resource, isGuestMode, loadUserData, checkUserRating, loadRatings, loadComments]);
+  }, [isOpen, resource, isGuestMode, loadUserData, checkUserRating, loadRatings, loadComments, loadTopics]);
 
   const handleSubmitRating = async () => {
-    if (!resource || !currentUserId || userHasRated) return;
+    if (!resource || !currentUserId) return;
 
     setSubmitting(true);
     const { error } = await supabase
       .from('ratings')
-      .insert({
+      .upsert({
         resource_id: resource.id,
         author_id: currentUserId,
         rating_usefulness: ratingData.usefulness,
         rating_correctness: ratingData.correctness,
         difficulty_match: ratingData.difficulty,
-      });
+      }, { onConflict: 'resource_id,author_id' });
 
     if (!error) {
       setShowRatingForm(false);
@@ -172,20 +196,40 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     if (!resource || !currentUserId || !commentText.trim()) return;
 
     setSubmitting(true);
-    const { error } = await supabase
-      .from('comments')
-      .insert({
-        resource_id: resource.id,
-        author_id: currentUserId,
-        content: commentText.trim(),
-      });
+
+    let error;
+
+    if (editingCommentId) {
+      const { error: updateError } = await supabase
+        .from('comments')
+        .update({ content: commentText.trim() })
+        .eq('id', editingCommentId);
+      error = updateError;
+    } else {
+      const { error: insertError } = await supabase
+        .from('comments')
+        .insert({
+          resource_id: resource.id,
+          author_id: currentUserId,
+          content: commentText.trim(),
+        });
+      error = insertError;
+    }
 
     if (!error) {
       setCommentText('');
+      setEditingCommentId(null);
       setShowCommentForm(false);
       loadComments();
+      onResourceUpdated();
     }
     setSubmitting(false);
+  };
+
+  const handleEditCommentClick = (comment: Comment) => {
+    setCommentText(comment.content);
+    setEditingCommentId(comment.id);
+    setShowCommentForm(true);
   };
 
   const handleDeleteCommentClick = (commentId: string) => {
@@ -203,6 +247,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     setDeleteCommentConfirm(null);
     if (!error) {
       loadComments();
+      onResourceUpdated();
     }
   };
 
@@ -233,6 +278,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
   if (!isOpen || !resource) return null;
 
   const Icon = typeIcons[resource.type] || FileText;
+  const thumbnailUrl = getThumbnailUrl(resource.thumbnail_path);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -248,23 +294,67 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
         </div>
 
         <div className="p-6">
-          <div className="flex items-start gap-4 mb-6">
-            <div className="bg-blue-50 p-3 rounded-lg">
-              <Icon size={32} className="text-blue-600" />
+          <div className="flex items-start gap-6 mb-6">
+            <div className="flex-shrink-0 w-80 aspect-video bg-gradient-to-br from-gray-100 to-gray-50 rounded-lg border border-gray-200 shadow-sm flex items-center justify-center overflow-hidden">
+              {thumbnailUrl ? (
+                <img
+                  src={thumbnailUrl}
+                  alt={resource.title}
+                  className="w-full h-full object-contain"
+                />
+              ) : (
+                <div className="bg-blue-50 p-6 rounded-lg flex items-center justify-center">
+                  <Icon size={48} className="text-blue-600" />
+                </div>
+              )}
             </div>
             <div className="flex-1">
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
                 {resource.title}
               </h3>
-              <p className="text-sm text-gray-600 mb-2">{resource.subject_name}</p>
+
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-4">
+                <span className="px-2 py-1 bg-gray-100 rounded text-gray-700 font-medium">
+                  {resource.subject_name}
+                </span>
+
+                {resource.language && (
+                  <span className="flex items-center gap-1" title="Język">
+                    <Globe size={16} />
+                    {resource.language.toUpperCase()}
+                  </span>
+                )}
+
+                {resource.contributor_nick && (
+                  <span className="flex items-center gap-1" title="Dodane przez">
+                    <User size={16} />
+                    {resource.contributor_nick}
+                  </span>
+                )}
+
+                {resource.created_at && (
+                  <span className="flex items-center gap-1" title="Data dodania">
+                    <Calendar size={16} />
+                    {new Date(resource.created_at).toLocaleDateString()}
+                  </span>
+                )}
+
+                {resource.ai_generated && (
+                  <span className="flex items-center gap-1 px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs font-medium border border-purple-200">
+                    <Sparkles size={12} />
+                    AI
+                  </span>
+                )}
+              </div>
+
               <a
                 href={resource.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
               >
                 Otwórz zasób
-                <ExternalLink size={14} />
+                <ExternalLink size={16} />
               </a>
             </div>
             {canEdit && (
@@ -303,14 +393,14 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                 </span>
               ))}
             </div>
-            {resource.topic_names && resource.topic_names.length > 0 && (
+            {topics.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {resource.topic_names.map((topic, idx) => (
+                {topics.map((topic) => (
                   <span
-                    key={idx}
+                    key={topic.topic_id}
                     className="px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded"
                   >
-                    {topic}
+                    {topic.topic_name}
                   </span>
                 ))}
               </div>
@@ -328,7 +418,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                   onClick={() => setShowRatingForm(!showRatingForm)}
                   className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                 >
-                  {showRatingForm ? 'Anuluj' : 'Dodaj ocenę'}
+                  {showRatingForm ? 'Anuluj' : (userHasRated ? 'Edytuj ocenę' : 'Dodaj ocenę')}
                 </button>
               )}
             </div>
@@ -380,14 +470,22 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                     disabled={submitting}
                     className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
                   >
-                    {submitting ? 'Wysyłanie...' : 'Wyślij ocenę'}
+                    {submitting ? 'Wysyłanie...' : (userHasRated ? 'Zaktualizuj ocenę' : 'Wyślij ocenę')}
                   </button>
                 </div>
               </div>
             )}
 
             {userHasRated && !showRatingForm && (
-              <p className="text-sm text-gray-600 mb-4">Już oceniłeś ten zasób.</p>
+              <p className="text-sm text-gray-600 mb-4">
+                Twoja ocena została zapisana.
+                <button
+                  onClick={() => setShowRatingForm(true)}
+                  className="text-blue-600 hover:text-blue-800 ml-1 underline"
+                >
+                  Edytuj
+                </button>
+              </p>
             )}
 
             <div className="space-y-3">
@@ -422,7 +520,15 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
               </h4>
               {!isGuestMode && (
                 <button
-                  onClick={() => setShowCommentForm(!showCommentForm)}
+                  onClick={() => {
+                    if (showCommentForm) {
+                      setShowCommentForm(false);
+                      setEditingCommentId(null);
+                      setCommentText('');
+                    } else {
+                      setShowCommentForm(true);
+                    }
+                  }}
                   className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                 >
                   {showCommentForm ? 'Anuluj' : 'Dodaj komentarz'}
@@ -444,7 +550,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                   disabled={submitting || !commentText.trim()}
                   className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
                 >
-                  {submitting ? 'Publikowanie...' : 'Opublikuj komentarz'}
+                  {submitting ? 'Zapisywanie...' : (editingCommentId ? 'Zaktualizuj komentarz' : 'Opublikuj komentarz')}
                 </button>
               </div>
             )}
@@ -459,12 +565,24 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                         {new Date(comment.created_at).toLocaleDateString()}
                       </span>
                       {(comment.author_id === currentUserId || currentUserRole === 'admin') && (
-                        <button
-                          onClick={() => handleDeleteCommentClick(comment.id)}
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          <Trash2 size={14} />
-                        </button>
+                        <div className="flex gap-2">
+                          {comment.author_id === currentUserId && (
+                            <button
+                              onClick={() => handleEditCommentClick(comment)}
+                              className="text-blue-600 hover:text-blue-800"
+                              title="Edytuj komentarz"
+                            >
+                              <Edit size={14} />
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleDeleteCommentClick(comment.id)}
+                            className="text-red-600 hover:text-red-800"
+                            title="Usuń komentarz"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                       )}
                     </div>
                   </div>

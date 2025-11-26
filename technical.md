@@ -56,6 +56,7 @@ Minimalna dokumentacja techniczna dla repozytorium.
 - description
 - language
 - ai_generated (bool)
+- thumbnail_path (text, nullable)
 - review_required (bool)
 - review_status (text)
 - timestamps

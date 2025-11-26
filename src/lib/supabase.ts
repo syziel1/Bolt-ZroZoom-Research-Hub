@@ -17,7 +17,7 @@ export type Subject = {
   subject_name: string;
   subject_slug: string;
   order_index: number;
-  resources_count: number;
+  topics_count: number;
 };
 
 export type Topic = {
@@ -39,4 +39,19 @@ export type Level = {
   id: string;
   name: string;
   slug: string;
+};
+
+export type ResourceTopic = {
+  topic_id: string;
+  topic_name: string;
+  topic_slug: string;
+  parent_topic_id: string | null;
+  subject_slug: string;
+};
+
+export type ResourceLevel = {
+  id: string;
+  name: string;
+  slug: string;
+  order_index: number;
 };
