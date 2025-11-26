@@ -71,15 +71,14 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
   const loadLandingPageData = async () => {
     setLoading(true);
     try {
-      const [topicsCount, subjectsData, levelsCount, latestResourcesData] = await Promise.all([
+      const [topicsCount, subjectsData, levelsCount, allResourcesData] = await Promise.all([
         supabase.from('topics').select('*', { count: 'exact', head: true }),
         supabase.from('v_subjects_basic').select('*').order('resources_count', { ascending: false }),
         supabase.from('levels').select('*', { count: 'exact', head: true }),
         supabase
           .from('v_resources_full')
           .select('*')
-          .order('created_at', { ascending: false })
-          .limit(3),
+          .order('created_at', { ascending: false }),
       ]);
 
       setStats({
@@ -89,7 +88,17 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
       });
 
       if (subjectsData.data) setSubjects(subjectsData.data);
-      if (latestResourcesData.data) setLatestResources(latestResourcesData.data);
+
+      // Get one latest resource per subject
+      if (allResourcesData.data) {
+        const resourcesBySubject = new Map<string, Resource>();
+        allResourcesData.data.forEach((resource: Resource) => {
+          if (!resourcesBySubject.has(resource.subject_id)) {
+            resourcesBySubject.set(resource.subject_id, resource);
+          }
+        });
+        setLatestResources(Array.from(resourcesBySubject.values()));
+      }
     } catch (error) {
       console.error('Error loading landing page data:', error);
     } finally {
