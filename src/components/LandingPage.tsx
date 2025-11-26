@@ -200,10 +200,8 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
       <section id="latest-resources" className="py-12 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <div className="inline-block bg-blue-50 p-3 rounded-full mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 flex items-center justify-center gap-3">
               <TrendingUp size={32} className="text-blue-600" />
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Ostatnio dodane materiały
             </h2>
             <p className="text-lg text-gray-600">Odkryj najnowsze zasoby dodane przez społeczność</p>
