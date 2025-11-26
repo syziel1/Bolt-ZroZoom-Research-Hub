@@ -115,8 +115,17 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
           ]);
 
           if (topicsData.data) {
+            // Define type for resource topic data
+            type ResourceTopicData = {
+              resource_id: string;
+              topic_id: string;
+              topic_name: string;
+              topic_slug: string;
+              parent_topic_id: string | null;
+              subject_slug: string;
+            };
             const topicsMap = new Map<string, ResourceTopic[]>();
-            topicsData.data.forEach((item: any) => {
+            (topicsData.data as ResourceTopicData[]).forEach((item) => {
               const { resource_id, ...topicData } = item;
               if (!topicsMap.has(resource_id)) {
                 topicsMap.set(resource_id, []);
@@ -127,8 +136,13 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
           }
 
           if (levelsData.data) {
+            // Define type for resource level data
+            type ResourceLevelData = {
+              resource_id: string;
+              levels: ResourceLevel[];
+            };
             const levelsMap = new Map<string, ResourceLevel[]>();
-            levelsData.data.forEach((item: any) => {
+            (levelsData.data as ResourceLevelData[]).forEach((item) => {
               if (item.levels && Array.isArray(item.levels)) {
                 levelsMap.set(item.resource_id, item.levels);
               }

@@ -73,7 +73,13 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
         // Calculate ratings stats
         const ratingsStats = new Map<string, { count: number; sumUsefulness: number; sumCorrectness: number }>();
         if (ratingsRes.data) {
-          ratingsRes.data.forEach((r: any) => {
+          // Define type for rating data
+          type RatingData = {
+            resource_id: string;
+            rating_usefulness: number;
+            rating_correctness: number;
+          };
+          (ratingsRes.data as RatingData[]).forEach((r) => {
             if (!ratingsStats.has(r.resource_id)) {
               ratingsStats.set(r.resource_id, { count: 0, sumUsefulness: 0, sumCorrectness: 0 });
             }
@@ -87,7 +93,11 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
         // Calculate comments counts
         const commentsCounts = new Map<string, number>();
         if (commentsRes.data) {
-          commentsRes.data.forEach((c: any) => {
+          // Define type for comment data
+          type CommentData = {
+            resource_id: string;
+          };
+          (commentsRes.data as CommentData[]).forEach((c) => {
             const count = commentsCounts.get(c.resource_id) || 0;
             commentsCounts.set(c.resource_id, count + 1);
           });
@@ -169,8 +179,17 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
       .in('resource_id', resourceIds);
 
     if (data) {
+      // Define type for resource topic data
+      type ResourceTopicData = {
+        resource_id: string;
+        topic_id: string;
+        topic_name: string;
+        topic_slug: string;
+        parent_topic_id: string | null;
+        subject_slug: string;
+      };
       const topicsMap = new Map<string, ResourceTopic[]>();
-      data.forEach((item: any) => {
+      (data as ResourceTopicData[]).forEach((item) => {
         const { resource_id, ...topicData } = item;
         if (!topicsMap.has(resource_id)) {
           topicsMap.set(resource_id, []);
@@ -190,8 +209,13 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
       .in('resource_id', resourceIds);
 
     if (data) {
+      // Define type for resource level data
+      type ResourceLevelData = {
+        resource_id: string;
+        levels: ResourceLevel[];
+      };
       const levelsMap = new Map<string, ResourceLevel[]>();
-      data.forEach((item: any) => {
+      (data as ResourceLevelData[]).forEach((item) => {
         if (item.levels && Array.isArray(item.levels)) {
           levelsMap.set(item.resource_id, item.levels);
         }

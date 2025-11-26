@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase, TopicNode } from '../lib/supabase';
 import { buildTopicTree } from '../utils/topicTree';
 import { Plus, Edit2, Trash2, Save, X, ChevronDown, ChevronRight } from 'lucide-react';
@@ -114,21 +114,7 @@ export function TopicTreeManager() {
 
     const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
 
-    // Load subjects
-    useEffect(() => {
-        loadSubjects();
-    }, []);
-
-    // Load topics when subject changes
-    useEffect(() => {
-        if (selectedSubjectId) {
-            loadTopics();
-        } else {
-            setTopics([]);
-        }
-    }, [selectedSubjectId]);
-
-    const loadSubjects = async () => {
+    const loadSubjects = useCallback(async () => {
         try {
             const { data, error } = await supabase
                 .from('subjects')
@@ -147,9 +133,9 @@ export function TopicTreeManager() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [selectedSubjectId]);
 
-    const loadTopics = async () => {
+    const loadTopics = useCallback(async () => {
         if (!selectedSubjectId) return;
 
         try {
@@ -167,7 +153,21 @@ export function TopicTreeManager() {
             console.error('Error loading topics:', err);
             setError('Błąd ładowania tematów');
         }
-    };
+    }, [selectedSubjectId]);
+
+    // Load subjects
+    useEffect(() => {
+        loadSubjects();
+    }, [loadSubjects]);
+
+    // Load topics when subject changes
+    useEffect(() => {
+        if (selectedSubjectId) {
+            loadTopics();
+        } else {
+            setTopics([]);
+        }
+    }, [selectedSubjectId, loadTopics]);
 
     const handleAdd = async () => {
         if (!formData.name.trim() || !formData.slug.trim()) {

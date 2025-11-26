@@ -38,7 +38,16 @@ export function CommentsManager({ onCommentDeleted }: CommentsManagerProps) {
             if (error) throw error;
 
             if (data) {
-                const formattedComments = data.map((item: any) => ({
+                // Define a type for the raw data structure from Supabase
+                type RawComment = {
+                    id: string;
+                    content: string;
+                    created_at: string;
+                    author: { nick: string } | null;
+                    resource: { title: string } | null;
+                };
+
+                const formattedComments = (data as unknown as RawComment[]).map((item) => ({
                     id: item.id,
                     content: item.content,
                     created_at: item.created_at,
