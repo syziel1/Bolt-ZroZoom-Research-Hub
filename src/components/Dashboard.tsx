@@ -6,18 +6,19 @@ import { ResourceCard } from './ResourceCard';
 import { AddResourceModal } from './AddResourceModal';
 import { ResourceDetailModal } from './ResourceDetailModal';
 import { AdminPanel } from './AdminPanel';
-import { Plus, LogOut, Loader, Settings, Menu, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, LogOut, Loader, Settings, Menu, ArrowLeft, ChevronLeft, ChevronRight, Search } from 'lucide-react';
 
 type DashboardProps = {
   isGuestMode?: boolean;
   onNavigateToAuth?: () => void;
   onBackToLanding?: () => void;
   initialSubject?: string | null;
+  initialSearchQuery?: string;
   onNavigateToAbout?: () => void;
   onNavigateToPrivacy?: () => void;
 };
 
-export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLanding, initialSubject = null, onNavigateToAbout, onNavigateToPrivacy }: DashboardProps) {
+export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLanding, initialSubject = null, initialSearchQuery = '', onNavigateToAbout, onNavigateToPrivacy }: DashboardProps) {
   const [resources, setResources] = useState<Resource[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [levels, setLevels] = useState<Level[]>([]);
@@ -28,6 +29,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
@@ -374,6 +376,15 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
       }
     }
 
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const titleMatch = resource.title.toLowerCase().includes(query);
+      const descriptionMatch = resource.description?.toLowerCase().includes(query);
+      if (!titleMatch && !descriptionMatch) {
+        return false;
+      }
+    }
+
     return true;
   });
 
@@ -411,7 +422,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
     return sorted.slice(0, 3);
   }, [resources]);
 
-  const hasActiveFilters = selectedSubject !== null || selectedTopics.length > 0 || selectedLevels.length > 0 || selectedLanguages.length > 0;
+  const hasActiveFilters = selectedSubject !== null || selectedTopics.length > 0 || selectedLevels.length > 0 || selectedLanguages.length > 0 || searchQuery.length > 0;
   const isAdmin = userRole === 'admin';
 
   if (showAdminPanel && isAdmin) {
@@ -531,7 +542,21 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
               )}
             </div>
           </div>
-        </header>
+
+
+          <div className="mt-4 max-w-2xl mx-auto">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <input
+                type="text"
+                placeholder="Szukaj w tytułach i opisach..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+        </header >
 
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
           {isGuestMode && (
@@ -670,7 +695,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
             </div>
           </footer>
         </main>
-      </div>
+      </div >
 
       {!isGuestMode && (
         <AddResourceModal
@@ -682,7 +707,8 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
           levels={levels}
           initialData={editingResource}
         />
-      )}
+      )
+      }
 
       <ResourceDetailModal
         isOpen={isDetailModalOpen}
@@ -692,6 +718,6 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
         isGuestMode={isGuestMode}
         onEdit={handleEditResource}
       />
-    </div>
+    </div >
   );
 }

@@ -15,6 +15,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<View>('landing');
   const [initialSubject, setInitialSubject] = useState<string | null>(null);
+  const [initialSearchQuery, setInitialSearchQuery] = useState('');
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -43,14 +44,16 @@ function App() {
     setView('auth');
   };
 
-  const handleBrowseAsGuest = (subjectId?: string) => {
+  const handleBrowseAsGuest = (subjectId?: string, searchQuery?: string) => {
     setInitialSubject(subjectId || null);
+    setInitialSearchQuery(searchQuery || '');
     setView('browse');
   };
 
   const handleBackToLanding = () => {
     setView('landing');
     setInitialSubject(null);
+    setInitialSearchQuery('');
   };
 
   if (loading) {
@@ -65,6 +68,7 @@ function App() {
     return <Dashboard
       onNavigateToAbout={() => setView('about')}
       onNavigateToPrivacy={() => setView('privacy')}
+      initialSearchQuery={initialSearchQuery}
     />;
   }
 
@@ -80,6 +84,7 @@ function App() {
       initialSubject={initialSubject}
       onNavigateToAbout={() => setView('about')}
       onNavigateToPrivacy={() => setView('privacy')}
+      initialSearchQuery={initialSearchQuery}
     />;
   }
 
@@ -94,6 +99,7 @@ function App() {
   return <LandingPage
     onNavigateToAuth={handleNavigateToAuth}
     onBrowseAsGuest={handleBrowseAsGuest}
+    onSearch={(query) => handleBrowseAsGuest(undefined, query)}
     onNavigateToAbout={() => setView('about')}
     onNavigateToPrivacy={() => setView('privacy')}
   />;
