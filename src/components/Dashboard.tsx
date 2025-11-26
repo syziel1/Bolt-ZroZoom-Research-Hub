@@ -30,6 +30,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
   const [userNick, setUserNick] = useState('');
+  const [userName, setUserName] = useState('');
   const [userRole, setUserRole] = useState('');
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -45,10 +46,11 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
     if (user) {
       const { data: profile } = await supabase
         .from('profiles')
-        .select('nick, role')
+        .select('nick, name, role')
         .eq('id', user.id)
         .single();
       setUserNick(profile?.nick || user.email?.split('@')[0] || 'User');
+      setUserName(profile?.name || '');
       setUserRole(profile?.role || '');
     }
   }, []);
@@ -410,7 +412,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
             </div>
           </div>
         </div>
-        <AdminPanel userRole={userRole} requireAdmin={true} />
+        <AdminPanel userRole={userRole} requireAdmin={true} onDataChange={loadData} />
       </div>
     );
   }
@@ -472,7 +474,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
                 </>
               ) : (
                 <>
-                  <span className="text-sm text-gray-600 hidden md:inline">Witaj, {userNick}</span>
+                  <span className="text-sm text-gray-600 hidden md:inline">Witaj, {userName ? userName.split(' ')[0] : userNick}</span>
                   {isAdmin && (
                     <button
                       onClick={() => setShowAdminPanel(true)}

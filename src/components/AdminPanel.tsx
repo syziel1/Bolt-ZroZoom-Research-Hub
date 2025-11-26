@@ -10,9 +10,10 @@ type Tab = 'subjects' | 'topics' | 'levels' | 'comments';
 type AdminPanelProps = {
     userRole: string;
     requireAdmin: boolean;
+    onDataChange?: () => void;
 };
 
-export function AdminPanel({ userRole, requireAdmin }: AdminPanelProps) {
+export function AdminPanel({ userRole, requireAdmin, onDataChange }: AdminPanelProps) {
     const [activeTab, setActiveTab] = useState<Tab>('subjects');
 
     if (requireAdmin && userRole !== 'admin') {
@@ -67,7 +68,7 @@ export function AdminPanel({ userRole, requireAdmin }: AdminPanelProps) {
                 {activeTab === 'subjects' && <SubjectsManager />}
                 {activeTab === 'topics' && <TopicTreeManager />}
                 {activeTab === 'levels' && <LevelsManager />}
-                {activeTab === 'comments' && <CommentsManager />}
+                {activeTab === 'comments' && <CommentsManager onCommentDeleted={onDataChange} />}
             </div>
         </div>
     );
