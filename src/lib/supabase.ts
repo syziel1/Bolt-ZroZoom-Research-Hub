@@ -17,7 +17,7 @@ export type Subject = {
   subject_name: string;
   subject_slug: string;
   order_index: number;
-  resources_count: number;
+  topics_count: number;
 };
 
 export type Topic = {

@@ -76,7 +76,7 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
     try {
       const [topicsCount, subjectsData, levelsCount, allResourcesData] = await Promise.all([
         supabase.from('topics').select('*', { count: 'exact', head: true }),
-        supabase.from('v_subjects_basic').select('*').order('resources_count', { ascending: false }),
+        supabase.from('v_subjects_basic').select('*').order('topics_count', { ascending: false }),
         supabase.from('levels').select('*', { count: 'exact', head: true }),
         supabase
           .from('v_resources_full')
@@ -282,7 +282,7 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
                         {subject.subject_name}
                       </h3>
                       <p className="text-sm text-white/80 mt-1">
-                        {subject.resources_count} {subject.resources_count === 1 ? 'zasób' : 'zasobów'}
+                        {subject.topics_count} {subject.topics_count === 1 ? 'temat' : subject.topics_count < 5 ? 'tematy' : 'tematów'}
                       </p>
                     </div>
                   </div>
