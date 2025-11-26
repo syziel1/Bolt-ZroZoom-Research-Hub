@@ -58,6 +58,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
   const [deleteCommentConfirm, setDeleteCommentConfirm] = useState<string | null>(null);
   const [deleteResourceConfirm, setDeleteResourceConfirm] = useState(false);
   const [topics, setTopics] = useState<ResourceTopic[]>([]);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
 
 
 
@@ -82,11 +83,19 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     if (user) {
       const { data } = await supabase
         .from('ratings')
-        .select('id')
+        .select('*')
         .eq('resource_id', resource.id)
         .eq('author_id', user.id)
         .maybeSingle();
+
       setUserHasRated(!!data);
+      if (data) {
+        setRatingData({
+          usefulness: data.rating_usefulness,
+          correctness: data.rating_correctness,
+          difficulty: data.difficulty_match || 3,
+        });
+      }
     }
   }, [resource]);
 
@@ -161,18 +170,18 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
   }, [isOpen, resource, isGuestMode, loadUserData, checkUserRating, loadRatings, loadComments, loadTopics]);
 
   const handleSubmitRating = async () => {
-    if (!resource || !currentUserId || userHasRated) return;
+    if (!resource || !currentUserId) return;
 
     setSubmitting(true);
     const { error } = await supabase
       .from('ratings')
-      .insert({
+      .upsert({
         resource_id: resource.id,
         author_id: currentUserId,
         rating_usefulness: ratingData.usefulness,
         rating_correctness: ratingData.correctness,
         difficulty_match: ratingData.difficulty,
-      });
+      }, { onConflict: 'resource_id,author_id' });
 
     if (!error) {
       setShowRatingForm(false);
@@ -187,20 +196,40 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     if (!resource || !currentUserId || !commentText.trim()) return;
 
     setSubmitting(true);
-    const { error } = await supabase
-      .from('comments')
-      .insert({
-        resource_id: resource.id,
-        author_id: currentUserId,
-        content: commentText.trim(),
-      });
+
+    let error;
+
+    if (editingCommentId) {
+      const { error: updateError } = await supabase
+        .from('comments')
+        .update({ content: commentText.trim() })
+        .eq('id', editingCommentId);
+      error = updateError;
+    } else {
+      const { error: insertError } = await supabase
+        .from('comments')
+        .insert({
+          resource_id: resource.id,
+          author_id: currentUserId,
+          content: commentText.trim(),
+        });
+      error = insertError;
+    }
 
     if (!error) {
       setCommentText('');
+      setEditingCommentId(null);
       setShowCommentForm(false);
       loadComments();
+      onResourceUpdated();
     }
     setSubmitting(false);
+  };
+
+  const handleEditCommentClick = (comment: Comment) => {
+    setCommentText(comment.content);
+    setEditingCommentId(comment.id);
+    setShowCommentForm(true);
   };
 
   const handleDeleteCommentClick = (commentId: string) => {
@@ -218,6 +247,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     setDeleteCommentConfirm(null);
     if (!error) {
       loadComments();
+      onResourceUpdated();
     }
   };
 
@@ -388,7 +418,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                   onClick={() => setShowRatingForm(!showRatingForm)}
                   className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                 >
-                  {showRatingForm ? 'Anuluj' : 'Dodaj ocenę'}
+                  {showRatingForm ? 'Anuluj' : (userHasRated ? 'Edytuj ocenę' : 'Dodaj ocenę')}
                 </button>
               )}
             </div>
@@ -440,14 +470,22 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                     disabled={submitting}
                     className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
                   >
-                    {submitting ? 'Wysyłanie...' : 'Wyślij ocenę'}
+                    {submitting ? 'Wysyłanie...' : (userHasRated ? 'Zaktualizuj ocenę' : 'Wyślij ocenę')}
                   </button>
                 </div>
               </div>
             )}
 
             {userHasRated && !showRatingForm && (
-              <p className="text-sm text-gray-600 mb-4">Już oceniłeś ten zasób.</p>
+              <p className="text-sm text-gray-600 mb-4">
+                Twoja ocena została zapisana.
+                <button
+                  onClick={() => setShowRatingForm(true)}
+                  className="text-blue-600 hover:text-blue-800 ml-1 underline"
+                >
+                  Edytuj
+                </button>
+              </p>
             )}
 
             <div className="space-y-3">
@@ -482,7 +520,15 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
               </h4>
               {!isGuestMode && (
                 <button
-                  onClick={() => setShowCommentForm(!showCommentForm)}
+                  onClick={() => {
+                    if (showCommentForm) {
+                      setShowCommentForm(false);
+                      setEditingCommentId(null);
+                      setCommentText('');
+                    } else {
+                      setShowCommentForm(true);
+                    }
+                  }}
                   className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                 >
                   {showCommentForm ? 'Anuluj' : 'Dodaj komentarz'}
@@ -504,7 +550,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                   disabled={submitting || !commentText.trim()}
                   className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
                 >
-                  {submitting ? 'Publikowanie...' : 'Opublikuj komentarz'}
+                  {submitting ? 'Zapisywanie...' : (editingCommentId ? 'Zaktualizuj komentarz' : 'Opublikuj komentarz')}
                 </button>
               </div>
             )}
@@ -519,12 +565,24 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                         {new Date(comment.created_at).toLocaleDateString()}
                       </span>
                       {(comment.author_id === currentUserId || currentUserRole === 'admin') && (
-                        <button
-                          onClick={() => handleDeleteCommentClick(comment.id)}
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          <Trash2 size={14} />
-                        </button>
+                        <div className="flex gap-2">
+                          {comment.author_id === currentUserId && (
+                            <button
+                              onClick={() => handleEditCommentClick(comment)}
+                              className="text-blue-600 hover:text-blue-800"
+                              title="Edytuj komentarz"
+                            >
+                              <Edit size={14} />
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleDeleteCommentClick(comment.id)}
+                            className="text-red-600 hover:text-red-800"
+                            title="Usuń komentarz"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                       )}
                     </div>
                   </div>

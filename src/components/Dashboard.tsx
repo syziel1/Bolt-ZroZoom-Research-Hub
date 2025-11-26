@@ -56,15 +56,40 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const [resourcesRes, subjectsRes, levelsRes, topicsRes] = await Promise.all([
+      const [resourcesRes, subjectsRes, levelsRes, topicsRes, ratingsRes, commentsRes] = await Promise.all([
         supabase.from('v_resources_full').select('*'),
         supabase.from('v_subjects_basic').select('*').order('order_index'),
         supabase.from('levels').select('*').order('order_index'),
         supabase.from('topics').select('*').order('order_index'),
+        supabase.from('ratings').select('resource_id, rating_usefulness, rating_correctness'),
+        supabase.from('comments').select('resource_id')
       ]);
 
       if (resourcesRes.data) {
         let resourcesData = resourcesRes.data;
+
+        // Calculate ratings stats
+        const ratingsStats = new Map<string, { count: number; sumUsefulness: number; sumCorrectness: number }>();
+        if (ratingsRes.data) {
+          ratingsRes.data.forEach((r: any) => {
+            if (!ratingsStats.has(r.resource_id)) {
+              ratingsStats.set(r.resource_id, { count: 0, sumUsefulness: 0, sumCorrectness: 0 });
+            }
+            const stats = ratingsStats.get(r.resource_id)!;
+            stats.count++;
+            stats.sumUsefulness += r.rating_usefulness;
+            stats.sumCorrectness += r.rating_correctness;
+          });
+        }
+
+        // Calculate comments counts
+        const commentsCounts = new Map<string, number>();
+        if (commentsRes.data) {
+          commentsRes.data.forEach((c: any) => {
+            const count = commentsCounts.get(c.resource_id) || 0;
+            commentsCounts.set(c.resource_id, count + 1);
+          });
+        }
 
         // Manual fetch of contributor nicks if missing or just to be safe
         const contributorIds = [...new Set(resourcesData.map(r => r.contributor_id).filter(Boolean))];
@@ -77,11 +102,48 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
 
           if (profiles) {
             const nickMap = new Map(profiles.map(p => [p.id, p.nick]));
-            resourcesData = resourcesData.map(r => ({
-              ...r,
-              contributor_nick: r.contributor_nick || nickMap.get(r.contributor_id!) || 'Anonim'
-            }));
+            resourcesData = resourcesData.map(r => {
+              const stats = ratingsStats.get(r.id);
+              const commentsCount = commentsCounts.get(r.id) || 0;
+
+              return {
+                ...r,
+                contributor_nick: r.contributor_nick || nickMap.get(r.contributor_id!) || 'Anonim',
+                ratings_count: stats ? stats.count : 0,
+                avg_usefulness: stats ? stats.sumUsefulness / stats.count : null,
+                avg_correctness: stats ? stats.sumCorrectness / stats.count : null,
+                comments_count: commentsCount
+              };
+            });
+          } else {
+            // Even if profiles fail, we still want to attach stats
+            resourcesData = resourcesData.map(r => {
+              const stats = ratingsStats.get(r.id);
+              const commentsCount = commentsCounts.get(r.id) || 0;
+
+              return {
+                ...r,
+                ratings_count: stats ? stats.count : 0,
+                avg_usefulness: stats ? stats.sumUsefulness / stats.count : null,
+                avg_correctness: stats ? stats.sumCorrectness / stats.count : null,
+                comments_count: commentsCount
+              };
+            });
           }
+        } else {
+          // No contributors to fetch, but still attach stats
+          resourcesData = resourcesData.map(r => {
+            const stats = ratingsStats.get(r.id);
+            const commentsCount = commentsCounts.get(r.id) || 0;
+
+            return {
+              ...r,
+              ratings_count: stats ? stats.count : 0,
+              avg_usefulness: stats ? stats.sumUsefulness / stats.count : null,
+              avg_correctness: stats ? stats.sumCorrectness / stats.count : null,
+              comments_count: commentsCount
+            };
+          });
         }
 
         setResources(resourcesData);

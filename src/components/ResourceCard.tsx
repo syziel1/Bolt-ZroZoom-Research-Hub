@@ -40,7 +40,7 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
   const hasRatings = (resource.ratings_count || 0) > 0;
 
   const getRatingColor = (rating: number | null): string => {
-    if (rating === null) return 'text-gray-400';
+    if (rating === null) return 'text-yellow-400';
     if (rating >= 4.5) return 'text-yellow-500';
     if (rating >= 3.5) return 'text-yellow-400';
     if (rating >= 2.5) return 'text-orange-400';
@@ -182,8 +182,8 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
               <span>{resource.subject_name}</span>
               <span>•</span>
               <div className="flex items-center gap-1">
-                <Star size={14} className={hasRatings ? "text-yellow-400 fill-current" : "text-gray-300"} />
-                <span>{hasRatings ? overallRating?.toFixed(1) : 'Brak ocen'}</span>
+                <Star size={14} className={`text-yellow-400 ${hasRatings ? 'fill-current' : ''}`} />
+                <span>{hasRatings ? overallRating?.toFixed(1) : 'Oceń jako pierwszy'}</span>
               </div>
             </div>
             {topics.length > 0 && (
@@ -298,7 +298,7 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
               <span className="text-xs text-gray-500">({resource.ratings_count})</span>
             </div>
           ) : (
-            <span className="text-xs text-gray-500">Brak ocen</span>
+            <span className="text-xs text-gray-500">Oceń jako pierwszy</span>
           )}
         </div>
 
