@@ -6,7 +6,7 @@ import { ResourceCard } from './ResourceCard';
 import { AddResourceModal } from './AddResourceModal';
 import { ResourceDetailModal } from './ResourceDetailModal';
 import { AdminPanel } from './AdminPanel';
-import { Plus, LogOut, Loader, Library, BookOpen, Hash, Settings, Menu, ArrowLeft } from 'lucide-react';
+import { Plus, LogOut, Loader, Settings, Menu, ArrowLeft } from 'lucide-react';
 
 type DashboardProps = {
   isGuestMode?: boolean;
@@ -292,13 +292,6 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
     return Array.from(langs) as string[];
   }, [resources]);
 
-  const stats = useMemo(() => {
-    return {
-      totalResources: resources.length,
-      totalSubjects: subjects.length,
-      totalTopics: 0, // Topics are now fetched per subject
-    };
-  }, [resources.length, subjects.length]);
 
   const recentlyAddedResources = useMemo(() => {
     const sorted = [...resources].sort((a, b) => {
@@ -456,38 +449,6 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
-                <div className="bg-white rounded-lg shadow-sm p-6 border-l-4 border-blue-500">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-3xl font-bold text-gray-900">{stats.totalResources}</p>
-                      <p className="text-sm text-gray-600 mt-1">Wszystkie zasoby</p>
-                    </div>
-                    <Library className="text-blue-500" size={32} />
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-lg shadow-sm p-6 border-l-4 border-blue-500">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-3xl font-bold text-gray-900">{stats.totalSubjects}</p>
-                      <p className="text-sm text-gray-600 mt-1">Przedmioty</p>
-                    </div>
-                    <BookOpen className="text-blue-500" size={32} />
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-lg shadow-sm p-6 border-l-4 border-blue-500">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-3xl font-bold text-gray-900">{stats.totalTopics}</p>
-                      <p className="text-sm text-gray-600 mt-1">Tematy</p>
-                    </div>
-                    <Hash className="text-blue-500" size={32} />
-                  </div>
-                </div>
-              </div>
-
               {!hasActiveFilters && recentlyAddedResources.length > 0 && (
                 <div className="mb-8">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">Ostatnio dodane</h2>
