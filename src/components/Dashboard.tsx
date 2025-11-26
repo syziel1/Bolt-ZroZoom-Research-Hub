@@ -566,6 +566,15 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
               )}
             </>
           )}
+
+          <footer className="mt-12 pt-8 border-t border-gray-200">
+            <div className="text-center text-sm text-gray-600">
+              <p className="mb-2">ZroZoom Hub - Szkoła Przyszłości z AI</p>
+              <p className="text-xs text-gray-500">
+                Platforma do współdzielenia zasobów edukacyjnych © {new Date().getFullYear()}
+              </p>
+            </div>
+          </footer>
         </main>
       </div>
 
