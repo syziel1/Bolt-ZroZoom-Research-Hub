@@ -496,7 +496,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
               </div>
 
               <div className="grid gap-4 md:gap-6" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))' }}>
-                {filteredResources.map((resource) => (
+                {currentResources.map((resource) => (
                   <ResourceCard
                     key={resource.id}
                     resource={resource}
