@@ -452,7 +452,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
               {!hasActiveFilters && recentlyAddedResources.length > 0 && (
                 <div className="mb-8">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">Ostatnio dodane</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                  <div className="grid gap-4 md:gap-6" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))' }}>
                     {recentlyAddedResources.map((resource) => (
                       <ResourceCard
                         key={resource.id}
@@ -476,7 +476,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+              <div className="grid gap-4 md:gap-6" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))' }}>
                 {filteredResources.map((resource) => (
                   <ResourceCard
                     key={resource.id}
