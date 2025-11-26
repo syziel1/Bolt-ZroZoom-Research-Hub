@@ -25,6 +25,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
   const { topics: topicNodes, loading: topicsLoading } = useTopics(selectedSubject);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
@@ -32,8 +33,6 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
   const [userRole, setUserRole] = useState('');
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-
 
   const loadUserProfile = useCallback(async () => {
     const {
@@ -117,15 +116,18 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
     );
   };
 
+  const handleLanguageToggle = (language: string) => {
+    setSelectedLanguages((prev) =>
+      prev.includes(language) ? prev.filter((l) => l !== language) : [...prev, language]
+    );
+  };
+
   const handleSubjectChange = (subjectId: string | null) => {
     setSelectedSubject(subjectId);
     setSelectedTopics([]); // Clear selected topics when subject changes
   };
 
   const handleTopicClick = (topicName: string) => {
-    // Logic for clicking a topic on a card
-    // Since we don't have all topics loaded, we can't easily switch subject and select topic
-    // without fetching. For now, we'll log it.
     console.log('Topic clicked:', topicName);
   };
 
@@ -160,7 +162,6 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
     }
 
     if (selectedTopics.length > 0) {
-      // Helper to flatten tree to find names
       const findTopicNames = (nodes: TopicNode[], ids: string[]): string[] => {
         const names: string[] = [];
         for (const node of nodes) {
@@ -188,8 +189,19 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
       if (!hasMatchingLevel) return false;
     }
 
+    if (selectedLanguages.length > 0) {
+      if (!resource.language || !selectedLanguages.includes(resource.language)) {
+        return false;
+      }
+    }
+
     return true;
   });
+
+  const languages = useMemo(() => {
+    const langs = new Set(resources.map((r) => r.language).filter(Boolean));
+    return Array.from(langs) as string[];
+  }, [resources]);
 
   const stats = useMemo(() => {
     return {
@@ -208,7 +220,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
     return sorted.slice(0, 3);
   }, [resources]);
 
-  const hasActiveFilters = selectedSubject !== null || selectedTopics.length > 0 || selectedLevels.length > 0;
+  const hasActiveFilters = selectedSubject !== null || selectedTopics.length > 0 || selectedLevels.length > 0 || selectedLanguages.length > 0;
   const isAdmin = userRole === 'admin';
 
   if (showAdminPanel && isAdmin) {
@@ -246,12 +258,15 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
         subjects={subjects}
         topicNodes={topicNodes}
         levels={levels}
+        languages={languages}
         selectedSubject={selectedSubject}
         selectedTopics={selectedTopics}
         selectedLevels={selectedLevels}
+        selectedLanguages={selectedLanguages}
         onSubjectChange={handleSubjectChange}
         onTopicToggle={handleTopicToggle}
         onLevelToggle={handleLevelToggle}
+        onLanguageToggle={handleLanguageToggle}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
         isLoading={topicsLoading}
