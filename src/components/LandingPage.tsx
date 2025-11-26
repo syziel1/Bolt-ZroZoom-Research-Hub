@@ -339,7 +339,7 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Gotowi do nauki?</h2>
           <p className="text-xl mb-8 text-blue-100">
-            Dołącz do społeczności uczących się i odkryj tysiące sprawdzonych materiałów edukacyjnych
+            Dołącz do społeczności uczących się i odkryj sprawdzone materiały edukacyjne
           </p>
           <button
             onClick={onNavigateToAuth}
