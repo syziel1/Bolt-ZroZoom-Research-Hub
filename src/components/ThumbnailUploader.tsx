@@ -112,11 +112,11 @@ export function ThumbnailUploader({ onFileSelect, previewUrl, disabled, uploadin
           disabled={disabled}
         />
         <div className="flex items-center gap-4">
-          <div className="w-24 h-24 rounded-md bg-white border border-gray-200 flex items-center justify-center overflow-hidden">
+          <div className="w-64 aspect-video rounded-md bg-white border border-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
             {localPreview ? (
               <img src={localPreview} alt="Podgląd miniatury" className="w-full h-full object-cover" />
             ) : (
-              <ImageIcon className="text-gray-400" size={32} />
+              <ImageIcon className="text-gray-400" size={48} />
             )}
           </div>
           <div className="flex-1 space-y-1">

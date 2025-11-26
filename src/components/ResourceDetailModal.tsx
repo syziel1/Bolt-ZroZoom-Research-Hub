@@ -270,7 +270,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                 <img
                   src={thumbnailUrl}
                   alt={resource.title}
-                  className="w-40 h-auto object-cover rounded-lg border border-gray-200 shadow-sm"
+                  className="w-80 aspect-video object-cover rounded-lg border border-gray-200 shadow-sm"
                 />
               ) : (
                 <div className="bg-blue-50 p-6 rounded-lg flex items-center justify-center">
