@@ -168,20 +168,20 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
       <section className="relative min-h-[70vh] bg-gradient-to-br from-violet-600 via-purple-600 to-violet-700 flex items-center justify-center px-4 pt-24 pb-12 overflow-hidden">
         <div className="max-w-6xl w-full text-center relative z-10">
           <div className="mb-8">
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6 animate-fade-in-up" style={{ animationDelay: '0.1s', opacity: 0 }}>
+            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
               <Sparkles size={20} className="text-yellow-300" />
               <span className="text-white text-sm font-medium">AI-powered • Nowoczesna edukacja</span>
             </div>
             <div className="inline-block bg-white/10 backdrop-blur-sm p-4 rounded-2xl mb-6 animate-float" style={{ animationDelay: '0.2s' }}>
               <Library size={64} className="text-white" />
             </div>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 animate-fade-in-up" style={{ animationDelay: '0.3s', opacity: 0 }}>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
               Szkoła Przyszłości z AI
             </h1>
-            <p className="text-2xl md:text-3xl lg:text-4xl text-violet-100 mb-6 max-w-3xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.4s', opacity: 0 }}>
+            <p className="text-2xl md:text-3xl lg:text-4xl text-violet-100 mb-6 max-w-3xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
               ZroZoom AI Hub
             </p>
-            <p className="text-lg md:text-xl text-violet-50 max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.5s', opacity: 0 }}>
+            <p className="text-lg md:text-xl text-violet-50 max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
               Odkryj materiały edukacyjne, pogrupowane według tematów i poziomów.
               Ucz się efektywniej z zasobów wybranych przez społeczność.
             </p>
