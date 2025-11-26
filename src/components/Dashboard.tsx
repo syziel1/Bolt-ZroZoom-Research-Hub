@@ -438,7 +438,7 @@ export function Dashboard({ isGuestMode = false, onNavigateToAuth, onBackToLandi
                   onClick={onNavigateToAuth}
                   className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm whitespace-nowrap"
                 >
-                  Zaloguj się
+                  Zarejestruj się
                 </button>
               </div>
             </div>
