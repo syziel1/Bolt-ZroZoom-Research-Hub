@@ -406,7 +406,14 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
       const query = searchQuery.toLowerCase();
       const titleMatch = resource.title.toLowerCase().includes(query);
       const descriptionMatch = resource.description?.toLowerCase().includes(query);
-      if (!titleMatch && !descriptionMatch) {
+
+      // Also search in topic names
+      const currentResourceTopics = resourceTopics.get(resource.id) || [];
+      const topicMatch = currentResourceTopics.some(topic =>
+        topic.topic_name.toLowerCase().includes(query)
+      );
+
+      if (!titleMatch && !descriptionMatch && !topicMatch) {
         return false;
       }
     }
@@ -537,7 +544,23 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
                 </>
               ) : (
                 <>
-                  <span className="text-sm text-gray-600 hidden md:inline">Witaj, {userName ? userName.split(' ')[0] : userNick}</span>
+                  <div className="flex flex-col items-end mr-4 hidden md:flex">
+                    <span className="text-lg font-bold text-gray-800">
+                      Witaj, {userName ? userName.split(' ')[0] : userNick}
+                    </span>
+                    <span className="text-xs font-medium text-blue-600">
+                      {(() => {
+                        const date = new Date();
+                        const day = date.getDay();
+                        const hour = date.getHours();
+
+                        if (day === 0 || day === 6) return "Nie zapominaj o nauce! 🏖️";
+                        if (hour >= 5 && hour < 12) return "Czas się uczyć! 🌅";
+                        if (hour >= 12 && hour < 18) return "Już bez pauzy! ☀️";
+                        return "Ostatnia szansa na dzisiaj 🌙";
+                      })()}
+                    </span>
+                  </div>
                   {isAdmin && (
                     <button
                       onClick={() => setShowAdminPanel(true)}

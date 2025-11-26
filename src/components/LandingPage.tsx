@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase, Resource, Subject, ResourceTopic, ResourceLevel } from '../lib/supabase';
 import { ResourceCard } from './ResourceCard';
 import { Navigation } from './Navigation';
-import { BookOpen, Library, Layers, TrendingUp, Award, Sparkles, ArrowRight, Calculator, Globe, Clock, Languages, Code, Palette, Dumbbell, Music, Microscope, Atom, Beaker, ChevronDown, ShieldCheck, Users, Search } from 'lucide-react';
+import { BookOpen, Layers, TrendingUp, Award, Sparkles, ArrowRight, Calculator, Globe, Clock, Languages, Code, Palette, Dumbbell, Music, Microscope, Atom, Beaker, ChevronDown, ShieldCheck, Users, Search } from 'lucide-react';
 
 type Stats = {
   topicsCount: number;
@@ -21,10 +21,41 @@ export function LandingPage() {
   const [resourceLevels, setResourceLevels] = useState<Map<string, ResourceLevel[]>>(new Map());
   const [searchQuery, setSearchQuery] = useState('');
 
+  const mottos = [
+    "Baza wiedzy i narzędzi",
+    "Odkrywaj świat nauki z AI",
+    "Ucz się mądrzej, nie ciężej",
+    "Wspieramy Twój rozwój"
+  ];
+  const [currentMottoIndex, setCurrentMottoIndex] = useState(0);
+  const [isMottoVisible, setIsMottoVisible] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsMottoVisible(false);
+      setTimeout(() => {
+        setCurrentMottoIndex((prev) => (prev + 1) % mottos.length);
+        setIsMottoVisible(true);
+      }, 500); // Wait for fade out
+    }, 4000); // Change every 4 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/zasoby?q=${encodeURIComponent(searchQuery.trim())}`);
+    const query = searchQuery.trim();
+    if (query) {
+      // Check if query matches a subject name
+      const matchedSubject = subjects.find(s =>
+        s.subject_name.toLowerCase() === query.toLowerCase()
+      );
+
+      if (matchedSubject) {
+        navigate(`/zasoby/${matchedSubject.subject_slug}`);
+      } else {
+        navigate(`/zasoby?q=${encodeURIComponent(query)}`);
+      }
     }
   };
 
@@ -192,18 +223,16 @@ export function LandingPage() {
       <section className="relative min-h-[70vh] bg-gradient-to-br from-violet-600 via-purple-600 to-violet-700 flex items-center justify-center px-4 pt-24 pb-12 overflow-hidden">
         <div className="max-w-6xl w-full text-center relative z-10">
           <div className="mb-8">
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6 animate-fade-in-up" style={{ animationDelay: '0.1s', opacity: 0 }}>
-              <Sparkles size={20} className="text-yellow-300" />
-              <span className="text-white text-sm font-medium">AI-powered • Nowoczesna edukacja</span>
-            </div>
-            <div className="inline-block bg-white/10 backdrop-blur-sm p-4 rounded-2xl mb-6 animate-float" style={{ animationDelay: '0.2s' }}>
-              <Library size={64} className="text-white" />
-            </div>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 animate-fade-in-up" style={{ animationDelay: '0.3s', opacity: 0 }}>
               Szkoła Przyszłości z AI
+              <sup className="inline-block ml-2">
+                <Sparkles size={32} className="text-yellow-300 animate-pulse" />
+              </sup>
             </h1>
-            <p className="text-2xl md:text-3xl lg:text-4xl text-violet-100 mb-6 max-w-3xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.4s', opacity: 0 }}>
-              Baza wiedzy i narzędzi
+            <p
+              className={`text-2xl md:text-3xl lg:text-4xl text-violet-100 mb-6 max-w-3xl mx-auto transition-opacity duration-500 ${isMottoVisible ? 'opacity-100' : 'opacity-0'}`}
+            >
+              {mottos[currentMottoIndex]}
             </p>
             <p className="text-lg md:text-xl text-violet-50 max-w-2xl mx-auto animate-fade-in-up mb-8" style={{ animationDelay: '0.5s', opacity: 0 }}>
               Odkryj materiały edukacyjne, pogrupowane według tematów i poziomów.
@@ -246,7 +275,7 @@ export function LandingPage() {
 
       <section className="py-8 bg-white border-b border-gray-100 relative z-20 -mt-8 mx-4">
         <div className="max-w-6xl mx-auto">
-          <div className="bg-white rounded-xl shadow-xl p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="bg-white rounded-xl shadow-2xl p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="flex items-center justify-center gap-4">
               <div className="bg-blue-50 p-3 rounded-full">
                 <BookOpen size={24} className="text-blue-600" />
@@ -282,7 +311,7 @@ export function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Dlaczego warto?</h2>
-            <p className="text-lg text-gray-600">Tworzymy edukację przyszłości razem</p>
+            <p className="text-lg text-gray-600">Tworzymy edukację przyszłości razem... ze sztuczną inteligencją!</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow text-center group">
