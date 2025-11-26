@@ -98,10 +98,7 @@ export function Sidebar({
                     : 'text-gray-700 hover:bg-gray-50'
                     }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <span>{subject.subject_name}</span>
-                    <span className="text-xs text-gray-500">({subject.resources_count})</span>
-                  </div>
+                  {subject.subject_name}
                 </button>
               ))}
             </div>
