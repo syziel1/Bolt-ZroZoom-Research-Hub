@@ -9,6 +9,47 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 - `uploadResourceThumbnail` logic in the service layer.
 - Image display handling in `ResourceCard`.
 
+## [1.6.1] - 2025-11-27
+**Added**
+- **Footer Component**: Reusable footer with theme support (light/dark).
+
+**Changed**
+- **UI Consistency**: Standardized footer across all pages (Landing Page, Dashboard, Help Center, static pages).
+
+## [1.6.0] - 2025-11-27
+**Added**
+- **Help Center**: New `/pomoc` route with sidebar navigation.
+- **Help Content**: Markdown-based user guide and FAQ.
+- **Components**: `HelpPage` component with `react-markdown` integration.
+
+
+## [1.5.0] - 2025-11-27
+**Added**
+- **Automated Testing**: Setup Vitest + React Testing Library.
+- **UI**: Clear button ("X") in search inputs.
+- **Components**: `TopicTree` component for hierarchical navigation.
+
+**Changed**
+- **Refactor**: Split `Dashboard.tsx` into smaller components (`DashboardHeader`, `DashboardGrid`) and hooks (`useDashboardData`, `useDashboardFilters`).
+
+## [1.4.0] - 2025-11-27
+**Added**
+- **AI Tutor**: Interactive chat assistant powered by Google Gemini (Edge Function).
+- **Edge Functions**: Integration with Supabase Edge Functions (`chat-with-ai`).
+- **Rich Text Support**: Markdown and LaTeX rendering for AI responses (`react-markdown`, `rehype-katex`).
+- **Video Search**: Integrated YouTube video search (`search-youtube` Edge Function).
+- **Metadata Analysis**: AI-powered metadata suggestions (`analyze-content` Edge Function).
+- **Favorites**: User favorites system (`user_favorites` table).
+- **UI**: Floating AI Assistant button and chat interface.
+
+## [1.3.0] - 2025-11-26
+**Added**
+- React Router DOM integration with declarative routing.
+- Client-side search functionality (filters by title and description).
+- URL-based navigation with query parameters (`?q=search`).
+- Protected routes and automatic redirects.
+- Markdown pages for About and Privacy Policy.
+
 ## [1.2.0] - 2025-11-26
 **Added**
 - Pagination in Dashboard (client-side).

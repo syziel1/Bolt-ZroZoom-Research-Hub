@@ -9,6 +9,7 @@ type AddResourceModalProps = {
   topics: Topic[];
   levels: Level[];
   initialData?: Resource | null;
+  prefillData?: Partial<Resource> | null;
 };
 
 export function AddResourceModal({
@@ -19,6 +20,7 @@ export function AddResourceModal({
   topics,
   levels,
   initialData,
+  prefillData,
 }: AddResourceModalProps) {
   if (!isOpen) return null;
 
@@ -32,6 +34,7 @@ export function AddResourceModal({
           onSuccess={onSuccess}
           onCancel={onClose}
           initialData={initialData}
+          prefillData={prefillData}
         />
       </div>
     </div>

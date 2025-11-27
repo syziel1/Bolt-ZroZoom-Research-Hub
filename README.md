@@ -1,4 +1,4 @@
-# ZroZoom Research Hub
+# Szkoła Przyszłości z AI
 
 **Platforma zasobów edukacyjnych** - Twoja baza wiedzy dla Szkoły Przyszłości AI
 
@@ -17,7 +17,7 @@
 
 ## 🎯 O projekcie
 
-ZroZoom Research Hub to platforma do gromadzenia, organizowania i udostępniania materiałów edukacyjnych. Umożliwia:
+Szkoła Przyszłości z AI to platforma do gromadzenia, organizowania i udostępniania materiałów edukacyjnych. Umożliwia:
 
 - **Przeglądanie** - dostęp do zasobów edukacyjnych bez logowania (tryb gościa)
 - **Dodawanie** - zalogowani użytkownicy mogą dodawać nowe materiały
@@ -33,7 +33,9 @@ ZroZoom Research Hub to platforma do gromadzenia, organizowania i udostępniania
 - 📊 Wyświetlanie statystyk i ocen materiałów
 - 🌳 Hierarchiczne drzewo tematów
 - 📑 Paginacja wyników wyszukiwania
+- 🔍 Wyszukiwanie pełnotekstowe (klient)
 - 🃏 Różne widoki kart (Hero, Lista, Siatka)
+- 🔗 Routing z URL parametrami
 
 ### Dla zalogowanych użytkowników
 - ➕ Dodawanie nowych zasobów
@@ -54,6 +56,9 @@ ZroZoom Research Hub to platforma do gromadzenia, organizowania i udostępniania
 - **Vite** - narzędzie budowania
 - **Tailwind CSS** - stylowanie
 - **Lucide React** - ikony
+- **React Router DOM** - routing i nawigacja
+- **React Markdown** + **Katex** - renderowanie treści AI
+- **Vitest** + **React Testing Library** - testy automatyczne
 
 ### Backend
 - **Supabase** - Backend-as-a-Service
@@ -61,6 +66,7 @@ ZroZoom Research Hub to platforma do gromadzenia, organizowania i udostępniania
   - Authentication - uwierzytelnianie
   - Row Level Security (RLS) - bezpieczeństwo
   - Real-time subscriptions - aktualizacje na żywo
+- **Supabase Edge Functions** - serverless functions (Deno)
 
 ## 📦 Instalacja
 
@@ -73,8 +79,8 @@ ZroZoom Research Hub to platforma do gromadzenia, organizowania i udostępniania
 
 1. **Sklonuj repozytorium**
 ```bash
-git clone https://github.com/your-username/Bolt-ZroZoom-Research-Hub.git
-cd Bolt-ZroZoom-Research-Hub
+git clone https://github.com/your-username/Szkola-Przyszlosci-AI.git
+cd Szkola-Przyszlosci-AI
 ```
 
 2. **Zainstaluj zależności**
@@ -105,7 +111,7 @@ VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key-here
 
 # Optional: Custom test user credentials for Developer Shortcut
-# If not set, defaults to test@zrozoomai.pl / 123TesT456
+# If not set, you must provide credentials manually
 VITE_TEST_EMAIL=your-test-email@example.com
 VITE_TEST_PASSWORD=your-test-password
 ```
@@ -154,24 +160,37 @@ npm run lint
 npm run typecheck
 ```
 
+### Testy automatyczne
+```bash
+npm test
+```
+
 ## 📁 Struktura projektu
 
 ```text
-Bolt-ZroZoom-Research-Hub/
+Szkola-Przyszlosci-AI/
 ├── src/
 │   ├── components/          # Komponenty React
 │   │   ├── AuthForm.tsx     # Formularz logowania/rejestracji
-│   │   ├── Dashboard.tsx    # Główny widok aplikacji
+│   │   ├── Dashboard.tsx    # Główny widok (kontener)
+│   │   ├── DashboardHeader.tsx # Nagłówek dashboardu
+│   │   ├── DashboardGrid.tsx   # Siatka zasobów
 │   │   ├── Sidebar.tsx      # Boczne menu z filtrami
+│   │   ├── TopicTree.tsx    # Drzewo tematów
 │   │   ├── ResourceCard.tsx # Karta pojedynczego zasobu
+│   │   ├── YouTubeSearchModal.tsx # Modal wyszukiwania YouTube
 │   │   ├── AddResourceModal.tsx
 │   │   ├── ResourceDetailModal.tsx
 │   │   ├── AdminPanel.tsx
 │   │   └── LandingPage.tsx
 │   ├── hooks/               # Custom React hooks
+│   │   ├── useDashboardData.ts    # Logika pobierania danych
+│   │   ├── useDashboardFilters.ts # Logika filtrowania
 │   │   └── useTopics.ts     # Hook do zarządzania tematami
 │   ├── lib/                 # Biblioteki i konfiguracja
 │   │   └── supabase.ts      # Klient Supabase + typy
+│   ├── test/                # Konfiguracja testów
+│   │   └── setup.ts         # Setup Vitest
 │   ├── App.tsx              # Główny komponent aplikacji
 │   ├── main.tsx             # Entry point
 │   └── index.css            # Globalne style
@@ -291,7 +310,7 @@ Ten projekt jest prywatny. Wszelkie prawa zastrzeżone.
 
 ## 👥 Autorzy
 
-- Zespół ZroZoom - Szkoła Przyszłości AI
+- Sylwester Zieliński
 
 ## 🐛 Zgłaszanie błędów
 

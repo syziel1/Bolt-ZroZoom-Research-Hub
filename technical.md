@@ -7,8 +7,10 @@ Minimalna dokumentacja techniczna dla repozytorium.
 ## 1. Architektura
 - **Backend / DB:** Supabase (PostgreSQL + Auth + RLS)
 - **Frontend:** Next.js / React (np. bolt.new) — czytelne API przez supabase-js
+- **Routing:** React Router DOM — deklaratywne routy, protected routes
 - **Publiczne odczytywanie:** materiały, tematy, poziomy, przedmioty
 - **Modyfikacje:** tylko zalogowani użytkownicy (z RLS)
+- **AI:** Supabase Edge Functions + Google Gemini API
 
 ---
 
@@ -56,7 +58,8 @@ Minimalna dokumentacja techniczna dla repozytorium.
 - description
 - language
 - ai_generated (bool)
-- thumbnail_path (text, nullable)
+- thumbnail_path (text, nullable) - dla uploadu
+- thumbnail_url (text, nullable) - dla linków zewnętrznych
 - review_required (bool)
 - review_status (text)
 - timestamps
@@ -83,6 +86,15 @@ Minimalna dokumentacja techniczna dla repozytorium.
 - content
 - parent_comment_id (nullable)
 - timestamps
+
+### user_favorites
+- id
+- user_id → profiles.id
+- resource_id → resources.id
+- created_at
+
+### Automatyzacja (Triggers)
+- **increment_reputation_on_resource_add**: Automatycznie dodaje +10 punktów reputacji autorowi po dodaniu nowego zasobu.
 
 ---
 
@@ -156,5 +168,32 @@ Minimalna dokumentacja techniczna dla repozytorium.
 
 ---
 
-Dokument gotowy do umieszczenia w głównym repozytorium jako `technical.md`. 
+## 9. Edge Functions & AI
 
+### chat-with-ai
+- **Runtime:** Deno
+- **Model:** Google Gemini 2.5 Flash
+- **Funkcja:** Edukacyjny asystent AI (AI Tutor)
+- **Input:** Historia czatu (JSON)
+- **Output:** Streaming text / Markdown + LaTeX
+- **Security:** Weryfikacja klucza API po stronie serwera (Edge)
+
+### analyze-content
+- **Runtime:** Deno
+- **Model:** Google Gemini 2.5 Flash
+- **Funkcja:** Automatyczna analiza treści (tytuł, opis, URL) i sugestia metadanych (przedmiot, temat, poziom)
+- **Input:** `{ title, description, url }`
+- **Output:** JSON z sugestiami
+- **Env:** `GEMINI_API_KEY`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`
+
+### search-youtube
+- **Runtime:** Deno
+- **API:** YouTube Data API v3
+- **Funkcja:** Wyszukiwanie filmów i pobieranie metadanych (czas trwania)
+- **Input:** Query string
+- **Output:** Znormalizowana lista wideo (JSON)
+- **Env:** `YOUTUBE_API_KEY`
+
+---
+
+Dokument gotowy do umieszczenia w głównym repozytorium jako `technical.md`.

@@ -31,18 +31,27 @@ function TopicItem({ node, selectedTopics, onTopicToggle, level = 0 }: TopicItem
                 className={`flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-gray-100 cursor-pointer ${isSelected ? 'bg-blue-50' : ''
                     }`}
                 style={{ marginLeft: `${level * 16}px` }}
-                onClick={() => onTopicToggle(node.id)}
+                onClick={() => {
+                    onTopicToggle(node.id);
+                    if (hasChildren) {
+                        setIsExpanded(true);
+                    }
+                }}
                 tabIndex={0}
                 onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
                         onTopicToggle(node.id);
+                        if (hasChildren) {
+                            setIsExpanded(true);
+                        }
                     }
                 }}
             >
                 <div className="flex-shrink-0 w-4 h-4 flex items-center justify-center">
                     {hasChildren && (
                         <button
+                            type="button"
                             onClick={handleToggle}
                             className="text-gray-500 hover:text-gray-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded"
                             aria-label={isExpanded ? `Collapse ${node.name}` : `Expand ${node.name}`}
@@ -55,10 +64,11 @@ function TopicItem({ node, selectedTopics, onTopicToggle, level = 0 }: TopicItem
 
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                     <input
-                        type="checkbox"
+                        type="radio"
+                        name="topic-selection"
                         checked={isSelected}
                         onChange={() => onTopicToggle(node.id)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 flex-shrink-0"
+                        className="border-gray-300 text-blue-600 focus:ring-blue-500 flex-shrink-0"
                         onClick={(e) => e.stopPropagation()}
                     />
                     <span className={`text-sm truncate ${isSelected ? 'text-blue-700 font-medium' : 'text-gray-700'}`}>

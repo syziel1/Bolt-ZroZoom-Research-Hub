@@ -1,56 +1,59 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Session } from '@supabase/supabase-js';
 import { supabase } from './lib/supabase';
 import { LandingPage } from './components/LandingPage';
 import { AuthForm } from './components/AuthForm';
 import { Dashboard } from './components/Dashboard';
+import { MarkdownPage } from './components/MarkdownPage';
+import { HelpPage } from './pages/HelpPage';
 import { Loader } from 'lucide-react';
 
+function AppRoutes({ session }: { session: Session | null }) {
+  return (
+    <Routes>
+      {/* Public routes */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/auth" element={
+        session ? <Navigate to="/zasoby" replace /> : <AuthForm />
+      } />
+      <Route path="/zasoby" element={<Dashboard />} />
+      <Route path="/zasoby/:subjectSlug" element={<Dashboard />} />
+      <Route path="/zasoby/:subjectSlug/:topicSlug" element={<Dashboard />} />
+      <Route path="/zasoby/:subjectSlug/:topicSlug/:subtopicSlug" element={<Dashboard />} />
 
-type View = 'landing' | 'auth' | 'dashboard' | 'browse';
+      {/* Help routes */}
+      <Route path="/pomoc" element={<HelpPage />} />
+      <Route path="/pomoc/:slug" element={<HelpPage />} />
+
+      {/* Static pages */}
+      <Route path="/o-nas" element={<MarkdownPage fileName="about.md" />} />
+      <Route path="/polityka-prywatnosci" element={<MarkdownPage fileName="privacy.md" />} />
+
+      {/* Catch all - redirect to home */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [view, setView] = useState<View>('landing');
-  const [initialSubject, setInitialSubject] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setLoading(false);
-      if (session) {
-        setView('dashboard');
-      }
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-      if (session) {
-        setView('dashboard');
-      } else {
-        setView('landing');
-      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
-
-  const handleNavigateToAuth = () => {
-    setView('auth');
-  };
-
-  const handleBrowseAsGuest = (subjectId?: string) => {
-    setInitialSubject(subjectId || null);
-    setView('browse');
-  };
-
-  const handleBackToLanding = () => {
-    setView('landing');
-    setInitialSubject(null);
-  };
 
   if (loading) {
     return (
@@ -60,19 +63,11 @@ function App() {
     );
   }
 
-  if (session) {
-    return <Dashboard />;
-  }
-
-  if (view === 'auth') {
-    return <AuthForm onSuccess={() => setView('dashboard')} onBack={handleBackToLanding} />;
-  }
-
-  if (view === 'browse') {
-    return <Dashboard isGuestMode={true} onNavigateToAuth={handleNavigateToAuth} onBackToLanding={handleBackToLanding} initialSubject={initialSubject} />;
-  }
-
-  return <LandingPage onNavigateToAuth={handleNavigateToAuth} onBrowseAsGuest={handleBrowseAsGuest} />;
+  return (
+    <BrowserRouter>
+      <AppRoutes session={session} />
+    </BrowserRouter>
+  );
 }
 
 export default App;

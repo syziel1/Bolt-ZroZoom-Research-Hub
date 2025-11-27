@@ -1,4 +1,5 @@
 import { supabase, SUPABASE_URL } from './supabase';
+import { logger } from './logger';
 
 export const THUMBNAIL_BUCKET = 'resource-thumbnails';
 export const THUMBNAIL_FOLDER = 'public';
@@ -34,17 +35,17 @@ export const uploadResourceThumbnail = async (
   resourceId: string,
   file: File,
 ): Promise<UploadResult> => {
-  console.log('[uploadResourceThumbnail] Starting upload', { resourceId, fileName: file.name });
+  logger.log('[uploadResourceThumbnail] Starting upload', { resourceId, fileName: file.name });
 
   const validationError = validateThumbnailFile(file);
   if (validationError) {
-    console.error('[uploadResourceThumbnail] Validation failed:', validationError);
+    logger.error('[uploadResourceThumbnail] Validation failed:', validationError);
     throw new Error(validationError);
   }
 
   const ext = getExtensionFromType(file.type);
   const path = `${THUMBNAIL_FOLDER}/${resourceId}.${ext}`;
-  console.log('[uploadResourceThumbnail] Upload path:', path);
+  logger.log('[uploadResourceThumbnail] Upload path:', path);
 
   try {
     const { error: uploadError } = await supabase.storage
@@ -52,10 +53,10 @@ export const uploadResourceThumbnail = async (
       .upload(path, file, { upsert: true });
 
     if (uploadError) {
-      console.error('[uploadResourceThumbnail] Storage upload error:', uploadError);
+      logger.error('[uploadResourceThumbnail] Storage upload error:', uploadError);
       throw new Error(`Upload failed: ${uploadError.message}`);
     }
-    console.log('[uploadResourceThumbnail] File uploaded successfully');
+    logger.log('[uploadResourceThumbnail] File uploaded successfully');
 
     const { error: updateError } = await supabase
       .from('resources')
@@ -63,20 +64,20 @@ export const uploadResourceThumbnail = async (
       .eq('id', resourceId);
 
     if (updateError) {
-      console.error('[uploadResourceThumbnail] Database update error:', updateError);
+      logger.error('[uploadResourceThumbnail] Database update error:', updateError);
       throw new Error(`Database update failed: ${updateError.message}`);
     }
-    console.log('[uploadResourceThumbnail] Database updated successfully');
+    logger.log('[uploadResourceThumbnail] Database updated successfully');
 
     const publicUrl = getThumbnailUrl(path) as string;
-    console.log('[uploadResourceThumbnail] Complete. Public URL:', publicUrl);
+    logger.log('[uploadResourceThumbnail] Complete. Public URL:', publicUrl);
 
     return {
       path,
       publicUrl,
     };
   } catch (error) {
-    console.error('[uploadResourceThumbnail] Unexpected error:', error);
+    logger.error('[uploadResourceThumbnail] Unexpected error:', error);
     throw error;
   }
 };

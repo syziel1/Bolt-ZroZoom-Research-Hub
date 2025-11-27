@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase, Resource, Subject, ResourceTopic, ResourceLevel } from '../lib/supabase';
 import { ResourceCard } from './ResourceCard';
 import { Navigation } from './Navigation';
-import { BookOpen, Library, Layers, TrendingUp, Award, Sparkles, ArrowRight, Calculator, Globe, Clock, Languages, Code, Palette, Dumbbell, Music, Microscope, Atom, Beaker } from 'lucide-react';
-
-type LandingPageProps = {
-  onNavigateToAuth: () => void;
-  onBrowseAsGuest: (subjectId?: string) => void;
-};
+import { Footer } from './Footer';
+import { BookOpen, Layers, TrendingUp, Award, Sparkles, ArrowRight, Calculator, Globe, Clock, Languages, Code, Palette, Dumbbell, Music, Microscope, Atom, Beaker, ChevronDown, ShieldCheck, Users, Search } from 'lucide-react';
+import { SEO } from './SEO';
 
 type Stats = {
   topicsCount: number;
@@ -15,13 +13,53 @@ type Stats = {
   levelsCount: number;
 };
 
-export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPageProps) {
+export function LandingPage() {
+  const navigate = useNavigate();
   const [stats, setStats] = useState<Stats>({ topicsCount: 0, subjectsCount: 0, levelsCount: 0 });
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [latestResources, setLatestResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
   const [resourceTopics, setResourceTopics] = useState<Map<string, ResourceTopic[]>>(new Map());
   const [resourceLevels, setResourceLevels] = useState<Map<string, ResourceLevel[]>>(new Map());
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const mottos = [
+    "Baza wiedzy i narzędzi",
+    "Odkrywaj świat nauki z AI",
+    "Ucz się mądrzej, nie ciężej",
+    "Wspieramy Twój rozwój"
+  ];
+  const [currentMottoIndex, setCurrentMottoIndex] = useState(0);
+  const [isMottoVisible, setIsMottoVisible] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsMottoVisible(false);
+      setTimeout(() => {
+        setCurrentMottoIndex((prev) => (prev + 1) % mottos.length);
+        setIsMottoVisible(true);
+      }, 500); // Wait for fade out
+    }, 4000); // Change every 4 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const query = searchQuery.trim();
+    if (query) {
+      // Check if query matches a subject name
+      const matchedSubject = subjects.find(s =>
+        s.subject_name.toLowerCase() === query.toLowerCase()
+      );
+
+      if (matchedSubject) {
+        navigate(`/zasoby/${matchedSubject.subject_slug}`);
+      } else {
+        navigate(`/zasoby?q=${encodeURIComponent(query)}`);
+      }
+    }
+  };
 
   useEffect(() => {
     loadLandingPageData();
@@ -165,6 +203,11 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
     element?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const scrollToResources = () => {
+    const element = document.getElementById('latest-resources');
+    element?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
@@ -178,27 +221,57 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
 
   return (
     <div className="min-h-screen bg-white">
-      <Navigation onNavigateToAuth={onNavigateToAuth} onScrollToSubjects={scrollToSubjects} onBrowseAsGuest={() => onBrowseAsGuest()} />
+      <SEO
+        title="Darmowe zasoby edukacyjne: Matematyka, Fizyka, AI"
+        description="Szkoła Przyszłości z AI to największa baza darmowych materiałów edukacyjnych. Przygotuj się do matury i egzaminu ósmoklasisty z pomocą sztucznej inteligencji."
+      />
+      <Navigation onNavigateToAuth={() => navigate('/auth')} onScrollToSubjects={scrollToSubjects} onBrowseAsGuest={() => navigate('/zasoby')} />
       <section className="relative min-h-[70vh] bg-gradient-to-br from-violet-600 via-purple-600 to-violet-700 flex items-center justify-center px-4 pt-24 pb-12 overflow-hidden">
         <div className="max-w-6xl w-full text-center relative z-10">
           <div className="mb-8">
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6 animate-fade-in-up" style={{ animationDelay: '0.1s', opacity: 0 }}>
-              <Sparkles size={20} className="text-yellow-300" />
-              <span className="text-white text-sm font-medium">AI-powered • Nowoczesna edukacja</span>
-            </div>
-            <div className="inline-block bg-white/10 backdrop-blur-sm p-4 rounded-2xl mb-6 animate-float" style={{ animationDelay: '0.2s' }}>
-              <Library size={64} className="text-white" />
-            </div>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 animate-fade-in-up" style={{ animationDelay: '0.3s', opacity: 0 }}>
               Szkoła Przyszłości z AI
+              <sup className="inline-block ml-2">
+                <Sparkles size={32} className="text-yellow-300 animate-pulse" />
+              </sup>
             </h1>
-            <p className="text-2xl md:text-3xl lg:text-4xl text-violet-100 mb-6 max-w-3xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.4s', opacity: 0 }}>
-              ZroZoom AI Hub
+            <p
+              className={`text-2xl md:text-3xl lg:text-4xl text-violet-100 mb-6 max-w-3xl mx-auto transition-opacity duration-500 ${isMottoVisible ? 'opacity-100' : 'opacity-0'}`}
+            >
+              {mottos[currentMottoIndex]}
             </p>
-            <p className="text-lg md:text-xl text-violet-50 max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.5s', opacity: 0 }}>
-              Odkryj materiały edukacyjne, pogrupowane według tematów i poziomów.
-              Ucz się efektywniej z zasobów wybranych przez społeczność.
+            <p className="text-lg md:text-xl text-violet-50 max-w-2xl mx-auto animate-fade-in-up mb-8" style={{ animationDelay: '0.5s', opacity: 0 }}>
+              Odkrywaj materiały edukacyjne, pogrupowane według tematów i poziomów.
+              Ucz się efektywniej z zasobów polecanych przez społeczność.
             </p>
+
+            <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-12 animate-fade-in-up relative z-20" style={{ animationDelay: '0.6s', opacity: 0 }}>
+              <div className="relative flex items-center">
+                <input
+                  type="text"
+                  placeholder="Czego chcesz się dzisiaj nauczyć?"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full px-6 py-4 rounded-full text-gray-900 text-lg shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-400/50 pl-14"
+                />
+                <Search className="absolute left-5 text-gray-400" size={24} />
+                <button
+                  type="submit"
+                  className="absolute right-2 bg-blue-600 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-700 transition-colors"
+                >
+                  Szukaj
+                </button>
+              </div>
+            </form>
+
+            <button
+              onClick={scrollToResources}
+              className="flex flex-col items-center gap-2 text-white/80 hover:text-white transition-colors animate-fade-in-up mx-auto"
+              style={{ animationDelay: '0.7s', opacity: 0 }}
+            >
+              <span className="text-sm font-medium">Zobacz ostatnio dodane materiały</span>
+              <ChevronDown size={32} className="animate-bounce" />
+            </button>
           </div>
         </div>
         <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 120" preserveAspectRatio="none" style={{ height: '120px' }}>
@@ -206,7 +279,73 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
         </svg>
       </section>
 
-      <section id="latest-resources" className="py-12 px-4 bg-white">
+      <section className="py-8 bg-white border-b border-gray-100 relative z-20 -mt-8 mx-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-white rounded-xl shadow-2xl p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="flex items-center justify-center gap-4">
+              <div className="bg-blue-50 p-3 rounded-full">
+                <BookOpen size={24} className="text-blue-600" />
+              </div>
+              <div className="text-left">
+                <div className="text-2xl font-bold text-gray-900">{stats.topicsCount}</div>
+                <div className="text-gray-600 text-sm">Tematów</div>
+              </div>
+            </div>
+            <div className="flex items-center justify-center gap-4 border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-8">
+              <div className="bg-green-50 p-3 rounded-full">
+                <Layers size={24} className="text-green-600" />
+              </div>
+              <div className="text-left">
+                <div className="text-2xl font-bold text-gray-900">{stats.subjectsCount}</div>
+                <div className="text-gray-600 text-sm">Przedmiotów</div>
+              </div>
+            </div>
+            <div className="flex items-center justify-center gap-4 border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-8">
+              <div className="bg-purple-50 p-3 rounded-full">
+                <Award size={24} className="text-purple-600" />
+              </div>
+              <div className="text-left">
+                <div className="text-2xl font-bold text-gray-900">{stats.levelsCount}</div>
+                <div className="text-gray-600 text-sm">Poziomów</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 px-4 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Dlaczego warto?</h2>
+            <p className="text-lg text-gray-600">Tworzymy edukację przyszłości razem... ze sztuczną inteligencją!</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow text-center group">
+              <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                <ShieldCheck size={32} className="text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Sprawdzone materiały</h3>
+              <p className="text-gray-600">Wszystkie zasoby są weryfikowane przez społeczność i ekspertów.</p>
+            </div>
+            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow text-center group">
+              <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                <Clock size={32} className="text-purple-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Oszczędność czasu</h3>
+              <p className="text-gray-600">Szybko znajdź gotowe materiały na lekcje dzięki zaawansowanym filtrom.</p>
+            </div>
+            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow text-center group">
+              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                <Users size={32} className="text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Społeczność</h3>
+              <p className="text-gray-600">Wymieniaj się doświadczeniami i inspiracjami z innymi nauczycielami.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="latest-resources" className="py-12 px-4 bg-white scroll-mt-24">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 flex items-center justify-center gap-3">
@@ -218,13 +357,18 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {latestResources.map((resource) => (
-              <div key={resource.id} className="resource-card-animate opacity-0">
+              <div key={resource.id}>
                 <ResourceCard
                   resource={resource}
                   topics={resourceTopics.get(resource.id) || []}
                   levels={resourceLevels.get(resource.id) || []}
                   variant="hero"
-                  onCardClick={(res) => onBrowseAsGuest(res.subject_id)}
+                  onCardClick={(res) => {
+                    const subject = subjects.find(s => s.subject_id === res.subject_id);
+                    if (subject) {
+                      navigate(`/zasoby/${subject.subject_slug}`);
+                    }
+                  }}
                 />
               </div>
             ))}
@@ -238,7 +382,7 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
         </div>
       </section>
 
-      <section id="available-subjects" className="py-20 px-4 bg-gray-50">
+      <section id="available-subjects" className="py-20 px-4 bg-gray-50 scroll-mt-24">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Dostępne przedmioty</h2>
@@ -279,8 +423,8 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
               return (
                 <div
                   key={subject.subject_id}
-                  onClick={() => onBrowseAsGuest(subject.subject_id)}
-                  className={`subject-card-animate opacity-0 bg-gradient-to-br ${gradient} p-6 rounded-lg shadow-lg hover:shadow-2xl transition-all hover:scale-105 cursor-pointer group`}
+                  onClick={() => navigate(`/zasoby/${subject.subject_slug}`)}
+                  className={`bg-gradient-to-br ${gradient} p-6 rounded-lg shadow-lg hover:shadow-2xl transition-all hover:scale-105 cursor-pointer group`}
                 >
                   <div className="flex items-center gap-4">
                     <div className="bg-white/20 backdrop-blur-sm p-3 rounded-lg group-hover:bg-white/30 transition-colors">
@@ -308,64 +452,25 @@ export function LandingPage({ onNavigateToAuth, onBrowseAsGuest }: LandingPagePr
         </div>
       </section>
 
-      <section className="py-12 px-4 bg-gray-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-            <div className="bg-white p-4 rounded-xl shadow-md border border-gray-100 flex items-center gap-4">
-              <div className="bg-blue-50 p-3 rounded-full flex-shrink-0">
-                <BookOpen size={28} className="text-blue-600" />
-              </div>
-              <div>
-                <div className="text-3xl font-bold text-gray-900">{stats.topicsCount}</div>
-                <div className="text-gray-600 text-sm">Tematów</div>
-              </div>
-            </div>
 
-            <div className="bg-white p-4 rounded-xl shadow-md border border-gray-100 flex items-center gap-4">
-              <div className="bg-green-50 p-3 rounded-full flex-shrink-0">
-                <Layers size={28} className="text-green-600" />
-              </div>
-              <div>
-                <div className="text-3xl font-bold text-gray-900">{stats.subjectsCount}</div>
-                <div className="text-gray-600 text-sm">Przedmiotów</div>
-              </div>
-            </div>
-
-            <div className="bg-white p-4 rounded-xl shadow-md border border-gray-100 flex items-center gap-4">
-              <div className="bg-purple-50 p-3 rounded-full flex-shrink-0">
-                <Award size={28} className="text-purple-600" />
-              </div>
-              <div>
-                <div className="text-3xl font-bold text-gray-900">{stats.levelsCount}</div>
-                <div className="text-gray-600 text-sm">Poziomów</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <section className="py-20 px-4 bg-gradient-to-br from-blue-600 to-blue-700 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Gotowi do nauki?</h2>
           <p className="text-xl mb-8 text-blue-100">
-            Dołącz do społeczności uczących się i odkryj sprawdzone materiały edukacyjne
+            Dołącz do społeczności uczących się i odkrywaj sprawdzone materiały edukacyjne
           </p>
           <button
-            onClick={onNavigateToAuth}
+            onClick={() => navigate('/auth')}
             className="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-50 transition-all hover:scale-105 shadow-lg inline-flex items-center gap-2"
           >
-            Rozpocznij teraz
+            Zarejestruj się teraz
             <ArrowRight size={20} />
           </button>
         </div>
       </section>
 
-      <footer className="py-8 px-4 bg-gray-900 text-gray-400 text-center">
-        <div className="max-w-6xl mx-auto">
-          <p className="mb-2">Szkoła Przyszłości AI - ZroZoom Hub - Twoja baza wiedzy edukacyjnej</p>
-          <p className="text-sm">&copy; {new Date().getFullYear()} Sylwester Zieliński. All rights reserved</p>
-        </div>
-      </footer>
-    </div>
+      <Footer theme="dark" />
+    </div >
   );
 }

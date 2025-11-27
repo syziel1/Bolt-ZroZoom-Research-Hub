@@ -40,6 +40,20 @@ const typeIcons: Record<string, React.ElementType> = {
   tool: Wrench,
 };
 
+const getYouTubeEmbedUrl = (url: string): string | null => {
+  if (!url) return null;
+
+  // Handle various YouTube URL formats
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+
+  if (match && match[2].length === 11) {
+    return `https://www.youtube.com/embed/${match[2]}`;
+  }
+
+  return null;
+};
+
 export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdated, isGuestMode = false, onEdit }: ResourceDetailModalProps) {
   const [ratings, setRatings] = useState<Rating[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -117,7 +131,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     if (data) {
       setRatings(data.map(r => ({
         ...r,
-        author_nick: (r.author as unknown as { nick: string })?.nick || 'Unknown',
+        author_nick: (r.author as unknown as { nick: string })?.nick || 'Nieznany',
       })));
     }
   }, [resource]);
@@ -140,7 +154,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     if (data) {
       setComments(data.map(c => ({
         ...c,
-        author_nick: (c.author as unknown as { nick: string })?.nick || 'Unknown',
+        author_nick: (c.author as unknown as { nick: string })?.nick || 'Nieznany',
       })));
     }
   }, [resource]);
@@ -278,7 +292,8 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
   if (!isOpen || !resource) return null;
 
   const Icon = typeIcons[resource.type] || FileText;
-  const thumbnailUrl = getThumbnailUrl(resource.thumbnail_path);
+  const thumbnailUrl = getThumbnailUrl(resource.thumbnail_path) || resource.thumbnail_url;
+  const embedUrl = getYouTubeEmbedUrl(resource.url);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -296,7 +311,15 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
         <div className="p-6">
           <div className="flex items-start gap-6 mb-6">
             <div className="flex-shrink-0 w-80 aspect-video bg-gradient-to-br from-gray-100 to-gray-50 rounded-lg border border-gray-200 shadow-sm flex items-center justify-center overflow-hidden">
-              {thumbnailUrl ? (
+              {embedUrl ? (
+                <iframe
+                  src={embedUrl}
+                  title={resource.title}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : thumbnailUrl ? (
                 <img
                   src={thumbnailUrl}
                   alt={resource.title}
@@ -507,7 +530,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                 </div>
               ))}
               {ratings.length === 0 && (
-                <p className="text-sm text-gray-500">Brak ocen. Bądź pierwszy!</p>
+                <p className="text-sm text-gray-500">Brak ocen. Dodaj pierwszą ocenę!</p>
               )}
             </div>
           </div>
