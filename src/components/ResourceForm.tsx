@@ -41,9 +41,15 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
   const handleTopicToggle = (topicId: string) => {
     setSelectedTopics(prev => {
       if (prev.includes(topicId)) {
-        return prev.filter(id => id !== topicId);
+        // If clicking the same topic, deselect it (optional, but good for radio buttons if we want to allow unchecking)
+        // Actually for radio buttons, usually you can't uncheck by clicking again, but let's allow it or just switch.
+        // Let's make it behave like a radio button: always select the new one.
+        // But if it's already selected, maybe we want to keep it selected?
+        // If we want standard radio behavior:
+        return [topicId];
       } else {
-        return [...prev, topicId];
+        // If clicking a new topic, replace the old selection
+        return [topicId];
       }
     });
   };

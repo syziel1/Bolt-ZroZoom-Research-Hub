@@ -1,352 +1,109 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { supabase, Resource, Subject, Level, TopicNode, Topic, ResourceTopic, ResourceLevel } from '../lib/supabase';
-import { useTopics } from '../hooks/useTopics';
+import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase, Resource } from '../lib/supabase';
 import { Sidebar } from './Sidebar';
-import { ResourceCard } from './ResourceCard';
 import { AddResourceModal } from './AddResourceModal';
 import { ResourceDetailModal } from './ResourceDetailModal';
 import { AdminPanel } from './AdminPanel';
-import { Plus, LogOut, Loader, Settings, Menu, ArrowLeft, ChevronLeft, ChevronRight, Search, Play } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { YouTubeSearchModal } from './YouTubeSearchModal';
+import { useDashboardData } from '../hooks/useDashboardData';
+import { useDashboardFilters } from '../hooks/useDashboardFilters';
+import { DashboardHeader } from './DashboardHeader';
+import { DashboardGrid } from './DashboardGrid';
 
 type DashboardProps = {
   isGuestMode?: boolean;
 };
 
-export function Dashboard({ isGuestMode = false }: DashboardProps) {
+export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardProps) {
   const navigate = useNavigate();
-  const { subjectSlug, topicSlug, subtopicSlug } = useParams<{ subjectSlug?: string; topicSlug?: string; subtopicSlug?: string }>();
-  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [resources, setResources] = useState<Resource[]>([]);
-  const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [levels, setLevels] = useState<Level[]>([]);
-  const [allTopics, setAllTopics] = useState<Topic[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
-  const { topics: topicNodes, loading: topicsLoading } = useTopics(selectedSubject);
-  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
-  const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  // Check auth session (simplified as it was in original, but could be moved to a context)
+  const [session, setSession] = useState<any>(null);
+  const [sessionChecked, setSessionChecked] = useState(false);
+  const isGuestMode = sessionChecked ? !session : propIsGuestMode;
+
+  // Ideally this session check should be in a higher level provider, but keeping it here for now to minimize scope creep
+  useState(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setSessionChecked(true);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setSessionChecked(true);
+    });
+
+    return () => subscription.unsubscribe();
+  });
+
+  const {
+    resources,
+    subjects,
+    levels,
+    allTopics,
+    loading,
+    resourceTopics,
+    resourceLevels,
+    userNick,
+    userName,
+    userRole,
+    refreshData
+  } = useDashboardData(isGuestMode);
+
+  const {
+    selectedSubject,
+    selectedTopics,
+    selectedLevels,
+    selectedLanguages,
+    searchQuery,
+    setSearchQuery,
+    sortBy,
+    setSortBy,
+    currentPage,
+    totalPages,
+    currentResources,
+    filteredResources,
+    sortedResources,
+    topicNodes,
+    topicsLoading,
+    hasActiveFilters,
+    indexOfFirstResource,
+    indexOfLastResource,
+    handleSubjectChange,
+    handleTopicToggle,
+    handleLevelToggle,
+    handleLanguageToggle,
+    handlePageChange
+  } = useDashboardFilters({
+    resources,
+    subjects,
+    allTopics,
+    resourceTopics,
+    resourceLevels
+  });
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
-  const [userNick, setUserNick] = useState('');
-  const [userName, setUserName] = useState('');
-  const [userRole, setUserRole] = useState('');
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [resourceTopics, setResourceTopics] = useState<Map<string, ResourceTopic[]>>(new Map());
-  const [resourceLevels, setResourceLevels] = useState<Map<string, ResourceLevel[]>>(new Map());
-  const [currentPage, setCurrentPage] = useState(1);
-  const [sortBy, setSortBy] = useState<'newest' | 'rating' | 'popular' | 'alphabetical'>('newest');
+  const [editingResource, setEditingResource] = useState<Resource | null>(null);
 
   // YouTube Integration State
   const [isYouTubeModalOpen, setIsYouTubeModalOpen] = useState(false);
   const [prefilledResource, setPrefilledResource] = useState<Partial<Resource> | null>(null);
-
-  const ITEMS_PER_PAGE = 12;
-
-  // Read search query from URL params
-  useEffect(() => {
-    const query = searchParams.get('q');
-    if (query) {
-      setSearchQuery(query);
-    }
-  }, [searchParams]);
-
-  // Map subjectSlug to subject ID
-  useEffect(() => {
-    if (subjectSlug && subjects.length > 0) {
-      const subject = subjects.find(s => s.subject_slug === subjectSlug);
-      if (subject) {
-        setSelectedSubject(subject.subject_id);
-      }
-    } else if (!subjectSlug) {
-      setSelectedSubject(null);
-    }
-  }, [subjectSlug, subjects]);
-
-  // Map topicSlug/subtopicSlug to topic IDs
-  useEffect(() => {
-    if (allTopics.length > 0 && subjectSlug) {
-      if (subtopicSlug) {
-        const topic = allTopics.find(t => t.slug === subtopicSlug);
-        if (topic) {
-          // We found the subtopic, select it
-          // We might also want to expand its parent, but selectedTopics handles selection
-          setSelectedTopics([topic.id]);
-        }
-      } else if (topicSlug) {
-        const topic = allTopics.find(t => t.slug === topicSlug);
-        if (topic) {
-          setSelectedTopics([topic.id]);
-        }
-      } else {
-        setSelectedTopics([]);
-      }
-    }
-  }, [subjectSlug, topicSlug, subtopicSlug, allTopics]);
-
-  const loadUserProfile = useCallback(async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (user) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('nick, name, role')
-        .eq('id', user.id)
-        .single();
-      setUserNick(profile?.nick || user.email?.split('@')[0] || 'Użytkownik');
-      setUserName(profile?.name || '');
-      setUserRole(profile?.role || '');
-    }
-  }, []);
-
-  const loadData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const [resourcesRes, subjectsRes, levelsRes, topicsRes, ratingsRes, commentsRes] = await Promise.all([
-        supabase.from('v_resources_full').select('*'),
-        supabase.from('v_subjects_basic').select('*').order('order_index'),
-        supabase.from('levels').select('*').order('order_index'),
-        supabase.from('topics').select('*').order('order_index'),
-        supabase.from('ratings').select('resource_id, rating_usefulness, rating_correctness'),
-        supabase.from('comments').select('resource_id')
-      ]);
-
-      if (resourcesRes.data) {
-        let resourcesData = resourcesRes.data;
-
-        // Calculate ratings stats
-        const ratingsStats = new Map<string, { count: number; sumUsefulness: number; sumCorrectness: number }>();
-        if (ratingsRes.data) {
-          // Define type for rating data
-          type RatingData = {
-            resource_id: string;
-            rating_usefulness: number;
-            rating_correctness: number;
-          };
-          (ratingsRes.data as RatingData[]).forEach((r) => {
-            if (!ratingsStats.has(r.resource_id)) {
-              ratingsStats.set(r.resource_id, { count: 0, sumUsefulness: 0, sumCorrectness: 0 });
-            }
-            const stats = ratingsStats.get(r.resource_id)!;
-            stats.count++;
-            stats.sumUsefulness += r.rating_usefulness;
-            stats.sumCorrectness += r.rating_correctness;
-          });
-        }
-
-        // Calculate comments counts
-        const commentsCounts = new Map<string, number>();
-        if (commentsRes.data) {
-          // Define type for comment data
-          type CommentData = {
-            resource_id: string;
-          };
-          (commentsRes.data as CommentData[]).forEach((c) => {
-            const count = commentsCounts.get(c.resource_id) || 0;
-            commentsCounts.set(c.resource_id, count + 1);
-          });
-        }
-
-        // Manual fetch of contributor nicks if missing or just to be safe
-        const contributorIds = [...new Set(resourcesData.map(r => r.contributor_id).filter(Boolean))];
-
-        if (contributorIds.length > 0) {
-          const { data: profiles } = await supabase
-            .from('profiles')
-            .select('id, nick')
-            .in('id', contributorIds);
-
-          if (profiles) {
-            const nickMap = new Map(profiles.map(p => [p.id, p.nick]));
-            resourcesData = resourcesData.map(r => {
-              const stats = ratingsStats.get(r.id);
-              const commentsCount = commentsCounts.get(r.id) || 0;
-
-              return {
-                ...r,
-                contributor_nick: r.contributor_nick || nickMap.get(r.contributor_id!) || 'Anonim',
-                ratings_count: stats ? stats.count : 0,
-                avg_usefulness: stats ? stats.sumUsefulness / stats.count : null,
-                avg_correctness: stats ? stats.sumCorrectness / stats.count : null,
-                comments_count: commentsCount
-              };
-            });
-          } else {
-            // Even if profiles fail, we still want to attach stats
-            resourcesData = resourcesData.map(r => {
-              const stats = ratingsStats.get(r.id);
-              const commentsCount = commentsCounts.get(r.id) || 0;
-
-              return {
-                ...r,
-                ratings_count: stats ? stats.count : 0,
-                avg_usefulness: stats ? stats.sumUsefulness / stats.count : null,
-                avg_correctness: stats ? stats.sumCorrectness / stats.count : null,
-                comments_count: commentsCount
-              };
-            });
-          }
-        } else {
-          // No contributors to fetch, but still attach stats
-          resourcesData = resourcesData.map(r => {
-            const stats = ratingsStats.get(r.id);
-            const commentsCount = commentsCounts.get(r.id) || 0;
-
-            return {
-              ...r,
-              ratings_count: stats ? stats.count : 0,
-              avg_usefulness: stats ? stats.sumUsefulness / stats.count : null,
-              avg_correctness: stats ? stats.sumCorrectness / stats.count : null,
-              comments_count: commentsCount
-            };
-          });
-        }
-
-        setResources(resourcesData);
-      }
-      if (subjectsRes.data) setSubjects(subjectsRes.data);
-      if (levelsRes.data) setLevels(levelsRes.data);
-      if (topicsRes.data) setAllTopics(topicsRes.data);
-    } catch (error) {
-      console.error('Error loading data:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const loadResourceTopics = useCallback(async (resourceIds: string[]) => {
-    if (resourceIds.length === 0) return;
-
-    const { data } = await supabase
-      .from('v_resource_topics')
-      .select('resource_id, topic_id, topic_name, topic_slug, parent_topic_id, subject_slug')
-      .in('resource_id', resourceIds);
-
-    if (data) {
-      // Define type for resource topic data
-      type ResourceTopicData = {
-        resource_id: string;
-        topic_id: string;
-        topic_name: string;
-        topic_slug: string;
-        parent_topic_id: string | null;
-        subject_slug: string;
-      };
-      const topicsMap = new Map<string, ResourceTopic[]>();
-      (data as ResourceTopicData[]).forEach((item) => {
-        const { resource_id, ...topicData } = item;
-        if (!topicsMap.has(resource_id)) {
-          topicsMap.set(resource_id, []);
-        }
-        topicsMap.get(resource_id)!.push(topicData);
-      });
-      setResourceTopics(topicsMap);
-    }
-  }, []);
-
-  const loadResourceLevels = useCallback(async (resourceIds: string[]) => {
-    if (resourceIds.length === 0) return;
-
-    const { data } = await supabase
-      .from('v_resource_levels')
-      .select('resource_id, levels')
-      .in('resource_id', resourceIds);
-
-    if (data) {
-      // Define type for resource level data
-      type ResourceLevelData = {
-        resource_id: string;
-        levels: ResourceLevel[];
-      };
-      const levelsMap = new Map<string, ResourceLevel[]>();
-      (data as ResourceLevelData[]).forEach((item) => {
-        if (item.levels && Array.isArray(item.levels)) {
-          levelsMap.set(item.resource_id, item.levels);
-        }
-      });
-      setResourceLevels(levelsMap);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadData().then(() => {
-      // Load topics after resources are loaded
-    });
-    if (!isGuestMode) {
-      loadUserProfile();
-    }
-  }, [isGuestMode, loadData, loadUserProfile]);
-
-  useEffect(() => {
-    if (resources.length > 0) {
-      const resourceIds = resources.map(r => r.id);
-      loadResourceTopics(resourceIds);
-      loadResourceLevels(resourceIds);
-    }
-  }, [resources, loadResourceTopics, loadResourceLevels]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     window.location.reload();
   };
 
-  const handleTopicToggle = (topicId: string) => {
-    // Navigate to the topic URL instead of just toggling state
-    const topic = allTopics.find(t => t.id === topicId);
-    if (!topic || !selectedSubject) return;
-
-    const subject = subjects.find(s => s.subject_id === selectedSubject);
-    if (!subject) return;
-
-    // Check if it's a subtopic
-    if (topic.parent_topic_id) {
-      const parentTopic = allTopics.find(t => t.id === topic.parent_topic_id);
-      if (parentTopic) {
-        navigate(`/zasoby/${subject.subject_slug}/${parentTopic.slug}/${topic.slug}`);
-        return;
-      }
-    }
-
-    // It's a main topic
-    navigate(`/zasoby/${subject.subject_slug}/${topic.slug}`);
-  };
-
-  const handleLevelToggle = (levelId: string) => {
-    setSelectedLevels((prev) =>
-      prev.includes(levelId) ? prev.filter((id) => id !== levelId) : [...prev, levelId]
-    );
-  };
-
-  const handleLanguageToggle = (language: string) => {
-    setSelectedLanguages((prev) =>
-      prev.includes(language) ? prev.filter((l) => l !== language) : [...prev, language]
-    );
-  };
-
-  const handleSubjectChange = (subjectId: string | null) => {
-    if (subjectId) {
-      const subject = subjects.find(s => s.subject_id === subjectId);
-      if (subject) {
-        navigate(`/zasoby/${subject.subject_slug}`);
-      }
-    } else {
-      navigate('/zasoby');
-    }
-    setSelectedTopics([]); // Clear selected topics when subject changes
-  };
-
   const handleTopicClick = (topicName: string) => {
     console.log('Topic clicked:', topicName);
   };
-
-  const [editingResource, setEditingResource] = useState<Resource | null>(null);
 
   const handleCardClick = (resource: Resource) => {
     setSelectedResource(resource);
@@ -383,127 +140,10 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
     setIsModalOpen(true);
   };
 
-  const filteredResources = resources.filter((resource) => {
-    if (selectedSubject) {
-      if (resource.subject_id !== selectedSubject) {
-        return false;
-      }
-    }
-
-    if (selectedTopics.length > 0) {
-      const findTopicNames = (nodes: TopicNode[], ids: string[]): string[] => {
-        const names: string[] = [];
-        for (const node of nodes) {
-          if (ids.includes(node.id)) names.push(node.name);
-          if (node.children) names.push(...findTopicNames(node.children, ids));
-        }
-        return names;
-      };
-
-      const selectedTopicNames = findTopicNames(topicNodes, selectedTopics);
-      const currentResourceTopics = resourceTopics.get(resource.id) || [];
-
-      const hasMatchingTopic = selectedTopicNames.some((topicName) =>
-        currentResourceTopics.some(topic => topic.topic_name === topicName)
-      );
-      if (!hasMatchingTopic) return false;
-    }
-
-    if (selectedLevels.length > 0) {
-      const currentResourceLevels = resourceLevels.get(resource.id) || [];
-      const hasMatchingLevel = currentResourceLevels.some((level) =>
-        selectedLevels.includes(level.id)
-      );
-      if (!hasMatchingLevel) return false;
-    }
-
-    if (selectedLanguages.length > 0) {
-      if (!resource.language || !selectedLanguages.includes(resource.language)) {
-        return false;
-      }
-    }
-
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      const titleMatch = resource.title.toLowerCase().includes(query);
-      const descriptionMatch = resource.description?.toLowerCase().includes(query);
-
-      // Also search in topic names
-      const currentResourceTopics = resourceTopics.get(resource.id) || [];
-      const topicMatch = currentResourceTopics.some(topic =>
-        topic.topic_name.toLowerCase().includes(query)
-      );
-
-      if (!titleMatch && !descriptionMatch && !topicMatch) {
-        return false;
-      }
-    }
-
-    return true;
-  });
-
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedSubject, selectedTopics, selectedLevels, selectedLanguages]);
-
-  // Sort filtered resources
-  const sortedResources = useMemo(() => {
-    const sorted = [...filteredResources];
-
-    switch (sortBy) {
-      case 'newest':
-        return sorted.sort((a, b) => {
-          const dateA = new Date(a.created_at || 0).getTime();
-          const dateB = new Date(b.created_at || 0).getTime();
-          return dateB - dateA; // Newest first
-        });
-
-      case 'rating':
-        return sorted.sort((a, b) => {
-          const avgA = a.avg_usefulness && a.avg_correctness
-            ? (a.avg_usefulness + a.avg_correctness) / 2
-            : 0;
-          const avgB = b.avg_usefulness && b.avg_correctness
-            ? (b.avg_usefulness + b.avg_correctness) / 2
-            : 0;
-          return avgB - avgA; // Highest rating first
-        });
-
-      case 'popular':
-        return sorted.sort((a, b) => {
-          const popularityA = (a.ratings_count || 0) + (a.comments_count || 0);
-          const popularityB = (b.ratings_count || 0) + (b.comments_count || 0);
-          return popularityB - popularityA; // Most popular first
-        });
-
-      case 'alphabetical':
-        return sorted.sort((a, b) => a.title.localeCompare(b.title, 'pl'));
-
-      default:
-        return sorted;
-    }
-  }, [filteredResources, sortBy]);
-
-  const indexOfLastResource = currentPage * ITEMS_PER_PAGE;
-  const indexOfFirstResource = indexOfLastResource - ITEMS_PER_PAGE;
-  const currentResources = sortedResources.slice(indexOfFirstResource, indexOfLastResource);
-  const totalPages = Math.ceil(sortedResources.length / ITEMS_PER_PAGE);
-
-  const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-    // Scroll to top of the list or top of the page
-    const mainContent = document.querySelector('main');
-    if (mainContent) {
-      mainContent.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
-
   const languages = useMemo(() => {
     const langs = new Set(resources.map((r) => r.language).filter(Boolean));
     return Array.from(langs) as string[];
   }, [resources]);
-
 
   const recentlyAddedResources = useMemo(() => {
     const sorted = [...resources].sort((a, b) => {
@@ -514,7 +154,6 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
     return sorted.slice(0, 3);
   }, [resources]);
 
-  const hasActiveFilters = selectedSubject !== null || selectedTopics.length > 0 || selectedLevels.length > 0 || selectedLanguages.length > 0 || searchQuery.length > 0;
   const isAdmin = userRole === 'admin';
 
   if (showAdminPanel && isAdmin) {
@@ -541,13 +180,13 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
             </div>
           </div>
         </div>
-        <AdminPanel userRole={userRole} requireAdmin={true} onDataChange={loadData} />
+        <AdminPanel userRole={userRole} requireAdmin={true} onDataChange={refreshData} />
         <AddResourceModal
           isOpen={isModalOpen}
           onClose={handleCloseAddModal}
           onSuccess={() => {
             handleCloseAddModal();
-            loadData();
+            refreshData();
           }}
           subjects={subjects}
           topics={allTopics}
@@ -560,13 +199,14 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
           onClose={handleCloseDetailModal}
           resource={selectedResource}
           onEdit={handleEditResource}
-          onResourceUpdated={loadData}
+          onResourceUpdated={refreshData}
         />
         <YouTubeSearchModal
           isOpen={isYouTubeModalOpen}
           onClose={() => setIsYouTubeModalOpen(false)}
           initialQuery={searchQuery}
           onAddVideo={handleYouTubeVideoAdd}
+          isGuestMode={isGuestMode}
         />
       </div>
     );
@@ -594,120 +234,19 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
       />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="bg-white border-b border-gray-200 px-4 md:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <button
-                onClick={() => setIsSidebarOpen(true)}
-                className="md:hidden mr-4 text-gray-600 hover:text-gray-900"
-              >
-                <Menu size={24} />
-              </button>
-              <div>
-                <h1 className="text-xl md:text-2xl font-bold text-gray-900">Szkoła Przyszłości z AI</h1>
-                <p className="text-xs md:text-sm text-gray-600 mt-1 hidden sm:block">
-                  Odkrywaj i dziel się zasobami edukacyjnymi
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 md:gap-4">
-              {isGuestMode ? (
-                <>
-                  <button
-                    onClick={() => navigate('/')}
-                    className="text-gray-600 hover:text-gray-900 flex items-center gap-2"
-                    title="Powrót do strony głównej"
-                  >
-                    <ArrowLeft size={20} />
-                    <span className="hidden lg:inline">Powrót</span>
-                  </button>
-                  <button
-                    onClick={() => navigate('/auth')}
-                    className="bg-blue-600 text-white px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
-                  >
-                    <span>Zaloguj się</span>
-                  </button>
-                </>
-              ) : (
-                <>
-                  <div className="flex flex-col items-end mr-4 hidden md:flex">
-                    <span className="text-lg font-bold text-gray-800">
-                      Witaj, {userName ? userName.split(' ')[0] : userNick}
-                    </span>
-                    <span className="text-xs font-medium text-blue-600">
-                      {(() => {
-                        const date = new Date();
-                        const day = date.getDay();
-                        const hour = date.getHours();
-
-                        if (day === 0 || day === 6) return "Nie zapominaj o nauce! 🏖️";
-                        if (hour >= 5 && hour < 12) return "Czas się uczyć! 🌅";
-                        if (hour >= 12 && hour < 18) return "Już bez pauzy! ☀️";
-                        return "Ostatnia szansa na dzisiaj 🌙";
-                      })()}
-                    </span>
-                  </div>
-                  {isAdmin && (
-                    <button
-                      onClick={() => setShowAdminPanel(true)}
-                      className="bg-purple-600 text-white px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-purple-700 flex items-center gap-2"
-                      title="Panel Administracyjny"
-                    >
-                      <Settings size={20} />
-                      <span className="hidden lg:inline">Panel Admina</span>
-                    </button>
-                  )}
-                  <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="bg-blue-600 text-white px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
-                    title="Dodaj zasób"
-                  >
-                    <Plus size={20} />
-                    <span className="hidden sm:inline">Dodaj zasób</span>
-                  </button>
-                  <button
-                    onClick={handleSignOut}
-                    className="text-gray-600 hover:text-gray-900 flex items-center gap-2"
-                    title="Wyloguj się"
-                  >
-                    <LogOut size={20} />
-                    <span className="hidden lg:inline">Wyloguj się</span>
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-
-
-          <div className="mt-4 max-w-2xl mx-auto flex gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-              <input
-                type="text"
-                placeholder="Szukaj w tytułach i opisach..."
-                value={searchQuery}
-                onChange={(e) => {
-                  const query = e.target.value;
-                  setSearchQuery(query);
-                  if (query) {
-                    setSearchParams({ q: query });
-                  } else {
-                    setSearchParams({});
-                  }
-                }}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <button
-              onClick={() => setIsYouTubeModalOpen(true)}
-              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center gap-2 whitespace-nowrap transition-colors"
-              title="Szukaj wideo na YouTube"
-            >
-              <Play size={20} className="fill-current" />
-              <span className="hidden sm:inline">Szukaj wideo</span>
-            </button>
-          </div>
-        </header >
+        <DashboardHeader
+          isGuestMode={isGuestMode}
+          userNick={userNick}
+          userName={userName}
+          userRole={userRole}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          onOpenSidebar={() => setIsSidebarOpen(true)}
+          onSignOut={handleSignOut}
+          onOpenAdmin={() => setShowAdminPanel(true)}
+          onOpenAddResource={() => setIsModalOpen(true)}
+          onOpenYouTube={() => setIsYouTubeModalOpen(true)}
+        />
 
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
           {isGuestMode && (
@@ -728,133 +267,26 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
               </div>
             </div>
           )}
-          {loading ? (
-            <div className="flex items-center justify-center h-64">
-              <Loader className="animate-spin text-blue-600" size={48} />
-            </div>
-          ) : (
-            <>
-              {/* Sorting dropdown */}
-              {hasActiveFilters && filteredResources.length > 0 && (
-                <div className="mb-4 flex items-center justify-between">
-                  <p className="text-sm text-gray-600">
-                    Znaleziono {filteredResources.length} {filteredResources.length === 1 ? 'zasób' : filteredResources.length < 5 ? 'zasoby' : 'zasobów'}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <label htmlFor="sort" className="text-sm text-gray-600">Sortuj:</label>
-                    <select
-                      id="sort"
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-                      className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="newest">Najnowsze</option>
-                      <option value="rating">Najlepiej oceniane</option>
-                      <option value="popular">Najpopularniejsze</option>
-                      <option value="alphabetical">Alfabetycznie (A-Z)</option>
-                    </select>
-                  </div>
-                </div>
-              )}
 
-              {!hasActiveFilters && recentlyAddedResources.length > 0 && (
-                <div className="mb-8">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Ostatnio dodane</h2>
-                  <div className="grid gap-4 md:gap-6" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))' }}>
-                    {recentlyAddedResources.map((resource) => (
-                      <ResourceCard
-                        key={resource.id}
-                        resource={resource}
-                        topics={resourceTopics.get(resource.id) || []}
-                        levels={resourceLevels.get(resource.id) || []}
-                        onTopicClick={handleTopicClick}
-                        onCardClick={handleCardClick}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="mb-4">
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                  {hasActiveFilters ? 'Wyniki filtrowania' : 'Wszystkie zasoby'}
-                </h2>
-                <p className="text-sm text-gray-600">
-                  Wyświetlanie zasobów {sortedResources.length > 0 ? indexOfFirstResource + 1 : 0}-{Math.min(indexOfLastResource, sortedResources.length)} spośród {sortedResources.length} znalezionych materiałów
-                </p>
-              </div>
-
-              <div className="grid gap-4 md:gap-6" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))' }}>
-                {currentResources.map((resource) => (
-                  <ResourceCard
-                    key={resource.id}
-                    resource={resource}
-                    topics={resourceTopics.get(resource.id) || []}
-                    levels={resourceLevels.get(resource.id) || []}
-                    onTopicClick={handleTopicClick}
-                    onCardClick={handleCardClick}
-                  />
-                ))}
-              </div>
-
-              {totalPages > 1 && (
-                <div className="flex justify-center items-center gap-2 mt-8 pb-4">
-                  <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600"
-                  >
-                    <ChevronLeft size={20} />
-                  </button>
-
-                  <div className="flex gap-1 overflow-x-auto max-w-[200px] sm:max-w-none no-scrollbar">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
-                      // Show first, last, current, and surrounding pages
-                      if (
-                        page === 1 ||
-                        page === totalPages ||
-                        (page >= currentPage - 1 && page <= currentPage + 1)
-                      ) {
-                        return (
-                          <button
-                            key={page}
-                            onClick={() => handlePageChange(page)}
-                            className={`w-10 h-10 rounded-md flex-shrink-0 flex items-center justify-center text-sm font-medium transition-colors
-                              ${currentPage === page
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
-                              }`}
-                          >
-                            {page}
-                          </button>
-                        );
-                      } else if (
-                        page === currentPage - 2 ||
-                        page === currentPage + 2
-                      ) {
-                        return <span key={page} className="w-10 h-10 flex items-center justify-center text-gray-400">...</span>;
-                      }
-                      return null;
-                    })}
-                  </div>
-
-                  <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600"
-                  >
-                    <ChevronRight size={20} />
-                  </button>
-                </div>
-              )}
-
-              {filteredResources.length === 0 && (
-                <div className="text-center py-12 text-gray-500">
-                  Nie znaleziono zasobów pasujących do filtrów
-                </div>
-              )}
-            </>
-          )}
+          <DashboardGrid
+            loading={loading}
+            filteredResources={filteredResources}
+            sortedResources={sortedResources}
+            currentResources={currentResources}
+            resourceTopics={resourceTopics}
+            resourceLevels={resourceLevels}
+            hasActiveFilters={hasActiveFilters}
+            recentlyAddedResources={recentlyAddedResources}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            indexOfFirstResource={indexOfFirstResource}
+            indexOfLastResource={indexOfLastResource}
+            onPageChange={handlePageChange}
+            onTopicClick={handleTopicClick}
+            onCardClick={handleCardClick}
+          />
 
           <footer className="mt-12 pt-8 border-t border-gray-200">
             <div className="text-center text-sm text-gray-600">
@@ -875,7 +307,7 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
         <AddResourceModal
           isOpen={isModalOpen}
           onClose={handleCloseAddModal}
-          onSuccess={loadData}
+          onSuccess={refreshData}
           subjects={subjects}
           topics={allTopics}
           levels={levels}
@@ -889,7 +321,7 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
         isOpen={isDetailModalOpen}
         onClose={handleCloseDetailModal}
         resource={selectedResource}
-        onResourceUpdated={loadData}
+        onResourceUpdated={refreshData}
         isGuestMode={isGuestMode}
         onEdit={handleEditResource}
       />
@@ -898,7 +330,8 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
         onClose={() => setIsYouTubeModalOpen(false)}
         initialQuery={searchQuery}
         onAddVideo={handleYouTubeVideoAdd}
+        isGuestMode={isGuestMode}
       />
-    </div >
+    </div>
   );
 }

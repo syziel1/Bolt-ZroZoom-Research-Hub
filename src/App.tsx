@@ -14,19 +14,14 @@ function AppRoutes({ session }: { session: Session | null }) {
       {/* Public routes */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/auth" element={
-        session ? <Navigate to="/pulpit" replace /> : <AuthForm />
+        session ? <Navigate to="/zasoby" replace /> : <AuthForm />
       } />
-      <Route path="/zasoby" element={<Dashboard isGuestMode={true} />} />
-      <Route path="/zasoby/:subjectSlug" element={<Dashboard isGuestMode={true} />} />
-      <Route path="/zasoby/:subjectSlug/:topicSlug" element={<Dashboard isGuestMode={true} />} />
-      <Route path="/zasoby/:subjectSlug/:topicSlug/:subtopicSlug" element={<Dashboard isGuestMode={true} />} />
+      <Route path="/zasoby" element={<Dashboard />} />
+      <Route path="/zasoby/:subjectSlug" element={<Dashboard />} />
+      <Route path="/zasoby/:subjectSlug/:topicSlug" element={<Dashboard />} />
+      <Route path="/zasoby/:subjectSlug/:topicSlug/:subtopicSlug" element={<Dashboard />} />
       <Route path="/o-nas" element={<MarkdownPage fileName="about.md" />} />
       <Route path="/polityka-prywatnosci" element={<MarkdownPage fileName="privacy.md" />} />
-
-      {/* Protected routes */}
-      <Route path="/pulpit" element={
-        session ? <Dashboard /> : <Navigate to="/auth" replace />
-      } />
 
       {/* Catch all - redirect to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
