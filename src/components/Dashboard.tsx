@@ -8,6 +8,7 @@ import { ResourceDetailModal } from './ResourceDetailModal';
 import { AdminPanel } from './AdminPanel';
 import { LogOut } from 'lucide-react';
 import { YouTubeSearchModal } from './YouTubeSearchModal';
+import { WikipediaSearchModal } from './WikipediaSearchModal';
 import { useDashboardData } from '../hooks/useDashboardData';
 import { useDashboardFilters } from '../hooks/useDashboardFilters';
 import { useFavorites } from '../hooks/useFavorites';
@@ -108,6 +109,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
 
   // YouTube Integration State
   const [isYouTubeModalOpen, setIsYouTubeModalOpen] = useState(false);
+  const [isWikipediaModalOpen, setIsWikipediaModalOpen] = useState(false);
   const [prefilledResource, setPrefilledResource] = useState<Partial<Resource> | null>(null);
 
   // AI Assistant State
@@ -159,6 +161,19 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
       description: `${video.description}\n\n[Czas trwania: ${video.duration}]`,
       thumbnail_url: video.thumbnailUrl,
       language: 'pl' // Default to PL, user can change
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleWikipediaArticleAdd = (article: any) => {
+    setIsWikipediaModalOpen(false);
+    setPrefilledResource({
+      title: article.title,
+      url: article.url,
+      type: 'article',
+      description: article.description,
+      thumbnail_url: article.thumbnailUrl,
+      language: 'pl'
     });
     setIsModalOpen(true);
   };
@@ -264,6 +279,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
         setSearchQuery={setSearchQuery}
         resources={resources}
         onOpenYouTube={() => setIsYouTubeModalOpen(true)}
+        onOpenWikipedia={() => setIsWikipediaModalOpen(true)}
       />
 
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -356,6 +372,13 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
         onClose={() => setIsYouTubeModalOpen(false)}
         initialQuery={searchQuery}
         onAddVideo={handleYouTubeVideoAdd}
+        isGuestMode={isGuestMode}
+      />
+      <WikipediaSearchModal
+        isOpen={isWikipediaModalOpen}
+        onClose={() => setIsWikipediaModalOpen(false)}
+        initialQuery={searchQuery}
+        onAddArticle={handleWikipediaArticleAdd}
         isGuestMode={isGuestMode}
       />
       <AiAssistant

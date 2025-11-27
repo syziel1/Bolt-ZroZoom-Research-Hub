@@ -1,5 +1,5 @@
 import { Subject, Level, TopicNode, Resource } from '../lib/supabase';
-import { ChevronDown, ChevronRight, X, Search, Video } from 'lucide-react';
+import { ChevronDown, ChevronRight, X, Search, Video, BookOpen } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { TopicTree } from './TopicTree';
 import { SearchAutocomplete } from './SearchAutocomplete';
@@ -26,6 +26,7 @@ type SidebarProps = {
   setSearchQuery: (query: string) => void;
   resources: Resource[];
   onOpenYouTube: () => void;
+  onOpenWikipedia: () => void;
 };
 
 export function Sidebar({
@@ -50,6 +51,7 @@ export function Sidebar({
   setSearchQuery,
   resources,
   onOpenYouTube,
+  onOpenWikipedia,
 }: SidebarProps) {
   const [topicsExpanded, setTopicsExpanded] = useState(true);
   const [levelsExpanded, setLevelsExpanded] = useState(true);
@@ -111,8 +113,16 @@ export function Sidebar({
                 className="bg-red-600 text-white px-3 py-2 rounded-md hover:bg-red-700 transition-colors flex items-center gap-2"
                 title="Szukaj wideo na YouTube"
               >
-                <span className="text-sm font-medium">Szukaj</span>
+                <span className="text-sm font-medium">YouTube</span>
                 <Video size={18} />
+              </button>
+              <button
+                onClick={onOpenWikipedia}
+                className="bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-gray-200 px-3 py-2 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors flex items-center gap-2"
+                title="Szukaj w Wikipedii"
+              >
+                <span className="text-sm font-medium">Wiki</span>
+                <BookOpen size={18} />
               </button>
               <button
                 onClick={onClose}
