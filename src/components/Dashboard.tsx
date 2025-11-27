@@ -14,6 +14,7 @@ import { DashboardHeader } from './DashboardHeader';
 import { DashboardGrid } from './DashboardGrid';
 import { AiAssistant } from './AiAssistant';
 import { Footer } from './Footer';
+import { SEO } from './SEO';
 
 type DashboardProps = {
   isGuestMode?: boolean;
@@ -236,6 +237,10 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
 
   return (
     <div className="flex h-screen bg-gray-50">
+      <SEO
+        title="Pulpit - Przeglądaj zasoby"
+        description="Przeglądaj tysiące materiałów edukacyjnych, filtruj po przedmiotach i poziomach. Dołącz do społeczności ZroZoom Hub."
+      />
       <Sidebar
         subjects={subjects}
         topicNodes={topicNodes}

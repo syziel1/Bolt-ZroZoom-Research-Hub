@@ -5,6 +5,7 @@ import { ResourceCard } from './ResourceCard';
 import { Navigation } from './Navigation';
 import { Footer } from './Footer';
 import { BookOpen, Layers, TrendingUp, Award, Sparkles, ArrowRight, Calculator, Globe, Clock, Languages, Code, Palette, Dumbbell, Music, Microscope, Atom, Beaker, ChevronDown, ShieldCheck, Users, Search } from 'lucide-react';
+import { SEO } from './SEO';
 
 type Stats = {
   topicsCount: number;
@@ -220,6 +221,10 @@ export function LandingPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      <SEO
+        title="Darmowe zasoby edukacyjne: Matematyka, Fizyka, AI"
+        description="ZroZoom Research Hub to największa baza darmowych materiałów edukacyjnych. Przygotuj się do matury i egzaminu ósmoklasisty z pomocą sztucznej inteligencji."
+      />
       <Navigation onNavigateToAuth={() => navigate('/auth')} onScrollToSubjects={scrollToSubjects} onBrowseAsGuest={() => navigate('/zasoby')} />
       <section className="relative min-h-[70vh] bg-gradient-to-br from-violet-600 via-purple-600 to-violet-700 flex items-center justify-center px-4 pt-24 pb-12 overflow-hidden">
         <div className="max-w-6xl w-full text-center relative z-10">
