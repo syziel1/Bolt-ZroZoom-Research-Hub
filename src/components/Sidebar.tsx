@@ -1,7 +1,8 @@
-import { Subject, Level, TopicNode } from '../lib/supabase';
-import { ChevronDown, ChevronRight, X } from 'lucide-react';
-import { useState } from 'react';
+import { Subject, Level, TopicNode, Resource } from '../lib/supabase';
+import { ChevronDown, ChevronRight, X, Search, Video } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import { TopicTree } from './TopicTree';
+import { SearchAutocomplete } from './SearchAutocomplete';
 
 type SidebarProps = {
   subjects: Subject[];
@@ -21,6 +22,10 @@ type SidebarProps = {
   isLoading?: boolean;
   includeSubtopics?: boolean;
   onIncludeSubtopicsChange?: (include: boolean) => void;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  resources: Resource[];
+  onOpenYouTube: () => void;
 };
 
 export function Sidebar({
@@ -41,10 +46,28 @@ export function Sidebar({
   isLoading = false,
   includeSubtopics = true,
   onIncludeSubtopicsChange,
+  searchQuery,
+  setSearchQuery,
+  resources,
+  onOpenYouTube,
 }: SidebarProps) {
   const [topicsExpanded, setTopicsExpanded] = useState(true);
   const [levelsExpanded, setLevelsExpanded] = useState(true);
   const [languagesExpanded, setLanguagesExpanded] = useState(true);
+  const [showAutocomplete, setShowAutocomplete] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  // Close autocomplete when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowAutocomplete(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Map language codes to full names
   const getLanguageName = (code: string): string => {
@@ -82,12 +105,79 @@ export function Sidebar({
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-900">Czego szukasz?</h2>
-            <button
-              onClick={onClose}
-              className="md:hidden text-gray-500 hover:text-gray-700"
-            >
-              <X size={24} />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={onOpenYouTube}
+                className="bg-red-600 text-white px-3 py-2 rounded-md hover:bg-red-700 transition-colors flex items-center gap-2"
+                title="Szukaj wideo na YouTube"
+              >
+                <span className="text-sm font-medium">Szukaj</span>
+                <Video size={18} />
+              </button>
+              <button
+                onClick={onClose}
+                className="md:hidden text-gray-500 hover:text-gray-700"
+              >
+                <X size={24} />
+              </button>
+            </div>
+          </div>
+
+          {/* Search field */}
+          <div className="mb-6">
+            <div ref={searchRef} className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <input
+                type="text"
+                placeholder="Szukaj w tytułach i opisach..."
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setShowAutocomplete(true);
+                }}
+                onFocus={() => setShowAutocomplete(true)}
+                className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => {
+                    setSearchQuery('');
+                    setShowAutocomplete(false);
+                  }}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <X size={16} />
+                </button>
+              )}
+              {showAutocomplete && (
+                <SearchAutocomplete
+                  resources={resources}
+                  searchQuery={searchQuery}
+                  onSelectSuggestion={(suggestion) => {
+                    setSearchQuery(suggestion);
+                    setShowAutocomplete(false);
+                  }}
+                />
+              )}
+            </div>
+            {searchQuery && (
+              <div className="mt-2 flex justify-center">
+                <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-300 rounded-full px-3 py-1.5 text-sm">
+                  <Search size={14} className="text-blue-600" />
+                  <span className="text-blue-800 font-medium">"{searchQuery}"</span>
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      setShowAutocomplete(false);
+                    }}
+                    className="hover:bg-blue-200 rounded-full p-0.5 transition"
+                    title="Wyczyść wyszukiwanie"
+                  >
+                    <X size={14} className="text-blue-600" />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="mb-6">

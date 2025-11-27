@@ -254,6 +254,10 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
         isLoading={topicsLoading}
         includeSubtopics={includeSubtopics}
         onIncludeSubtopicsChange={setIncludeSubtopics}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        resources={resources}
+        onOpenYouTube={() => setIsYouTubeModalOpen(true)}
       />
 
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -262,17 +266,13 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
           userNick={userNick}
           userName={userName}
           userRole={userRole}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
           onOpenSidebar={() => setIsSidebarOpen(true)}
           onSignOut={handleSignOut}
           onOpenAdmin={() => setShowAdminPanel(true)}
           onOpenAddResource={() => setIsModalOpen(true)}
-          onOpenYouTube={() => setIsYouTubeModalOpen(true)}
           showOnlyFavorites={showOnlyFavorites}
           onFavoritesToggle={() => setShowOnlyFavorites(!showOnlyFavorites)}
           favoritesCount={favoritesCount}
-          resources={resources}
         />
 
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
