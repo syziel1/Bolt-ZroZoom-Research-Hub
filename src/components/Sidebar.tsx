@@ -19,6 +19,8 @@ type SidebarProps = {
   isOpen: boolean;
   onClose: () => void;
   isLoading?: boolean;
+  includeSubtopics?: boolean;
+  onIncludeSubtopicsChange?: (include: boolean) => void;
 };
 
 export function Sidebar({
@@ -37,6 +39,8 @@ export function Sidebar({
   isOpen,
   onClose,
   isLoading = false,
+  includeSubtopics = true,
+  onIncludeSubtopicsChange,
 }: SidebarProps) {
   const [topicsExpanded, setTopicsExpanded] = useState(true);
   const [levelsExpanded, setLevelsExpanded] = useState(true);
@@ -130,6 +134,15 @@ export function Sidebar({
               </button>
               {topicsExpanded && (
                 <div className="pl-1">
+                  <label className="flex items-center gap-2 mb-3 px-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={includeSubtopics}
+                      onChange={(e) => onIncludeSubtopicsChange?.(e.target.checked)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-600">Pokaż też podtematy</span>
+                  </label>
                   {isLoading ? (
                     <div className="text-sm text-gray-500 px-2 py-1">Ładowanie tematów...</div>
                   ) : (

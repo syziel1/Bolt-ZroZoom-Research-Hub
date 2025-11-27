@@ -76,7 +76,9 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
     handleTopicToggle,
     handleLevelToggle,
     handleLanguageToggle,
-    handlePageChange
+    handlePageChange,
+    includeSubtopics,
+    setIncludeSubtopics
   } = useDashboardFilters({
     resources,
     subjects,
@@ -250,6 +252,8 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
         isLoading={topicsLoading}
+        includeSubtopics={includeSubtopics}
+        onIncludeSubtopicsChange={setIncludeSubtopics}
       />
 
       <div className="flex-1 flex flex-col overflow-hidden">

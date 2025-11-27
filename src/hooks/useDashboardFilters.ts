@@ -34,6 +34,8 @@ export function useDashboardFilters({
     const [currentPage, setCurrentPage] = useState(1);
     const [sortBy, setSortBy] = useState<SortOption>('newest');
 
+    const [includeSubtopics, setIncludeSubtopics] = useState(true);
+
     const ITEMS_PER_PAGE = 12;
 
     // Read search query from URL params
@@ -167,8 +169,27 @@ export function useDashboardFilters({
                 const findTopicNames = (nodes: TopicNode[], ids: string[]): string[] => {
                     const names: string[] = [];
                     for (const node of nodes) {
-                        if (ids.includes(node.id)) names.push(node.name);
-                        if (node.children) names.push(...findTopicNames(node.children, ids));
+                        if (ids.includes(node.id)) {
+                            names.push(node.name);
+                            // If including subtopics, add all descendants
+                            if (includeSubtopics && node.children) {
+                                const getAllDescendants = (children: TopicNode[]): string[] => {
+                                    let descendants: string[] = [];
+                                    for (const child of children) {
+                                        descendants.push(child.name);
+                                        if (child.children) {
+                                            descendants = [...descendants, ...getAllDescendants(child.children)];
+                                        }
+                                    }
+                                    return descendants;
+                                };
+                                names.push(...getAllDescendants(node.children));
+                            }
+                        }
+                        // Continue searching down the tree even if parent wasn't selected (to find selected subtopics)
+                        if (node.children) {
+                            names.push(...findTopicNames(node.children, ids));
+                        }
                     }
                     return names;
                 };
@@ -198,12 +219,12 @@ export function useDashboardFilters({
 
             return true;
         });
-    }, [resources, selectedSubject, selectedTopics, selectedLevels, selectedLanguages, searchQuery, topicNodes, resourceTopics, resourceLevels, fuse]);
+    }, [resources, selectedSubject, selectedTopics, selectedLevels, selectedLanguages, searchQuery, topicNodes, resourceTopics, resourceLevels, fuse, includeSubtopics]);
 
     // Reset page when filters change
     useEffect(() => {
         setCurrentPage(1);
-    }, [selectedSubject, selectedTopics, selectedLevels, selectedLanguages, searchQuery]);
+    }, [selectedSubject, selectedTopics, selectedLevels, selectedLanguages, searchQuery, includeSubtopics]);
 
     const sortedResources = useMemo(() => {
         const sorted = [...filteredResources];
@@ -280,6 +301,8 @@ export function useDashboardFilters({
         handleTopicToggle,
         handleLevelToggle,
         handleLanguageToggle,
-        handlePageChange
+        handlePageChange,
+        includeSubtopics,
+        setIncludeSubtopics
     };
 }

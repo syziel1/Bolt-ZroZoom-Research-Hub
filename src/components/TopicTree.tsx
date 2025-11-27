@@ -31,12 +31,20 @@ function TopicItem({ node, selectedTopics, onTopicToggle, level = 0 }: TopicItem
                 className={`flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-gray-100 cursor-pointer ${isSelected ? 'bg-blue-50' : ''
                     }`}
                 style={{ marginLeft: `${level * 16}px` }}
-                onClick={() => onTopicToggle(node.id)}
+                onClick={() => {
+                    onTopicToggle(node.id);
+                    if (hasChildren) {
+                        setIsExpanded(true);
+                    }
+                }}
                 tabIndex={0}
                 onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
                         onTopicToggle(node.id);
+                        if (hasChildren) {
+                            setIsExpanded(true);
+                        }
                     }
                 }}
             >
