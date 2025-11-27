@@ -26,7 +26,7 @@ const typeIcons: Record<string, React.ElementType> = {
 
 export function ResourceCard({ resource, topics = [], levels = [], onTopicClick, onCardClick, variant = 'default' }: ResourceCardProps) {
   const Icon = typeIcons[resource.type] || FileText;
-  const thumbnailUrl = getThumbnailUrl(resource.thumbnail_path);
+  const thumbnailUrl = getThumbnailUrl(resource.thumbnail_path) || resource.thumbnail_url;
 
   const calculateOverallRating = (): number | null => {
     const { avg_usefulness, avg_correctness } = resource;

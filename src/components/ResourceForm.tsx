@@ -13,20 +13,23 @@ type ResourceFormProps = {
   onSuccess: () => void;
   onCancel: () => void;
   initialData?: Resource | null;
+  prefillData?: Partial<Resource> | null;
 };
 
-export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, initialData }: ResourceFormProps) {
-  const [title, setTitle] = useState(initialData?.title || '');
-  const [url, setUrl] = useState(initialData?.url || '');
-  const [type, setType] = useState(initialData?.type || 'article');
-  const [description, setDescription] = useState(initialData?.description || '');
-  const [subjectId, setSubjectId] = useState(initialData?.subject_id || '');
+export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, initialData, prefillData }: ResourceFormProps) {
+  const [title, setTitle] = useState(initialData?.title || prefillData?.title || '');
+  const [url, setUrl] = useState(initialData?.url || prefillData?.url || '');
+  const [type, setType] = useState(initialData?.type || prefillData?.type || 'article');
+  const [description, setDescription] = useState(initialData?.description || prefillData?.description || '');
+  const [subjectId, setSubjectId] = useState(initialData?.subject_id || prefillData?.subject_id || '');
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
-  const [language, setLanguage] = useState(initialData?.language || 'pl');
-  const [aiGenerated, setAiGenerated] = useState(initialData?.ai_generated || false);
+  const [language, setLanguage] = useState(initialData?.language || prefillData?.language || 'pl');
+  const [aiGenerated, setAiGenerated] = useState(initialData?.ai_generated || prefillData?.ai_generated || false);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
-  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(getThumbnailUrl(initialData?.thumbnail_path) || null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(
+    getThumbnailUrl(initialData?.thumbnail_path) || initialData?.thumbnail_url || prefillData?.thumbnail_url || null
+  );
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
@@ -45,20 +48,32 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
     });
   };
 
-  // Update state when initialData changes (e.g., switching from add to edit mode)
+  // Update state when initialData or prefillData changes
   useEffect(() => {
-    setTitle(initialData?.title || '');
-    setUrl(initialData?.url || '');
-    setType(initialData?.type || 'article');
-    setDescription(initialData?.description || '');
-    setSubjectId(initialData?.subject_id || '');
-    setLanguage(initialData?.language || 'pl');
-    setAiGenerated(initialData?.ai_generated || false);
-    setThumbnailPreview(getThumbnailUrl(initialData?.thumbnail_path) || null);
+    const data = initialData || prefillData;
+    setTitle(data?.title || '');
+    setUrl(data?.url || '');
+    setType(data?.type || 'article');
+    setDescription(data?.description || '');
+    setSubjectId(data?.subject_id || '');
+    setLanguage(data?.language || 'pl');
+    setAiGenerated(data?.ai_generated || false);
+
+    // Handle thumbnail
+    if (initialData?.thumbnail_path) {
+      setThumbnailPreview(getThumbnailUrl(initialData.thumbnail_path));
+    } else if (data?.thumbnail_url) {
+      setThumbnailPreview(data.thumbnail_url);
+    } else {
+      setThumbnailPreview(null);
+    }
+
     setThumbnailFile(null);
-    setSelectedTopics([]);
-    setSelectedLevels([]);
-  }, [initialData]);
+    if (initialData) {
+      setSelectedTopics([]);
+      setSelectedLevels([]);
+    }
+  }, [initialData, prefillData]);
 
   useEffect(() => {
     if (initialData) {
@@ -132,6 +147,11 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
 
       if (initialData) {
         // Update existing resource
+        // If we have a thumbnail preview but no file, it's an external URL (e.g., from YouTube)
+        const externalThumbnailUrl = (!thumbnailFile && thumbnailPreview && !thumbnailPreview.startsWith('blob:'))
+          ? thumbnailPreview
+          : undefined;
+
         const { error: updateError } = await supabase
           .from('resources')
           .update({
@@ -142,12 +162,18 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
             subject_id: subjectId,
             language,
             ai_generated: aiGenerated,
+            ...(externalThumbnailUrl && { thumbnail_url: externalThumbnailUrl }),
           })
           .eq('id', initialData.id);
 
         if (updateError) throw updateError;
       } else {
         // Create new resource
+        // If we have a thumbnail preview but no file, it's an external URL (e.g., from YouTube)
+        const externalThumbnailUrl = (!thumbnailFile && thumbnailPreview && !thumbnailPreview.startsWith('blob:'))
+          ? thumbnailPreview
+          : undefined;
+
         const { data: resource, error: insertError } = await supabase
           .from('resources')
           .insert({
@@ -160,6 +186,7 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
             author: user.user_metadata?.nick || user.email?.split('@')[0] || 'Anonim',
             language,
             ai_generated: aiGenerated,
+            ...(externalThumbnailUrl && { thumbnail_url: externalThumbnailUrl }),
           })
           .select()
           .single();

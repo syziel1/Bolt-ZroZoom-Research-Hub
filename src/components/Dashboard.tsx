@@ -7,7 +7,8 @@ import { ResourceCard } from './ResourceCard';
 import { AddResourceModal } from './AddResourceModal';
 import { ResourceDetailModal } from './ResourceDetailModal';
 import { AdminPanel } from './AdminPanel';
-import { Plus, LogOut, Loader, Settings, Menu, ArrowLeft, ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { Plus, LogOut, Loader, Settings, Menu, ArrowLeft, ChevronLeft, ChevronRight, Search, Play } from 'lucide-react';
+import { YouTubeSearchModal } from './YouTubeSearchModal';
 
 type DashboardProps = {
   isGuestMode?: boolean;
@@ -41,6 +42,11 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
   const [resourceLevels, setResourceLevels] = useState<Map<string, ResourceLevel[]>>(new Map());
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState<'newest' | 'rating' | 'popular' | 'alphabetical'>('newest');
+
+  // YouTube Integration State
+  const [isYouTubeModalOpen, setIsYouTubeModalOpen] = useState(false);
+  const [prefilledResource, setPrefilledResource] = useState<Partial<Resource> | null>(null);
+
   const ITEMS_PER_PAGE = 12;
 
   // Read search query from URL params
@@ -361,6 +367,20 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
   const handleCloseAddModal = () => {
     setIsModalOpen(false);
     setEditingResource(null);
+    setPrefilledResource(null);
+  };
+
+  const handleYouTubeVideoAdd = (video: any) => {
+    setIsYouTubeModalOpen(false);
+    setPrefilledResource({
+      title: video.title,
+      url: video.url,
+      type: 'video',
+      description: `${video.description}\n\n[Czas trwania: ${video.duration}]`,
+      thumbnail_url: video.thumbnailUrl,
+      language: 'pl' // Default to PL, user can change
+    });
+    setIsModalOpen(true);
   };
 
   const filteredResources = resources.filter((resource) => {
@@ -522,12 +542,39 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
           </div>
         </div>
         <AdminPanel userRole={userRole} requireAdmin={true} onDataChange={loadData} />
+        <AddResourceModal
+          isOpen={isModalOpen}
+          onClose={handleCloseAddModal}
+          onSuccess={() => {
+            handleCloseAddModal();
+            loadData();
+          }}
+          subjects={subjects}
+          topics={allTopics}
+          levels={levels}
+          initialData={editingResource}
+          prefillData={prefilledResource}
+        />
+        <ResourceDetailModal
+          isOpen={isDetailModalOpen}
+          onClose={handleCloseDetailModal}
+          resource={selectedResource}
+          onEdit={handleEditResource}
+          onResourceUpdated={loadData}
+        />
+        <YouTubeSearchModal
+          isOpen={isYouTubeModalOpen}
+          onClose={() => setIsYouTubeModalOpen(false)}
+          initialQuery={searchQuery}
+          onAddVideo={handleYouTubeVideoAdd}
+        />
       </div>
     );
   }
 
   return (
     <div className="flex h-screen bg-gray-50">
+
       <Sidebar
         subjects={subjects}
         topicNodes={topicNodes}
@@ -632,8 +679,8 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
           </div>
 
 
-          <div className="mt-4 max-w-2xl mx-auto">
-            <div className="relative">
+          <div className="mt-4 max-w-2xl mx-auto flex gap-2">
+            <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
               <input
                 type="text"
@@ -651,6 +698,14 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
+            <button
+              onClick={() => setIsYouTubeModalOpen(true)}
+              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center gap-2 whitespace-nowrap transition-colors"
+              title="Szukaj wideo na YouTube"
+            >
+              <Play size={20} className="fill-current" />
+              <span className="hidden sm:inline">Szukaj wideo</span>
+            </button>
           </div>
         </header >
 
@@ -825,6 +880,7 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
           topics={allTopics}
           levels={levels}
           initialData={editingResource}
+          prefillData={prefilledResource}
         />
       )
       }
@@ -836,6 +892,12 @@ export function Dashboard({ isGuestMode = false }: DashboardProps) {
         onResourceUpdated={loadData}
         isGuestMode={isGuestMode}
         onEdit={handleEditResource}
+      />
+      <YouTubeSearchModal
+        isOpen={isYouTubeModalOpen}
+        onClose={() => setIsYouTubeModalOpen(false)}
+        initialQuery={searchQuery}
+        onAddVideo={handleYouTubeVideoAdd}
       />
     </div >
   );
