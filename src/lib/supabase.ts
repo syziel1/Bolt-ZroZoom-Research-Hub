@@ -55,3 +55,10 @@ export type ResourceLevel = {
   slug: string;
   order_index: number;
 };
+
+export type UserFavorite = {
+  id: string;
+  user_id: string;
+  resource_id: string;
+  created_at: string;
+};

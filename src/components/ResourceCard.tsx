@@ -1,7 +1,7 @@
 import React from 'react';
 import { Resource, ResourceTopic, ResourceLevel } from '../lib/supabase';
 import { getThumbnailUrl } from '../lib/storage';
-import { Video, FileText, Presentation, Beaker, Wrench, Star, ExternalLink, ImageIcon, MessageSquare } from 'lucide-react';
+import { Video, FileText, Presentation, Beaker, Wrench, Star, ExternalLink, ImageIcon, MessageSquare, Heart } from 'lucide-react';
 
 export type ResourceCardVariant = 'default' | 'hero' | 'list';
 
@@ -12,6 +12,9 @@ type ResourceCardProps = {
   onTopicClick?: (topicName: string) => void;
   onCardClick?: (resource: Resource) => void;
   variant?: ResourceCardVariant;
+  isFavorite?: boolean;
+  onFavoriteToggle?: (resourceId: string) => void;
+  isLoggedIn?: boolean;
 };
 
 const typeIcons: Record<string, React.ElementType> = {
@@ -24,7 +27,7 @@ const typeIcons: Record<string, React.ElementType> = {
   tool: Wrench,
 };
 
-export function ResourceCard({ resource, topics = [], levels = [], onTopicClick, onCardClick, variant = 'default' }: ResourceCardProps) {
+export function ResourceCard({ resource, topics = [], levels = [], onTopicClick, onCardClick, variant = 'default', isFavorite = false, onFavoriteToggle, isLoggedIn = true }: ResourceCardProps) {
   const Icon = typeIcons[resource.type] || FileText;
   const thumbnailUrl = getThumbnailUrl(resource.thumbnail_path) || resource.thumbnail_url;
 
@@ -56,6 +59,13 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
     e.stopPropagation();
   };
 
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isLoggedIn && onFavoriteToggle) {
+      onFavoriteToggle(resource.id);
+    }
+  };
+
   if (variant === 'hero') {
     return (
       <div
@@ -63,6 +73,25 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
         className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-200 cursor-pointer flex flex-col h-full overflow-hidden group"
       >
         <div className="w-full h-48 sm:h-56 bg-gradient-to-br from-gray-100 to-gray-50 relative overflow-hidden flex items-center justify-center">
+          <button
+            onClick={handleFavoriteClick}
+            disabled={!isLoggedIn}
+            className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-200 z-10 ${isLoggedIn
+                ? 'bg-white/90 hover:bg-white hover:scale-110 shadow-md cursor-pointer'
+                : 'bg-gray-200/50 cursor-not-allowed'
+              }`}
+            title={!isLoggedIn ? 'Zaloguj się, aby dodać do ulubionych' : isFavorite ? 'Usuń z ulubionych' : 'Dodaj do ulubionych'}
+          >
+            <Heart
+              size={20}
+              className={`transition-colors ${isFavorite && isLoggedIn
+                  ? 'fill-red-500 text-red-500'
+                  : isLoggedIn
+                    ? 'text-gray-600 hover:text-red-500'
+                    : 'text-gray-400'
+                }`}
+            />
+          </button>
           {thumbnailUrl ? (
             <img
               src={thumbnailUrl}
@@ -163,7 +192,26 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
         onClick={() => onCardClick?.(resource)}
         className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 border border-gray-200 cursor-pointer flex gap-4 items-center"
       >
-        <div className="w-16 h-16 rounded-lg overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 flex-shrink-0 border border-gray-200 flex items-center justify-center">
+        <div className="w-16 h-16 rounded-lg overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 flex-shrink-0 border border-gray-200 flex items-center justify-center relative">
+          <button
+            onClick={handleFavoriteClick}
+            disabled={!isLoggedIn}
+            className={`absolute -top-2 -right-2 p-1.5 rounded-full transition-all duration-200 z-10 ${isLoggedIn
+                ? 'bg-white hover:scale-110 shadow-md cursor-pointer'
+                : 'bg-gray-200 cursor-not-allowed'
+              }`}
+            title={!isLoggedIn ? 'Zaloguj się, aby dodać do ulubionych' : isFavorite ? 'Usuń z ulubionych' : 'Dodaj do ulubionych'}
+          >
+            <Heart
+              size={14}
+              className={`transition-colors ${isFavorite && isLoggedIn
+                  ? 'fill-red-500 text-red-500'
+                  : isLoggedIn
+                    ? 'text-gray-600 hover:text-red-500'
+                    : 'text-gray-400'
+                }`}
+            />
+          </button>
           {thumbnailUrl ? (
             <img src={thumbnailUrl} alt={resource.title} className="w-full h-full object-contain" />
           ) : (
@@ -225,9 +273,28 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
   return (
     <div
       onClick={() => onCardClick?.(resource)}
-      className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6 border border-gray-200 cursor-pointer flex flex-col h-full"
+      className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6 border border-gray-200 cursor-pointer flex flex-col h-full relative"
     >
       <div className="flex items-start gap-4 mb-4">
+        <button
+          onClick={handleFavoriteClick}
+          disabled={!isLoggedIn}
+          className={`absolute top-4 right-4 p-2 rounded-full transition-all duration-200 z-10 ${isLoggedIn
+              ? 'bg-white hover:bg-gray-50 hover:scale-110 shadow-md cursor-pointer'
+              : 'bg-gray-200 cursor-not-allowed'
+            }`}
+          title={!isLoggedIn ? 'Zaloguj się, aby dodać do ulubionych' : isFavorite ? 'Usuń z ulubionych' : 'Dodaj do ulubionych'}
+        >
+          <Heart
+            size={18}
+            className={`transition-colors ${isFavorite && isLoggedIn
+                ? 'fill-red-500 text-red-500'
+                : isLoggedIn
+                  ? 'text-gray-600 hover:text-red-500'
+                  : 'text-gray-400'
+              }`}
+          />
+        </button>
         <div className="w-24 h-24 rounded-lg overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 flex-shrink-0 border border-gray-200 flex items-center justify-center">
           {thumbnailUrl ? (
             <img src={thumbnailUrl} alt="Miniatura zasobu" className="w-full h-full object-contain" />

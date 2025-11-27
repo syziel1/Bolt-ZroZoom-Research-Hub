@@ -1,5 +1,8 @@
-import { Menu, ArrowLeft, LogOut, Settings, Plus, Search, Play, X } from 'lucide-react';
+import { Menu, ArrowLeft, LogOut, Settings, Plus, Search, Play, X, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import { Resource } from '../lib/supabase';
+import { SearchAutocomplete } from './SearchAutocomplete';
 
 type DashboardHeaderProps = {
     isGuestMode: boolean;
@@ -13,6 +16,10 @@ type DashboardHeaderProps = {
     onOpenAdmin: () => void;
     onOpenAddResource: () => void;
     onOpenYouTube: () => void;
+    showOnlyFavorites?: boolean;
+    onFavoritesToggle?: () => void;
+    favoritesCount?: number;
+    resources?: Resource[];
 };
 
 export function DashboardHeader({
@@ -26,10 +33,28 @@ export function DashboardHeader({
     onSignOut,
     onOpenAdmin,
     onOpenAddResource,
-    onOpenYouTube
+    onOpenYouTube,
+    showOnlyFavorites = false,
+    onFavoritesToggle,
+    favoritesCount = 0,
+    resources = []
 }: DashboardHeaderProps) {
     const navigate = useNavigate();
     const isAdmin = userRole === 'admin';
+    const [showAutocomplete, setShowAutocomplete] = useState(false);
+    const searchRef = useRef<HTMLDivElement>(null);
+
+    // Close autocomplete when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+                setShowAutocomplete(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     return (
         <header className="bg-white border-b border-gray-200 px-4 md:px-8 py-4">
@@ -118,24 +143,64 @@ export function DashboardHeader({
 
 
             <div className="mt-4 max-w-2xl mx-auto flex gap-2">
-                <div className="relative flex-1">
+                <div ref={searchRef} className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                     <input
                         type="text"
                         placeholder="Szukaj w tytułach i opisach..."
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onChange={(e) => {
+                            setSearchQuery(e.target.value);
+                            setShowAutocomplete(true);
+                        }}
+                        onFocus={() => setShowAutocomplete(true)}
                         className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                     {searchQuery && (
                         <button
-                            onClick={() => setSearchQuery('')}
+                            onClick={() => {
+                                setSearchQuery('');
+                                setShowAutocomplete(false);
+                            }}
                             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                         >
                             <X size={16} />
                         </button>
                     )}
+                    {showAutocomplete && (
+                        <SearchAutocomplete
+                            resources={resources}
+                            searchQuery={searchQuery}
+                            onSelectSuggestion={(suggestion) => {
+                                setSearchQuery(suggestion);
+                                setShowAutocomplete(false);
+                            }}
+                        />
+                    )}
                 </div>
+                {!isGuestMode && onFavoritesToggle && (
+                    <button
+                        onClick={onFavoritesToggle}
+                        className={`px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-all ${showOnlyFavorites
+                            ? 'bg-red-500 text-white hover:bg-red-600'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                        title={showOnlyFavorites ? 'Pokaż wszystkie zasoby' : 'Pokaż tylko ulubione'}
+                    >
+                        <Heart
+                            size={18}
+                            className={showOnlyFavorites ? 'fill-current' : ''}
+                        />
+                        <span className="hidden sm:inline">
+                            {showOnlyFavorites ? 'Ulubione' : 'Pokaż ulubione'}
+                        </span>
+                        {favoritesCount > 0 && (
+                            <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-bold">
+                                {favoritesCount}
+                            </span>
+                        )}
+                    </button>
+                )}
                 <button
                     onClick={onOpenYouTube}
                     className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center gap-2 whitespace-nowrap transition-colors"

@@ -69,7 +69,7 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
         if (onSuccess) {
           onSuccess();
         } else {
-          navigate('/pulpit');
+          navigate('/zasoby');
         }
       }
     });
@@ -87,7 +87,7 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/pulpit`,
+          redirectTo: `${window.location.origin}/zasoby`,
         },
       });
       if (error) throw error;
@@ -132,7 +132,7 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
       if (onSuccess) {
         onSuccess();
       } else {
-        navigate('/pulpit');
+        navigate('/zasoby');
       }
     } catch (err) {
       if (err instanceof Error) {

@@ -51,7 +51,7 @@ serve(async (req) => {
         const chat = model.startChat({
             history: history,
             generationConfig: {
-                maxOutputTokens: 500, // Reduced from 1000 to encourage shorter responses
+                maxOutputTokens: 800, // Increased to allow longer responses with LaTeX
                 temperature: 0.7,
             },
         });

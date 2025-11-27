@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Bot, Send, X, Sparkles } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { supabase, Resource, Subject } from '../lib/supabase';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
@@ -15,9 +15,23 @@ type AiAssistantProps = {
     initialQuery?: string;
     isOpen?: boolean;
     onToggle?: (isOpen: boolean) => void;
+    // Context props
+    selectedSubject?: Subject | null;
+    selectedTopics?: string[];
+    selectedLevels?: string[];
+    selectedLanguages?: string[];
+    currentResource?: Resource | null;
 };
 
-export function AiAssistant({ initialQuery, isOpen: propIsOpen, onToggle }: AiAssistantProps) {
+export function AiAssistant({
+    initialQuery,
+    isOpen: propIsOpen,
+    onToggle,
+    selectedSubject,
+    selectedTopics = [],
+    selectedLevels = [],
+    currentResource
+}: AiAssistantProps) {
     const [internalIsOpen, setInternalIsOpen] = useState(false);
     const isOpen = propIsOpen !== undefined ? propIsOpen : internalIsOpen;
 
@@ -38,7 +52,9 @@ export function AiAssistant({ initialQuery, isOpen: propIsOpen, onToggle }: AiAs
     }, [initialQuery, isOpen]);
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
     };
 
     useEffect(() => {
@@ -62,14 +78,39 @@ export function AiAssistant({ initialQuery, isOpen: propIsOpen, onToggle }: AiAs
         setIsLoading(true);
 
         try {
-            // Prepare context for the AI (last 10 messages to keep context but save tokens)
-            const contextMessages = [...messages, userMessage].slice(-10);
+            // Build context information (only if present)
+            const contextParts: string[] = [];
+
+            if (currentResource) {
+                contextParts.push(`📚 Zasób: "${currentResource.title}"`);
+            }
+
+            if (selectedSubject) {
+                contextParts.push(`📖 Przedmiot: ${selectedSubject.subject_name}`);
+            }
+
+            if (selectedTopics.length > 0) {
+                contextParts.push(`🎯 Tematy: ${selectedTopics.join(', ')}`);
+            }
+
+            if (selectedLevels.length > 0) {
+                contextParts.push(`📊 Poziomy: ${selectedLevels.join(', ')}`);
+            }
+
+            // Build message content with optional context
+            let messageContent = text;
+            if (contextParts.length > 0 && messages.length === 1) {
+                // Add context only to first user message
+                messageContent = `${text}\n\n[Kontekst: ${contextParts.join(' | ')}]`;
+            }
+
+            // Prepare messages for API (last 6 to save tokens)
+            const recentMessages = [...messages, { role: 'user', content: messageContent }].slice(-6);
 
             console.log('[AI Assistant] Sending request to chat-with-ai function');
-            console.log('[AI Assistant] Context messages:', contextMessages);
 
             const { data, error } = await supabase.functions.invoke('chat-with-ai', {
-                body: { messages: contextMessages }
+                body: { messages: recentMessages }
             });
 
             console.log('[AI Assistant] Response received:', { data, error });
@@ -96,14 +137,9 @@ export function AiAssistant({ initialQuery, isOpen: propIsOpen, onToggle }: AiAs
 
         } catch (error) {
             console.error('[AI Assistant] Chat error:', error);
-            console.error('[AI Assistant] Error details:', {
-                message: error instanceof Error ? error.message : 'Unknown error',
-                stack: error instanceof Error ? error.stack : undefined,
-                raw: error
-            });
             setMessages(prev => [...prev, {
                 role: 'assistant',
-                content: `Przepraszam, wystąpił błąd połączenia.\n\n**Szczegóły błędu:**\n${error instanceof Error ? error.message : 'Nieznany błąd'}\n\nSpróbuj ponownie później lub sprawdź konsolę deweloperską (F12).`
+                content: `Przepraszam, wystąpił błąd połączenia.\n\n**Szczegóły błędu:**\n${error instanceof Error ? error.message : 'Nieznany błąd'}\n\nSpróbuj ponownie później.`
             }]);
         } finally {
             setIsLoading(false);

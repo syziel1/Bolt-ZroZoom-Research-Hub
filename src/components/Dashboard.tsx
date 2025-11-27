@@ -9,6 +9,7 @@ import { LogOut } from 'lucide-react';
 import { YouTubeSearchModal } from './YouTubeSearchModal';
 import { useDashboardData } from '../hooks/useDashboardData';
 import { useDashboardFilters } from '../hooks/useDashboardFilters';
+import { useFavorites } from '../hooks/useFavorites';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardGrid } from './DashboardGrid';
 import { AiAssistant } from './AiAssistant';
@@ -65,8 +66,6 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
     setSortBy,
     currentPage,
     totalPages,
-    currentResources,
-    filteredResources,
     sortedResources,
     topicNodes,
     topicsLoading,
@@ -85,6 +84,16 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
     resourceTopics,
     resourceLevels
   });
+
+  // Favorites functionality
+  const { isFavorite, toggleFavorite, isLoggedIn, favoritesCount } = useFavorites();
+  const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
+
+  // Apply favorites filter on top of existing filters
+  const finalFilteredResources = useMemo(() => {
+    if (!showOnlyFavorites) return sortedResources;
+    return sortedResources.filter(resource => isFavorite(resource.id));
+  }, [sortedResources, showOnlyFavorites, isFavorite]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -256,6 +265,10 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
           onOpenAdmin={() => setShowAdminPanel(true)}
           onOpenAddResource={() => setIsModalOpen(true)}
           onOpenYouTube={() => setIsYouTubeModalOpen(true)}
+          showOnlyFavorites={showOnlyFavorites}
+          onFavoritesToggle={() => setShowOnlyFavorites(!showOnlyFavorites)}
+          favoritesCount={favoritesCount}
+          resources={resources}
         />
 
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
@@ -280,12 +293,12 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
 
           <DashboardGrid
             loading={loading}
-            filteredResources={filteredResources}
-            sortedResources={sortedResources}
-            currentResources={currentResources}
+            filteredResources={finalFilteredResources}
+            sortedResources={finalFilteredResources}
+            currentResources={finalFilteredResources}
             resourceTopics={resourceTopics}
             resourceLevels={resourceLevels}
-            hasActiveFilters={hasActiveFilters}
+            hasActiveFilters={hasActiveFilters || showOnlyFavorites}
             recentlyAddedResources={recentlyAddedResources}
             sortBy={sortBy}
             setSortBy={setSortBy}
@@ -298,6 +311,9 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
             onCardClick={handleCardClick}
             searchQuery={searchQuery}
             onAskAi={handleAskAi}
+            isFavorite={isFavorite}
+            onFavoriteToggle={toggleFavorite}
+            isLoggedIn={!isGuestMode && isLoggedIn}
           />
 
           <footer className="mt-12 pt-8 border-t border-gray-200">
@@ -348,6 +364,25 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
         isOpen={isAiAssistantOpen}
         onToggle={setIsAiAssistantOpen}
         initialQuery={aiInitialQuery}
+        selectedSubject={subjects.find(s => s.subject_id === selectedSubject) || null}
+        selectedTopics={(() => {
+          // Convert topic IDs to names
+          const findTopicNames = (nodes: any[], ids: string[]): string[] => {
+            const names: string[] = [];
+            for (const node of nodes) {
+              if (ids.includes(node.id)) names.push(node.name);
+              if (node.children) names.push(...findTopicNames(node.children, ids));
+            }
+            return names;
+          };
+          return findTopicNames(topicNodes, selectedTopics);
+        })()}
+        selectedLevels={selectedLevels.map(levelId => {
+          const level = levels.find(l => l.id === levelId);
+          return level ? level.name : levelId;
+        })}
+        selectedLanguages={selectedLanguages}
+        currentResource={selectedResource}
       />
     </div>
   );

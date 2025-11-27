@@ -13,7 +13,7 @@ type DashboardGridProps = {
     hasActiveFilters: boolean;
     recentlyAddedResources: Resource[];
     sortBy: SortOption;
-    setSortBy: (sort: SortOption) => void;
+    setSortBy: (sortBy: SortOption) => void;
     currentPage: number;
     totalPages: number;
     indexOfFirstResource: number;
@@ -23,6 +23,9 @@ type DashboardGridProps = {
     onCardClick: (resource: Resource) => void;
     searchQuery: string;
     onAskAi: (query: string) => void;
+    isFavorite?: (resourceId: string) => boolean;
+    onFavoriteToggle?: (resourceId: string) => void;
+    isLoggedIn?: boolean;
 };
 
 export function DashboardGrid({
@@ -44,7 +47,10 @@ export function DashboardGrid({
     onTopicClick,
     onCardClick,
     searchQuery,
-    onAskAi
+    onAskAi,
+    isFavorite,
+    onFavoriteToggle,
+    isLoggedIn = true
 }: DashboardGridProps) {
 
     if (loading) {
@@ -92,6 +98,9 @@ export function DashboardGrid({
                                 levels={resourceLevels.get(resource.id) || []}
                                 onTopicClick={onTopicClick}
                                 onCardClick={onCardClick}
+                                isFavorite={isFavorite?.(resource.id)}
+                                onFavoriteToggle={onFavoriteToggle}
+                                isLoggedIn={isLoggedIn}
                             />
                         ))}
                     </div>
@@ -116,6 +125,9 @@ export function DashboardGrid({
                         levels={resourceLevels.get(resource.id) || []}
                         onTopicClick={onTopicClick}
                         onCardClick={onCardClick}
+                        isFavorite={isFavorite?.(resource.id)}
+                        onFavoriteToggle={onFavoriteToggle}
+                        isLoggedIn={isLoggedIn}
                     />
                 ))}
             </div>
