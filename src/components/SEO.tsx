@@ -15,7 +15,7 @@ export function SEO({
     url = window.location.href,
     type = 'website'
 }: SEOProps) {
-    const siteTitle = 'ZroZoom Research Hub';
+    const siteTitle = 'Szkoła Przyszłości z AI';
     const fullTitle = `${title} | ${siteTitle}`;
 
     return (

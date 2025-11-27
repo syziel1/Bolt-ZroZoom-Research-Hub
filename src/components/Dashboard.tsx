@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, Resource } from '../lib/supabase';
+import { logger } from '../lib/logger';
 import { Sidebar } from './Sidebar';
 import { AddResourceModal } from './AddResourceModal';
 import { ResourceDetailModal } from './ResourceDetailModal';
@@ -124,7 +125,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
   };
 
   const handleTopicClick = (topicName: string) => {
-    console.log('Topic clicked:', topicName);
+    logger.log('Topic clicked:', topicName);
   };
 
   const handleCardClick = (resource: Resource) => {
@@ -239,7 +240,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
     <div className="flex h-screen bg-gray-50">
       <SEO
         title="Pulpit - Przeglądaj zasoby"
-        description="Przeglądaj tysiące materiałów edukacyjnych, filtruj po przedmiotach i poziomach. Dołącz do społeczności ZroZoom Hub."
+        description="Przeglądaj tysiące materiałów edukacyjnych, filtruj po przedmiotach i poziomach. Dołącz do społeczności Szkoły Przyszłości z AI."
       />
       <Sidebar
         subjects={subjects}

@@ -1,8 +1,8 @@
 # Roadmap
 
-**Mapa Drogowa – ZroZoom Hub**
+**Mapa Drogowa – Szkoła Przyszłości z AI**
 
-Ten dokument opisuje plany rozwoju platformy ZroZoom Research Hub. Cele podzielone są na fazy, od zadań natychmiastowych po długoterminową wizję „Szkoły Przyszłości”.
+Ten dokument opisuje plany rozwoju platformy Szkoła Przyszłości z AI. Cele podzielone są na fazy, od zadań natychmiastowych po długoterminową wizję „Szkoły Przyszłości”.
 
 🟢 **Faza 1: Stabilizacja, SEO i Content (Q4 2025 – w trakcie)**
 **Cel:** Wypełnienie pustej aplikacji treścią, dopięcie techniczne MVP i ściągnięcie ruchu organicznego.
@@ -11,7 +11,7 @@ Ten dokument opisuje plany rozwoju platformy ZroZoom Research Hub. Cele podzielo
 - [ ] **Blog Edukacyjny:** Uruchomienie sekcji blogowej (CMS w Supabase + Markdown) dla Content Marketingu.
 - [ ] **Konfiguracja Storage:** Uruchomienie bucketu `resource-thumbnails` i `avatars` w Supabase.
 - [ ] **Seed Danych:** Import 50–100 quizów i kanałów YouTube.
-- [ ] **Deployment:** Podpięcie własnej domeny (np. hub.zrozoom.pl) i konfiguracja HTTPS.
+- [ ] **Deployment:** Podpięcie własnej domeny (np. szkolaprzyszlosciai.pl) i konfiguracja HTTPS.
 - [x] **Wyszukiwanie (MVP):** Implementacja wyszukiwania po stronie klienta (Fuse.js).
 - [ ] **Dark Mode:** Wdrożenie trybu ciemnego (Tailwind).
 

@@ -223,7 +223,7 @@ export function LandingPage() {
     <div className="min-h-screen bg-white">
       <SEO
         title="Darmowe zasoby edukacyjne: Matematyka, Fizyka, AI"
-        description="ZroZoom Research Hub to największa baza darmowych materiałów edukacyjnych. Przygotuj się do matury i egzaminu ósmoklasisty z pomocą sztucznej inteligencji."
+        description="Szkoła Przyszłości z AI to największa baza darmowych materiałów edukacyjnych. Przygotuj się do matury i egzaminu ósmoklasisty z pomocą sztucznej inteligencji."
       />
       <Navigation onNavigateToAuth={() => navigate('/auth')} onScrollToSubjects={scrollToSubjects} onBrowseAsGuest={() => navigate('/zasoby')} />
       <section className="relative min-h-[70vh] bg-gradient-to-br from-violet-600 via-purple-600 to-violet-700 flex items-center justify-center px-4 pt-24 pb-12 overflow-hidden">

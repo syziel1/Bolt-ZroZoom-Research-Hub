@@ -1,4 +1,4 @@
-# ZroZoom Research Hub
+# Szkoła Przyszłości z AI
 
 **Platforma zasobów edukacyjnych** - Twoja baza wiedzy dla Szkoły Przyszłości AI
 
@@ -17,7 +17,7 @@
 
 ## 🎯 O projekcie
 
-ZroZoom Research Hub to platforma do gromadzenia, organizowania i udostępniania materiałów edukacyjnych. Umożliwia:
+Szkoła Przyszłości z AI to platforma do gromadzenia, organizowania i udostępniania materiałów edukacyjnych. Umożliwia:
 
 - **Przeglądanie** - dostęp do zasobów edukacyjnych bez logowania (tryb gościa)
 - **Dodawanie** - zalogowani użytkownicy mogą dodawać nowe materiały
@@ -79,8 +79,8 @@ ZroZoom Research Hub to platforma do gromadzenia, organizowania i udostępniania
 
 1. **Sklonuj repozytorium**
 ```bash
-git clone https://github.com/your-username/Bolt-ZroZoom-Research-Hub.git
-cd Bolt-ZroZoom-Research-Hub
+git clone https://github.com/your-username/Szkola-Przyszlosci-AI.git
+cd Szkola-Przyszlosci-AI
 ```
 
 2. **Zainstaluj zależności**
@@ -111,7 +111,7 @@ VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key-here
 
 # Optional: Custom test user credentials for Developer Shortcut
-# If not set, defaults to test@zrozoomai.pl / 123TesT456
+# If not set, you must provide credentials manually
 VITE_TEST_EMAIL=your-test-email@example.com
 VITE_TEST_PASSWORD=your-test-password
 ```
@@ -168,7 +168,7 @@ npm test
 ## 📁 Struktura projektu
 
 ```text
-Bolt-ZroZoom-Research-Hub/
+Szkola-Przyszlosci-AI/
 ├── src/
 │   ├── components/          # Komponenty React
 │   │   ├── AuthForm.tsx     # Formularz logowania/rejestracji
@@ -310,7 +310,7 @@ Ten projekt jest prywatny. Wszelkie prawa zastrzeżone.
 
 ## 👥 Autorzy
 
-- Zespół ZroZoom - Szkoła Przyszłości AI
+- Sylwester Zieliński
 
 ## 🐛 Zgłaszanie błędów
 

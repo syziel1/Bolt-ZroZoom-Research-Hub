@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import { ConfirmationModal } from './ConfirmationModal';
 import { supabase, Subject, Topic, Level, Resource } from '../lib/supabase';
 import { uploadResourceThumbnail, getThumbnailUrl } from '../lib/storage';
+import { logger } from '../lib/logger';
 import { ThumbnailUploader } from './ThumbnailUploader';
 import { buildTopicTree } from '../utils/topicTree';
 import { TopicTree } from './TopicTree';
@@ -300,18 +301,18 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
       if (thumbnailFile) {
         try {
           setUploading(true);
-          console.log('Starting thumbnail upload for resource:', resourceId);
-          console.log('File details:', {
+          logger.log('Starting thumbnail upload for resource:', resourceId);
+          logger.log('File details:', {
             name: thumbnailFile.name,
             size: thumbnailFile.size,
             type: thumbnailFile.type
           });
 
           const result = await uploadResourceThumbnail(resourceId, thumbnailFile);
-          console.log('Thumbnail upload successful:', result);
+          logger.log('Thumbnail upload successful:', result);
           setSuccessMessage('Miniatura została przesłana pomyślnie.');
         } catch (uploadError) {
-          console.error('Thumbnail upload failed:', uploadError);
+          logger.error('Thumbnail upload failed:', uploadError);
           const errorMessage = uploadError instanceof Error ? uploadError.message : 'Nie udało się przesłać miniatury.';
           setError(`Błąd miniaturki: ${errorMessage}`);
           // Don't throw - allow resource to be saved even if thumbnail fails
@@ -325,7 +326,7 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
       onSuccess();
       onCancel();
     } catch (err: unknown) {
-      console.error('Resource save error:', err);
+      logger.error('Resource save error:', err);
       setError(err instanceof Error ? err.message : 'Wystąpił błąd podczas zapisu.');
     } finally {
       setUploading(false);
@@ -351,7 +352,7 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
       });
 
       if (error) {
-        console.error('Supabase Function Error:', error);
+        logger.error('Supabase Function Error:', error);
         // Try to parse the error body if it exists and is JSON
         let errorMessage = error.message;
         try {
@@ -364,7 +365,7 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
             }
           }
         } catch (e) {
-          console.error('Error parsing error response:', e);
+          logger.error('Error parsing error response:', e);
         }
         throw new Error(errorMessage || 'Błąd wywołania funkcji AI');
       }
@@ -439,7 +440,7 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
       setSuccessMessage('AI przeanalizowało treść i uzupełniło formularz! ✨');
 
     } catch (err: any) {
-      console.error('AI analysis error:', err);
+      logger.error('AI analysis error:', err);
       setError(err.message || 'Nie udało się uzyskać sugestii AI.');
     } finally {
       setAnalyzing(false);

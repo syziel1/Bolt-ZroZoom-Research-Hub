@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Bot, Send, X, Sparkles, RotateCcw } from 'lucide-react';
 import { supabase, Resource, Subject } from '../lib/supabase';
+import { logger } from '../lib/logger';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
@@ -112,36 +113,36 @@ export function AiAssistant({
             // Prepare messages for API (last 6 to save tokens)
             const recentMessages = [...messages, { role: 'user', content: messageContent }].slice(-6);
 
-            console.log('[AI Assistant] Sending request to chat-with-ai function');
+            logger.log('[AI Assistant] Sending request to chat-with-ai function');
 
             const { data, error } = await supabase.functions.invoke('chat-with-ai', {
                 body: { messages: recentMessages }
             });
 
-            console.log('[AI Assistant] Response received:', { data, error });
+            logger.log('[AI Assistant] Response received:', { data, error });
 
             if (error) {
-                console.error('[AI Assistant] Supabase function error:', error);
+                logger.error('[AI Assistant] Supabase function error:', error);
                 throw error;
             }
 
             if (data.error) {
-                console.error('[AI Assistant] API error in response:', data.error);
+                logger.error('[AI Assistant] API error in response:', data.error);
                 throw new Error(data.error);
             }
 
             if (!data.content) {
-                console.error('[AI Assistant] No content in response:', data);
+                logger.error('[AI Assistant] No content in response:', data);
                 throw new Error('Brak odpowiedzi od AI');
             }
 
-            console.log('[AI Assistant] AI response content:', data.content);
+            logger.log('[AI Assistant] AI response content:', data.content);
 
             const aiMessage: Message = { role: 'assistant', content: data.content };
             setMessages(prev => [...prev, aiMessage]);
 
         } catch (error) {
-            console.error('[AI Assistant] Chat error:', error);
+            logger.error('[AI Assistant] Chat error:', error);
             setMessages(prev => [...prev, {
                 role: 'assistant',
                 content: `Przepraszam, wystąpił błąd połączenia.\n\n**Szczegóły błędu:**\n${error instanceof Error ? error.message : 'Nieznany błąd'}\n\nSpróbuj ponownie później.`

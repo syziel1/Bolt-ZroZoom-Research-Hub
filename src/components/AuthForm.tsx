@@ -150,7 +150,7 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <SEO
         title={isLogin ? "Logowanie" : "Rejestracja"}
-        description="Zaloguj się lub zarejestruj w ZroZoom Research Hub, aby uzyskać dostęp do pełnej bazy wiedzy i funkcji społecznościowych."
+        description="Zaloguj się lub zarejestruj, aby uzyskać dostęp do pełnej bazy wiedzy i funkcji społecznościowych."
       />
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
         {(onBack || true) && (
@@ -321,10 +321,10 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
            * It provides a quick way to auto-fill login credentials for testing purposes.
            * 
            * Environment Variables (optional):
-           * - VITE_TEST_EMAIL: Email address for test user (default: 'test@zrozoomai.pl')
-           * - VITE_TEST_PASSWORD: Password for test user (default: '123TesT456')
-           * - VITE_TEST_ADMIN_EMAIL: Email address for test admin (default: 'test2@zrozoomai.pl')
-           * - VITE_TEST_ADMIN_PASSWORD: Password for test admin (default: 'qnZgZaG_Y6k#A.b')
+           * - VITE_TEST_EMAIL: Email address for test user
+           * - VITE_TEST_PASSWORD: Password for test user
+           * - VITE_TEST_ADMIN_EMAIL: Email address for test admin
+           * - VITE_TEST_ADMIN_PASSWORD: Password for test admin
            * 
            * To configure custom test credentials, add these to your .env file:
            * ```
@@ -345,8 +345,14 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
                 <button
                   type="button"
                   onClick={() => {
-                    setEmail(import.meta.env.VITE_TEST_EMAIL || 'test@zrozoomai.pl');
-                    setPassword(import.meta.env.VITE_TEST_PASSWORD || '123TesT456');
+                    const email = import.meta.env.VITE_TEST_EMAIL;
+                    const password = import.meta.env.VITE_TEST_PASSWORD;
+                    if (email && password) {
+                      setEmail(email);
+                      setPassword(password);
+                    } else {
+                      alert('Skonfiguruj VITE_TEST_EMAIL i VITE_TEST_PASSWORD w pliku .env');
+                    }
                   }}
                   className="w-full bg-yellow-100 text-yellow-800 py-2 px-4 rounded border border-yellow-300 hover:bg-yellow-200 text-sm font-medium transition-colors"
                 >
@@ -355,8 +361,14 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
                 <button
                   type="button"
                   onClick={() => {
-                    setEmail(import.meta.env.VITE_TEST_ADMIN_EMAIL || 'test2@zrozoomai.pl');
-                    setPassword(import.meta.env.VITE_TEST_ADMIN_PASSWORD || 'qnZgZaG_Y6k#A.b');
+                    const email = import.meta.env.VITE_TEST_ADMIN_EMAIL;
+                    const password = import.meta.env.VITE_TEST_ADMIN_PASSWORD;
+                    if (email && password) {
+                      setEmail(email);
+                      setPassword(password);
+                    } else {
+                      alert('Skonfiguruj VITE_TEST_ADMIN_EMAIL i VITE_TEST_ADMIN_PASSWORD w pliku .env');
+                    }
                   }}
                   className="w-full bg-purple-100 text-purple-800 py-2 px-4 rounded border border-purple-300 hover:bg-purple-200 text-sm font-medium transition-colors"
                 >
@@ -365,8 +377,8 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
               </div>
             </div>
           )}
-        </form>
-      </div>
-    </div>
+        </form >
+      </div >
+    </div >
   );
 }

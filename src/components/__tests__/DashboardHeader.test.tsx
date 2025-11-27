@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { DashboardHeader } from '../DashboardHeader';
 import { BrowserRouter } from 'react-router-dom';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
 describe('DashboardHeader', () => {
     it('renders user name correctly', () => {
@@ -12,13 +12,10 @@ describe('DashboardHeader', () => {
                     userNick="TestUser"
                     userName="Jan Testowy"
                     userRole="user"
-                    searchQuery=""
-                    setSearchQuery={() => { }}
                     onOpenSidebar={() => { }}
                     onSignOut={() => { }}
                     onOpenAdmin={() => { }}
                     onOpenAddResource={() => { }}
-                    onOpenYouTube={() => { }}
                 />
             </BrowserRouter>
         );
@@ -34,13 +31,10 @@ describe('DashboardHeader', () => {
                     userNick=""
                     userName=""
                     userRole=""
-                    searchQuery=""
-                    setSearchQuery={() => { }}
                     onOpenSidebar={() => { }}
                     onSignOut={() => { }}
                     onOpenAdmin={() => { }}
                     onOpenAddResource={() => { }}
-                    onOpenYouTube={() => { }}
                 />
             </BrowserRouter>
         );
