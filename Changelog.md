@@ -9,6 +9,15 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 - `uploadResourceThumbnail` logic in the service layer.
 - Image display handling in `ResourceCard`.
 
+## [1.5.0] - 2025-11-27
+**Added**
+- **Automated Testing**: Setup Vitest + React Testing Library.
+- **UI**: Clear button ("X") in search inputs.
+- **Components**: `TopicTree` component for hierarchical navigation.
+
+**Changed**
+- **Refactor**: Split `Dashboard.tsx` into smaller components (`DashboardHeader`, `DashboardGrid`) and hooks (`useDashboardData`, `useDashboardFilters`).
+
 ## [1.4.0] - 2025-11-27
 **Added**
 - **AI Tutor**: Interactive chat assistant powered by Google Gemini (Edge Function).

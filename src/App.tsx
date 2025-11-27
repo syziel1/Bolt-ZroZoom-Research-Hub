@@ -6,6 +6,7 @@ import { LandingPage } from './components/LandingPage';
 import { AuthForm } from './components/AuthForm';
 import { Dashboard } from './components/Dashboard';
 import { MarkdownPage } from './components/MarkdownPage';
+import { HelpPage } from './pages/HelpPage';
 import { Loader } from 'lucide-react';
 
 function AppRoutes({ session }: { session: Session | null }) {
@@ -20,6 +21,12 @@ function AppRoutes({ session }: { session: Session | null }) {
       <Route path="/zasoby/:subjectSlug" element={<Dashboard />} />
       <Route path="/zasoby/:subjectSlug/:topicSlug" element={<Dashboard />} />
       <Route path="/zasoby/:subjectSlug/:topicSlug/:subtopicSlug" element={<Dashboard />} />
+
+      {/* Help routes */}
+      <Route path="/pomoc" element={<HelpPage />} />
+      <Route path="/pomoc/:slug" element={<HelpPage />} />
+
+      {/* Static pages */}
       <Route path="/o-nas" element={<MarkdownPage fileName="about.md" />} />
       <Route path="/polityka-prywatnosci" element={<MarkdownPage fileName="privacy.md" />} />
 

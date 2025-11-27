@@ -21,12 +21,11 @@ type DashboardProps = {
 export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardProps) {
   const navigate = useNavigate();
 
-  // Check auth session (simplified as it was in original, but could be moved to a context)
+  // Check auth session
   const [session, setSession] = useState<any>(null);
   const [sessionChecked, setSessionChecked] = useState(false);
   const isGuestMode = sessionChecked ? !session : propIsGuestMode;
 
-  // Ideally this session check should be in a higher level provider, but keeping it here for now to minimize scope creep
   useState(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -219,8 +218,9 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
           isOpen={isDetailModalOpen}
           onClose={handleCloseDetailModal}
           resource={selectedResource}
-          onEdit={handleEditResource}
           onResourceUpdated={refreshData}
+          isGuestMode={isGuestMode}
+          onEdit={handleEditResource}
         />
         <YouTubeSearchModal
           isOpen={isYouTubeModalOpen}
@@ -235,7 +235,6 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
 
   return (
     <div className="flex h-screen bg-gray-50">
-
       <Sidebar
         subjects={subjects}
         topicNodes={topicNodes}
@@ -325,6 +324,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
               <p className="mb-2">Szkoła Przyszłości z AI - Twoja baza wiedzy edukacyjnej</p>
               <div className="flex justify-center gap-4 mb-2 text-xs text-gray-500">
                 <button onClick={() => navigate('/o-nas')} className="hover:text-gray-700 transition-colors">O nas</button>
+                <button onClick={() => navigate('/pomoc')} className="hover:text-gray-700 transition-colors">Pomoc</button>
                 <button onClick={() => navigate('/polityka-prywatnosci')} className="hover:text-gray-700 transition-colors">Polityka Prywatności</button>
               </div>
               <p className="text-xs text-gray-500">
@@ -333,7 +333,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
             </div>
           </footer>
         </main>
-      </div >
+      </div>
 
       {!isGuestMode && (
         <AddResourceModal
@@ -346,8 +346,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
           initialData={editingResource}
           prefillData={prefilledResource}
         />
-      )
-      }
+      )}
 
       <ResourceDetailModal
         isOpen={isDetailModalOpen}

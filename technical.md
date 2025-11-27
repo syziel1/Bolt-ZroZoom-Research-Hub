@@ -6,11 +6,20 @@ Minimalna dokumentacja techniczna dla repozytorium.
 
 ## 1. Architektura
 - **Backend / DB:** Supabase (PostgreSQL + Auth + RLS)
-- **Frontend:** Next.js / React (np. bolt.new) — czytelne API przez supabase-js
+- **Frontend:** Next.js / React (Vite) — modułowa architektura z custom hookami (`useDashboardData`, `useDashboardFilters`)
 - **Routing:** React Router DOM — deklaratywne routy, protected routes
 - **Publiczne odczytywanie:** materiały, tematy, poziomy, przedmioty
 - **Modyfikacje:** tylko zalogowani użytkownicy (z RLS)
 - **AI:** Supabase Edge Functions + Google Gemini API
+
+## 1a. Role i Uprawnienia
+- **admin**: Pełny dostęp do edycji, usuwania i zarządzania treścią.
+- **user**: Może dodawać zasoby, oceniać i komentować.
+- **guest** (niezalogowany):
+  - Może wyłącznie przeszukiwać i przeglądać zasoby.
+  - **Nie może** dodawać ani modyfikować zasobów.
+  - **Nie może** oceniać, komentować ani dodawać do ulubionych.
+  - Każdy zasób w systemie musi mieć przypisanego autora (`contributor_id`).
 
 ---
 
@@ -91,22 +100,6 @@ Minimalna dokumentacja techniczna dla repozytorium.
 ## 3. Polityki RLS (skrót)
 
 ### Public SELECT
-- subjects, topics, levels → pełny dostęp odczytu
-- resources → SELECT dla wszystkich
-
-### INSERT — tylko WITH CHECK
-- użytkownik może dodać rekord tylko z własnym `author_id` / `contributor_id`
-
-### UPDATE / DELETE
-- użytkownik modyfikuje **wyłącznie własne** materiały, oceny i komentarze
-
-### Admin / service_role
-- pełny dostęp do subjects, topics, levels (zarządzanie słownikami)
-
-### Optymalizacja
-- wszystkie `auth.uid()` i `auth.role()` zapisane jako:
-  ```sql
-  (select auth.uid())
   (select auth.role())
   ```
 - widoki używają `SQL SECURITY INVOKER`
@@ -177,6 +170,25 @@ Minimalna dokumentacja techniczna dla repozytorium.
 - **Input:** Query string
 - **Output:** Znormalizowana lista wideo (JSON)
 - **Env:** `YOUTUBE_API_KEY`
+
+---
+
+## 10. Testowanie
+
+### Stack testowy
+- **Runner:** Vitest (kompatybilny z Vite)
+- **Environment:** jsdom (symulacja przeglądarki)
+- **Utilities:** React Testing Library (testowanie komponentów z perspektywy użytkownika)
+
+### Struktura testów
+- Testy znajdują się w katalogu `src/components/__tests__/` (lub obok komponentów)
+- Plik konfiguracyjny: `src/test/setup.ts` (rozszerza matchery `jest-dom`)
+
+### Uruchamianie
+```bash
+npm test        # Uruchomienie wszystkich testów
+npm test -- ui  # Uruchomienie z interfejsem graficznym Vitest
+```
 
 ---
 

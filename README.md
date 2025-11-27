@@ -38,6 +38,7 @@ ZroZoom Research Hub to platforma do gromadzenia, organizowania i udostępniania
 - 🔗 Routing z URL parametrami
 - 🤖 AI Tutor - inteligentny asystent edukacyjny (Gemini 2.5 Flash)
 - 🎥 Wyszukiwanie wideo (YouTube API)
+- 🧪 Automatyczne testy komponentów (Vitest)
 
 ### Dla zalogowanych użytkowników
 - ➕ Dodawanie nowych zasobów
@@ -60,6 +61,7 @@ ZroZoom Research Hub to platforma do gromadzenia, organizowania i udostępniania
 - **Lucide React** - ikony
 - **React Router DOM** - routing i nawigacja
 - **React Markdown** + **Katex** - renderowanie treści AI
+- **Vitest** + **React Testing Library** - testy automatyczne
 
 ### Backend
 - **Supabase** - Backend-as-a-Service
@@ -161,6 +163,11 @@ npm run lint
 npm run typecheck
 ```
 
+### Testy automatyczne
+```bash
+npm test
+```
+
 ## 📁 Struktura projektu
 
 ```text
@@ -168,17 +175,25 @@ Bolt-ZroZoom-Research-Hub/
 ├── src/
 │   ├── components/          # Komponenty React
 │   │   ├── AuthForm.tsx     # Formularz logowania/rejestracji
-│   │   ├── Dashboard.tsx    # Główny widok aplikacji
+│   │   ├── Dashboard.tsx    # Główny widok (kontener)
+│   │   ├── DashboardHeader.tsx # Nagłówek dashboardu
+│   │   ├── DashboardGrid.tsx   # Siatka zasobów
 │   │   ├── Sidebar.tsx      # Boczne menu z filtrami
+│   │   ├── TopicTree.tsx    # Drzewo tematów
 │   │   ├── ResourceCard.tsx # Karta pojedynczego zasobu
+│   │   ├── YouTubeSearchModal.tsx # Modal wyszukiwania YouTube
 │   │   ├── AddResourceModal.tsx
 │   │   ├── ResourceDetailModal.tsx
 │   │   ├── AdminPanel.tsx
 │   │   └── LandingPage.tsx
 │   ├── hooks/               # Custom React hooks
+│   │   ├── useDashboardData.ts    # Logika pobierania danych
+│   │   ├── useDashboardFilters.ts # Logika filtrowania
 │   │   └── useTopics.ts     # Hook do zarządzania tematami
 │   ├── lib/                 # Biblioteki i konfiguracja
 │   │   └── supabase.ts      # Klient Supabase + typy
+│   ├── test/                # Konfiguracja testów
+│   │   └── setup.ts         # Setup Vitest
 │   ├── App.tsx              # Główny komponent aplikacji
 │   ├── main.tsx             # Entry point
 │   └── index.css            # Globalne style
