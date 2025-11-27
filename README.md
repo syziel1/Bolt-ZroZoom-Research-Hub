@@ -36,6 +36,7 @@ Szkoła Przyszłości z AI to platforma do gromadzenia, organizowania i udostęp
 - 🔍 Wyszukiwanie pełnotekstowe (klient)
 - 🃏 Różne widoki kart (Hero, Lista, Siatka)
 - 🔗 Routing z URL parametrami
+- 🌓 Tryb ciemny (Dark Mode) z wykrywaniem ustawień systemowych (beta)
 
 ### Dla zalogowanych użytkowników
 - ➕ Dodawanie nowych zasobów
@@ -176,20 +177,6 @@ Szkola-Przyszlosci-AI/
 │   │   ├── DashboardHeader.tsx # Nagłówek dashboardu
 │   │   ├── DashboardGrid.tsx   # Siatka zasobów
 │   │   ├── Sidebar.tsx      # Boczne menu z filtrami
-│   │   ├── TopicTree.tsx    # Drzewo tematów
-│   │   ├── ResourceCard.tsx # Karta pojedynczego zasobu
-│   │   ├── YouTubeSearchModal.tsx # Modal wyszukiwania YouTube
-│   │   ├── AddResourceModal.tsx
-│   │   ├── ResourceDetailModal.tsx
-│   │   ├── AdminPanel.tsx
-│   │   └── LandingPage.tsx
-│   ├── hooks/               # Custom React hooks
-│   │   ├── useDashboardData.ts    # Logika pobierania danych
-│   │   ├── useDashboardFilters.ts # Logika filtrowania
-│   │   └── useTopics.ts     # Hook do zarządzania tematami
-│   ├── lib/                 # Biblioteki i konfiguracja
-│   │   └── supabase.ts      # Klient Supabase + typy
-│   ├── test/                # Konfiguracja testów
 │   │   └── setup.ts         # Setup Vitest
 │   ├── App.tsx              # Główny komponent aplikacji
 │   ├── main.tsx             # Entry point

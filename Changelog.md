@@ -9,6 +9,17 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 - `uploadResourceThumbnail` logic in the service layer.
 - Image display handling in `ResourceCard`.
 
+## [1.7.0] - 2025-11-27
+**Added**
+- **Dark Mode**: Full dark mode support with system preference detection and manual toggle.
+- **ThemeContext**: Global theme management (`light`, `dark`, `system`).
+- **UI**: Theme toggle in Dashboard Header and Sidebar.
+
+**Changed**
+- **Landing Page**: Replaced "Latest Resources" with "Top Rated Resources" (sorted by `avg_usefulness`).
+- **Landing Page**: Restored original Hero section design with dynamic motto.
+- **Styling**: Updated scrollbars to match dark mode theme.
+
 ## [1.6.1] - 2025-11-27
 **Added**
 - **Footer Component**: Reusable footer with theme support (light/dark).

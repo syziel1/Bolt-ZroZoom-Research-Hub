@@ -197,3 +197,16 @@ Minimalna dokumentacja techniczna dla repozytorium.
 ---
 
 Dokument gotowy do umieszczenia w głównym repozytorium jako `technical.md`.
+
+---
+
+## 10. UI & Theming
+
+### Dark Mode
+- **Implementacja:** `ThemeContext` + Tailwind CSS `darkMode: 'class'`
+- **Storage:** `localStorage` (klucz: `vite-ui-theme`)
+- **Tryby:** `light`, `dark`, `system` (auto-wykrywanie do dopracowania i testowania)
+
+### Style
+- **Tailwind:** Globalne style w `index.css` dla scrollbarów i podstawowych elementów.
+- **Komponenty:** Wszystkie komponenty wspierają klasy `dark:` dla spójnego wyglądu.
