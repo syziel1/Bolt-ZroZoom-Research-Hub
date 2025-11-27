@@ -5,7 +5,7 @@ import { supabase, Resource, Subject, ResourceTopic, ResourceLevel } from '../li
 import { ResourceCard } from './ResourceCard';
 import { Navigation } from './Navigation';
 import { Footer } from './Footer';
-import { BookOpen, Layers, TrendingUp, Award, Sparkles, ArrowRight, Calculator, Globe, Clock, Languages, Code, Palette, Dumbbell, Music, Microscope, Atom, Beaker, ChevronDown, ShieldCheck, Users, Search, LayoutDashboard } from 'lucide-react';
+import { BookOpen, Layers, Award, Sparkles, ArrowRight, Calculator, Globe, Clock, Languages, Code, Palette, Dumbbell, Music, Microscope, Atom, Beaker, ChevronDown, ShieldCheck, Users, Search, LayoutDashboard, Star } from 'lucide-react';
 import { SEO } from './SEO';
 
 type Stats = {
@@ -133,7 +133,8 @@ export function LandingPage() {
         supabase
           .from('v_resources_full')
           .select('*')
-          .order('created_at', { ascending: false }),
+          .order('avg_usefulness', { ascending: false })
+          .limit(4),
       ]);
 
       setStats({
@@ -288,7 +289,7 @@ export function LandingPage() {
               className="flex flex-col items-center gap-2 text-white/80 hover:text-white transition-colors animate-fade-in-up mx-auto"
               style={{ animationDelay: '0.7s', opacity: 0 }}
             >
-              <span className="text-sm font-medium">Zobacz ostatnio dodane materiały</span>
+              <span className="text-sm font-medium">Zobacz najwyżej oceniane materiały</span>
               <ChevronDown size={32} className="animate-bounce" />
             </button>
           </div>
@@ -368,10 +369,10 @@ export function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center justify-center gap-3">
-              <TrendingUp size={32} className="text-blue-600 dark:text-blue-400" />
-              Ostatnio dodane materiały
+              <Star size={32} className="text-yellow-500 fill-yellow-500" />
+              Najwyżej oceniane materiały
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400">Odkryj najnowsze zasoby dodane przez społeczność</p>
+            <p className="text-lg text-gray-600 dark:text-gray-400">Odkryj najlepiej oceniane zasoby przez społeczność</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -470,8 +471,6 @@ export function LandingPage() {
           )}
         </div>
       </section>
-
-
 
       <section className="py-20 px-4 bg-gradient-to-br from-blue-600 to-blue-700 text-white">
         <div className="max-w-4xl mx-auto text-center">

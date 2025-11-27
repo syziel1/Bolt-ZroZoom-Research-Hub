@@ -66,16 +66,16 @@ export function DashboardGrid({
             {/* Sorting dropdown */}
             {hasActiveFilters && filteredResources.length > 0 && (
                 <div className="mb-4 flex items-center justify-between">
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
                         Znaleziono {filteredResources.length} {filteredResources.length === 1 ? 'zasób' : filteredResources.length < 5 ? 'zasoby' : 'zasobów'}
                     </p>
                     <div className="flex items-center gap-2">
-                        <label htmlFor="sort" className="text-sm text-gray-600">Sortuj:</label>
+                        <label htmlFor="sort" className="text-sm text-gray-600 dark:text-gray-400">Sortuj:</label>
                         <select
                             id="sort"
                             value={sortBy}
                             onChange={(e) => setSortBy(e.target.value as SortOption)}
-                            className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="px-3 py-1.5 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                         >
                             <option value="newest">Najnowsze</option>
                             <option value="rating">Najlepiej oceniane</option>
@@ -88,7 +88,7 @@ export function DashboardGrid({
 
             {!hasActiveFilters && recentlyAddedResources.length > 0 && (
                 <div className="mb-8">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Ostatnio dodane</h2>
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Ostatnio dodane</h2>
                     <div className="grid gap-4 md:gap-6" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))' }}>
                         {recentlyAddedResources.map((resource) => (
                             <ResourceCard
@@ -108,10 +108,10 @@ export function DashboardGrid({
             )}
 
             <div className="mb-4">
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
                     {hasActiveFilters ? 'Wyniki filtrowania' : 'Wszystkie zasoby'}
                 </h2>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
                     Wyświetlanie zasobów {sortedResources.length > 0 ? indexOfFirstResource + 1 : 0}-{Math.min(indexOfLastResource, sortedResources.length)} spośród {sortedResources.length} znalezionych materiałów
                 </p>
             </div>
@@ -184,7 +184,7 @@ export function DashboardGrid({
             )}
 
             {filteredResources.length === 0 && (
-                <div className="text-center py-12 text-gray-500 flex flex-col items-center gap-4">
+                <div className="text-center py-12 text-gray-500 dark:text-gray-400 flex flex-col items-center gap-4">
                     <p>Nie znaleziono zasobów pasujących do filtrów</p>
                     {searchQuery && (
                         <button
