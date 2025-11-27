@@ -147,16 +147,16 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900">
       <SEO
         title={isLogin ? "Logowanie" : "Rejestracja"}
         description="Zaloguj się lub zarejestruj, aby uzyskać dostęp do pełnej bazy wiedzy i funkcji społecznościowych."
       />
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+      <div className="max-w-md w-full bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8">
         {(onBack || true) && (
           <button
             onClick={() => onBack ? onBack() : navigate('/')}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
+            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 mb-6 transition-colors"
           >
             <ArrowLeft size={20} />
             Powrót do strony głównej
@@ -164,13 +164,13 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
         )}
 
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Szkoła Przyszłości z AI</h1>
-          <p className="text-gray-600 mt-2">Edukacja z wykorzystaniem sztucznej inteligencji</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Szkoła Przyszłości z AI</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">Edukacja z wykorzystaniem sztucznej inteligencji</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Email
             </label>
             <input
@@ -179,14 +179,14 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100"
             />
           </div>
 
           {!isLogin && (
             <>
               <div>
-                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Imię i Nazwisko / Nazwa (opcjonalnie)
                 </label>
                 <input
@@ -194,13 +194,13 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100"
                   placeholder="np. Jan Kowalski"
                 />
               </div>
 
               <div>
-                <label htmlFor="nick" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="nick" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Pseudonim (wymagany)
                 </label>
                 <div className="flex gap-2">
@@ -210,19 +210,19 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
                     value={nick}
                     onChange={(e) => setNick(e.target.value)}
                     required
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100"
                     placeholder="Unikalny identyfikator"
                   />
                   <button
                     type="button"
                     onClick={generateNick}
-                    className="px-3 py-2 bg-gray-100 text-gray-600 rounded-md hover:bg-gray-200 border border-gray-300 text-sm whitespace-nowrap"
+                    className="px-3 py-2 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 border border-gray-300 dark:border-slate-600 text-sm whitespace-nowrap"
                     title="Wygeneruj z nazwy lub emaila"
                   >
                     Generuj
                   </button>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   Będzie widoczny dla innych użytkowników
                 </p>
               </div>
@@ -230,7 +230,7 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
           )}
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Hasło
             </label>
             <input
@@ -240,12 +240,12 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100"
             />
           </div>
 
           {error && (
-            <div className="text-red-600 text-sm bg-red-50 p-3 rounded-md">
+            <div className="text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/30 p-3 rounded-md border border-red-200 dark:border-red-800">
               {error}
             </div>
           )}
@@ -253,7 +253,7 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center gap-2"
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 dark:disabled:bg-slate-600 flex items-center justify-center gap-2"
           >
             {loading ? (
               'Ładowanie...'
@@ -272,10 +272,10 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
+              <div className="w-full border-t border-gray-300 dark:border-slate-600"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">lub</span>
+              <span className="px-2 bg-white dark:bg-slate-800 text-gray-500 dark:text-gray-400">lub</span>
             </div>
           </div>
 
@@ -283,7 +283,7 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
             type="button"
             onClick={handleGoogleLogin}
             disabled={googleLoading || loading}
-            className="w-full bg-white text-gray-700 py-2 px-4 rounded-md border border-gray-300 hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed flex items-center justify-center gap-3 transition-colors"
+            className="w-full bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-200 py-2 px-4 rounded-md border border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-600 disabled:bg-gray-100 dark:disabled:bg-slate-800 disabled:cursor-not-allowed flex items-center justify-center gap-3 transition-colors"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -309,7 +309,7 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
           <button
             type="button"
             onClick={() => setIsLogin(!isLogin)}
-            className="w-full text-blue-600 hover:text-blue-800 text-sm mt-4"
+            className="w-full text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm mt-4"
           >
             {isLogin ? "Nie masz konta? Zarejestruj się" : 'Masz już konto? Zaloguj się'}
           </button>
@@ -337,8 +337,8 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
            * Note: This feature is automatically removed in production builds.
            */}
           {import.meta.env.DEV && (
-            <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-              <div className="text-xs font-bold text-yellow-800 uppercase mb-3">
+            <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
+              <div className="text-xs font-bold text-yellow-800 dark:text-yellow-200 uppercase mb-3">
                 🚧 Developer Mode Only
               </div>
               <div className="space-y-2">
@@ -354,7 +354,7 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
                       alert('Skonfiguruj VITE_TEST_EMAIL i VITE_TEST_PASSWORD w pliku .env');
                     }
                   }}
-                  className="w-full bg-yellow-100 text-yellow-800 py-2 px-4 rounded border border-yellow-300 hover:bg-yellow-200 text-sm font-medium transition-colors"
+                  className="w-full bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 py-2 px-4 rounded border border-yellow-300 dark:border-yellow-700 hover:bg-yellow-200 dark:hover:bg-yellow-900/60 text-sm font-medium transition-colors"
                 >
                   🎓 Auto-fill Test Student
                 </button>
@@ -370,7 +370,7 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
                       alert('Skonfiguruj VITE_TEST_ADMIN_EMAIL i VITE_TEST_ADMIN_PASSWORD w pliku .env');
                     }
                   }}
-                  className="w-full bg-purple-100 text-purple-800 py-2 px-4 rounded border border-purple-300 hover:bg-purple-200 text-sm font-medium transition-colors"
+                  className="w-full bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-200 py-2 px-4 rounded border border-purple-300 dark:border-purple-700 hover:bg-purple-200 dark:hover:bg-purple-900/60 text-sm font-medium transition-colors"
                 >
                   👑 Auto-fill Test Admin
                 </button>

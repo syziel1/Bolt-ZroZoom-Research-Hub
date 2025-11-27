@@ -32,30 +32,30 @@ export function EntityTable<T extends BaseEntity>({
     const totalColumns = 2 + columns.length; // order + columns + actions
 
     return (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-slate-700">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+                <thead className="bg-gray-50 dark:bg-slate-900/50">
                     <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                             Kolejność
                         </th>
                         {columns.map((col) => (
                             <th
                                 key={col.key}
-                                className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase ${col.className || ''}`}
+                                className={`px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase ${col.className || ''}`}
                             >
                                 {col.label}
                             </th>
                         ))}
-                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                             Akcje
                         </th>
                     </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
                     {entities.length === 0 ? (
                         <tr>
-                            <td colSpan={totalColumns} className="px-6 py-8 text-center text-gray-500">
+                            <td colSpan={totalColumns} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
                                 {emptyMessage}
                             </td>
                         </tr>
@@ -78,10 +78,10 @@ export function EntityTable<T extends BaseEntity>({
                                                     onChange={(e) =>
                                                         onFormChange({ ...formData, [col.key]: e.target.value })
                                                     }
-                                                    className="w-full px-2 py-1 border border-gray-300 rounded"
+                                                    className="w-full px-2 py-1 border border-gray-300 dark:border-slate-600 rounded bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                 />
                                             ) : (
-                                                <span className="text-sm text-gray-900">
+                                                <span className="text-sm text-gray-900 dark:text-gray-100">
                                                     {String(entity[col.key] || '')}
                                                 </span>
                                             )}

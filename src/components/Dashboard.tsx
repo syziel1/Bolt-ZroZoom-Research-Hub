@@ -181,21 +181,21 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
 
   if (showAdminPanel && isAdmin) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="bg-white border-b border-gray-200 px-4 md:px-8 py-4">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+        <div className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 px-4 md:px-8 py-4">
           <div className="flex items-center justify-between max-w-7xl mx-auto">
-            <h1 className="text-xl md:text-2xl font-bold text-gray-900">Szkoła Przyszłości z AI</h1>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100">Szkoła Przyszłości z AI</h1>
             <div className="flex items-center gap-2 md:gap-4">
               <button
                 onClick={() => setShowAdminPanel(false)}
-                className="text-blue-600 hover:text-blue-800 flex items-center gap-2 text-sm md:text-base"
+                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex items-center gap-2 text-sm md:text-base"
               >
                 <span className="hidden md:inline">Powrót do pulpitu</span>
                 <span className="md:hidden">Powrót</span>
               </button>
               <button
                 onClick={handleSignOut}
-                className="text-gray-600 hover:text-gray-900 flex items-center gap-2 text-sm md:text-base"
+                className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 flex items-center gap-2 text-sm md:text-base"
               >
                 <LogOut size={20} />
                 <span className="hidden md:inline">Wyloguj się</span>
@@ -237,7 +237,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50 dark:bg-slate-900">
       <SEO
         title="Pulpit - Przeglądaj zasoby"
         description="Przeglądaj tysiące materiałów edukacyjnych, filtruj po przedmiotach i poziomach. Dołącz do społeczności Szkoły Przyszłości z AI."
@@ -283,11 +283,11 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
 
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
           {isGuestMode && (
-            <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="mb-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
               <div className="flex items-start gap-3">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-blue-900 mb-1">Przeglądasz jako gość</h3>
-                  <p className="text-sm text-blue-700">
+                  <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">Przeglądasz jako gość</h3>
+                  <p className="text-sm text-blue-700 dark:text-blue-300">
                     Zaloguj się, aby dodawać własne materiały, oceniać zasoby i mieć dostęp do dodatkowych funkcji.
                   </p>
                 </div>

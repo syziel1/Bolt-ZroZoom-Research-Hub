@@ -1,5 +1,6 @@
 import { Menu, ArrowLeft, LogOut, Settings, Plus, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { ThemeToggle } from './ThemeToggle';
 
 type DashboardHeaderProps = {
     isGuestMode: boolean;
@@ -69,10 +70,10 @@ export function DashboardHeader({
                     ) : (
                         <>
                             <div className="flex flex-col items-end mr-4 hidden md:flex">
-                                <span className="text-lg font-bold text-gray-800">
+                                <span className="text-lg font-bold text-gray-800 dark:text-gray-100">
                                     Witaj, {userName ? userName.split(' ')[0] : userNick}
                                 </span>
-                                <span className="text-xs font-medium text-blue-600">
+                                <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
                                     {(() => {
                                         const date = new Date();
                                         const day = date.getDay();
@@ -85,6 +86,7 @@ export function DashboardHeader({
                                     })()}
                                 </span>
                             </div>
+                            <ThemeToggle />
                             {isAdmin && (
                                 <button
                                     onClick={onOpenAdmin}

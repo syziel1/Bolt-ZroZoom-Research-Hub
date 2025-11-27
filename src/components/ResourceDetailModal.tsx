@@ -296,21 +296,21 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
   const embedUrl = getYouTubeEmbedUrl(resource.url);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-900">Szczegóły zasobu</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+      <div className="bg-white dark:bg-slate-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200 dark:border-slate-700">
+        <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 px-6 py-4 flex items-center justify-between z-10">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Szczegóły zasobu</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
           >
             <X size={24} />
           </button>
         </div>
 
         <div className="p-6">
-          <div className="flex items-start gap-6 mb-6">
-            <div className="flex-shrink-0 w-80 aspect-video bg-gradient-to-br from-gray-100 to-gray-50 rounded-lg border border-gray-200 shadow-sm flex items-center justify-center overflow-hidden">
+          <div className="flex flex-col md:flex-row items-start gap-6 mb-6">
+            <div className="flex-shrink-0 w-full md:w-80 aspect-video bg-gradient-to-br from-gray-100 to-gray-50 dark:from-slate-700 dark:to-slate-800 rounded-lg border border-gray-200 dark:border-slate-600 shadow-sm flex items-center justify-center overflow-hidden">
               {embedUrl ? (
                 <iframe
                   src={embedUrl}
@@ -326,18 +326,18 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                   className="w-full h-full object-contain"
                 />
               ) : (
-                <div className="bg-blue-50 p-6 rounded-lg flex items-center justify-center">
-                  <Icon size={48} className="text-blue-600" />
+                <div className="bg-blue-50 dark:bg-blue-900/30 p-6 rounded-lg flex items-center justify-center">
+                  <Icon size={48} className="text-blue-600 dark:text-blue-400" />
                 </div>
               )}
             </div>
-            <div className="flex-1">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+            <div className="flex-1 w-full">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                 {resource.title}
               </h3>
 
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-4">
-                <span className="px-2 py-1 bg-gray-100 rounded text-gray-700 font-medium">
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
+                <span className="px-2 py-1 bg-gray-100 dark:bg-slate-700 rounded text-gray-700 dark:text-gray-300 font-medium">
                   {resource.subject_name}
                 </span>
 
@@ -363,7 +363,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                 )}
 
                 {resource.ai_generated && (
-                  <span className="flex items-center gap-1 px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs font-medium border border-purple-200">
+                  <span className="flex items-center gap-1 px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-xs font-medium border border-purple-200 dark:border-purple-800">
                     <Sparkles size={12} />
                     AI
                   </span>
@@ -374,23 +374,25 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                 href={resource.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium shadow-sm hover:shadow"
               >
                 Otwórz zasób
                 <ExternalLink size={16} />
               </a>
             </div>
             {canEdit && (
-              <div className="flex gap-2">
+              <div className="flex gap-2 ml-auto">
                 <button
                   onClick={() => onEdit?.(resource)}
-                  className="text-blue-600 hover:text-blue-800 p-2"
+                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 p-2 transition-colors"
+                  title="Edytuj zasób"
                 >
                   <Edit size={20} />
                 </button>
                 <button
                   onClick={handleDeleteResourceClick}
-                  className="text-red-600 hover:text-red-800 p-2"
+                  className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 p-2 transition-colors"
+                  title="Usuń zasób"
                 >
                   <Trash2 size={20} />
                 </button>
@@ -400,8 +402,8 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
 
           {resource.description && (
             <div className="mb-6">
-              <h4 className="font-semibold text-gray-900 mb-2">Opis</h4>
-              <p className="text-gray-700">{resource.description}</p>
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Opis</h4>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{resource.description}</p>
             </div>
           )}
 
@@ -410,7 +412,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
               {resource.level_names?.map((level, idx) => (
                 <span
                   key={idx}
-                  className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full"
+                  className="px-3 py-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 text-sm rounded-full border border-gray-200 dark:border-slate-600"
                 >
                   {level}
                 </span>
@@ -421,7 +423,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                 {topics.map((topic) => (
                   <span
                     key={topic.topic_id}
-                    className="px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded"
+                    className="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm rounded border border-blue-100 dark:border-blue-800"
                   >
                     {topic.topic_name}
                   </span>
@@ -430,16 +432,16 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
             )}
           </div>
 
-          <div className="border-t border-gray-200 pt-6 mb-6">
+          <div className="border-t border-gray-200 dark:border-slate-700 pt-6 mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h4 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
                 <Star className="text-yellow-500 fill-yellow-500" size={20} />
                 Oceny ({ratings.length})
               </h4>
               {!isGuestMode && !userHasRated && (
                 <button
                   onClick={() => setShowRatingForm(!showRatingForm)}
-                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium transition-colors"
                 >
                   {showRatingForm ? 'Anuluj' : (userHasRated ? 'Edytuj ocenę' : 'Dodaj ocenę')}
                 </button>
@@ -447,10 +449,10 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
             </div>
 
             {showRatingForm && (
-              <div className="bg-gray-50 p-4 rounded-lg mb-4">
+              <div className="bg-gray-50 dark:bg-slate-900 p-4 rounded-lg mb-4 border border-gray-200 dark:border-slate-700">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Przydatność: {ratingData.usefulness}
                     </label>
                     <input
@@ -459,11 +461,11 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                       max="5"
                       value={ratingData.usefulness}
                       onChange={(e) => setRatingData({ ...ratingData, usefulness: parseInt(e.target.value) })}
-                      className="w-full"
+                      className="w-full accent-blue-600"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Poprawność: {ratingData.correctness}
                     </label>
                     <input
@@ -472,11 +474,11 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                       max="5"
                       value={ratingData.correctness}
                       onChange={(e) => setRatingData({ ...ratingData, correctness: parseInt(e.target.value) })}
-                      className="w-full"
+                      className="w-full accent-blue-600"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Dopasowanie trudności: {ratingData.difficulty}
                     </label>
                     <input
@@ -485,13 +487,13 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                       max="5"
                       value={ratingData.difficulty}
                       onChange={(e) => setRatingData({ ...ratingData, difficulty: parseInt(e.target.value) })}
-                      className="w-full"
+                      className="w-full accent-blue-600"
                     />
                   </div>
                   <button
                     onClick={handleSubmitRating}
                     disabled={submitting}
-                    className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
+                    className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
                   >
                     {submitting ? 'Wysyłanie...' : (userHasRated ? 'Zaktualizuj ocenę' : 'Wyślij ocenę')}
                   </button>
@@ -500,11 +502,11 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
             )}
 
             {userHasRated && !showRatingForm && (
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 Twoja ocena została zapisana.
                 <button
                   onClick={() => setShowRatingForm(true)}
-                  className="text-blue-600 hover:text-blue-800 ml-1 underline"
+                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 ml-1 underline"
                 >
                   Edytuj
                 </button>
@@ -513,14 +515,14 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
 
             <div className="space-y-3">
               {ratings.map((rating) => (
-                <div key={rating.id} className="bg-gray-50 p-3 rounded-lg">
+                <div key={rating.id} className="bg-gray-50 dark:bg-slate-900 p-3 rounded-lg border border-gray-100 dark:border-slate-700">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-900">{rating.author_nick}</span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{rating.author_nick}</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
                       {new Date(rating.created_at).toLocaleDateString()}
                     </span>
                   </div>
-                  <div className="flex gap-4 text-sm text-gray-700">
+                  <div className="flex flex-wrap gap-4 text-sm text-gray-700 dark:text-gray-300">
                     <span>Przydatność: {rating.rating_usefulness}/5</span>
                     <span>Poprawność: {rating.rating_correctness}/5</span>
                     {rating.difficulty_match && (
@@ -530,14 +532,14 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                 </div>
               ))}
               {ratings.length === 0 && (
-                <p className="text-sm text-gray-500">Brak ocen. Dodaj pierwszą ocenę!</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 italic">Brak ocen. Dodaj pierwszą ocenę!</p>
               )}
             </div>
           </div>
 
-          <div className="border-t border-gray-200 pt-6">
+          <div className="border-t border-gray-200 dark:border-slate-700 pt-6">
             <div className="flex items-center justify-between mb-4">
-              <h4 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
                 <MessageSquare size={20} />
                 Komentarze ({comments.length})
               </h4>
@@ -552,7 +554,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                       setShowCommentForm(true);
                     }
                   }}
-                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium transition-colors"
                 >
                   {showCommentForm ? 'Anuluj' : 'Dodaj komentarz'}
                 </button>
@@ -560,18 +562,18 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
             </div>
 
             {showCommentForm && (
-              <div className="bg-gray-50 p-4 rounded-lg mb-4">
+              <div className="bg-gray-50 dark:bg-slate-900 p-4 rounded-lg mb-4 border border-gray-200 dark:border-slate-700">
                 <textarea
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
                   placeholder="Podziel się swoimi przemyśleniami..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                   rows={3}
                 />
                 <button
                   onClick={handleSubmitComment}
                   disabled={submitting || !commentText.trim()}
-                  className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
+                  className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
                 >
                   {submitting ? 'Zapisywanie...' : (editingCommentId ? 'Zaktualizuj komentarz' : 'Opublikuj komentarz')}
                 </button>
@@ -580,11 +582,11 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
 
             <div className="space-y-3">
               {comments.map((comment) => (
-                <div key={comment.id} className="bg-gray-50 p-3 rounded-lg">
+                <div key={comment.id} className="bg-gray-50 dark:bg-slate-900 p-3 rounded-lg border border-gray-100 dark:border-slate-700">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-900">{comment.author_nick}</span>
+                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{comment.author_nick}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
                         {new Date(comment.created_at).toLocaleDateString()}
                       </span>
                       {(comment.author_id === currentUserId || currentUserRole === 'admin') && (
@@ -592,7 +594,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                           {comment.author_id === currentUserId && (
                             <button
                               onClick={() => handleEditCommentClick(comment)}
-                              className="text-blue-600 hover:text-blue-800"
+                              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                               title="Edytuj komentarz"
                             >
                               <Edit size={14} />
@@ -600,7 +602,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                           )}
                           <button
                             onClick={() => handleDeleteCommentClick(comment.id)}
-                            className="text-red-600 hover:text-red-800"
+                            className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                             title="Usuń komentarz"
                           >
                             <Trash2 size={14} />
@@ -609,11 +611,11 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                       )}
                     </div>
                   </div>
-                  <p className="text-sm text-gray-700">{comment.content}</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{comment.content}</p>
                 </div>
               ))}
               {comments.length === 0 && (
-                <p className="text-sm text-gray-500">Brak komentarzy. Rozpocznij rozmowę!</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 italic">Brak komentarzy. Rozpocznij rozmowę!</p>
               )}
             </div>
           </div>

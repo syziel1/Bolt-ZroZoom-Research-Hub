@@ -147,7 +147,7 @@ export function ThumbnailUploader({ onFileSelect, previewUrl, disabled, uploadin
     <>
       <div className="space-y-2">
         <div
-          className={`relative border-2 border-dashed rounded-lg p-4 transition-colors ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-gray-50'
+          className={`relative border-2 border-dashed rounded-lg p-4 transition-colors ${isDragActive ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900'
             } ${disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`}
           onClick={() => !disabled && fileInputRef.current?.click()}
           onPaste={onPaste}
@@ -164,22 +164,22 @@ export function ThumbnailUploader({ onFileSelect, previewUrl, disabled, uploadin
             disabled={disabled}
           />
           <div className="flex items-center gap-4">
-            <div className="w-64 aspect-video rounded-md bg-white border border-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+            <div className="w-64 aspect-video rounded-md bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 flex items-center justify-center overflow-hidden flex-shrink-0">
               {localPreview ? (
                 <img src={localPreview} alt="Podgląd miniatury" className="w-full h-full object-contain" />
               ) : (
-                <ImageIcon className="text-gray-400" size={48} />
+                <ImageIcon className="text-gray-400 dark:text-gray-500" size={48} />
               )}
             </div>
             <div className="flex-1 space-y-1">
-              <p className="text-sm text-gray-900 font-medium flex items-center gap-2">
-                <UploadCloud size={18} className="text-blue-600" />
+              <p className="text-sm text-gray-900 dark:text-gray-100 font-medium flex items-center gap-2">
+                <UploadCloud size={18} className="text-blue-600 dark:text-blue-400" />
                 Przeciągnij i upuść, wklej lub wybierz plik
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 Obsługiwane formaty: PNG, JPEG, WEBP. Maksymalny rozmiar: {Math.round(MAX_THUMBNAIL_SIZE / 1024 / 1024)} MB.
               </p>
-              <p className="text-xs text-blue-600 font-medium">
+              <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
                 <Crop size={12} className="inline mr-1" />
                 Obraz zostanie automatycznie wykadrowany w proporcjach 16:9
               </p>
@@ -191,7 +191,7 @@ export function ThumbnailUploader({ onFileSelect, previewUrl, disabled, uploadin
                     fileInputRef.current?.click();
                   }}
                   disabled={disabled}
-                  className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400"
+                  className="px-3 py-1.5 text-sm bg-blue-600 dark:bg-blue-500 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 disabled:bg-gray-400 dark:disabled:bg-slate-600 transition-colors"
                 >
                   Wybierz plik
                 </button>
@@ -204,7 +204,7 @@ export function ThumbnailUploader({ onFileSelect, previewUrl, disabled, uploadin
                         recropImage();
                       }}
                       disabled={disabled}
-                      className="px-3 py-1.5 text-sm border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 disabled:bg-gray-200 flex items-center gap-1"
+                      className="px-3 py-1.5 text-sm border border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-400 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/30 disabled:bg-gray-200 dark:disabled:bg-slate-700 flex items-center gap-1 transition-colors"
                     >
                       <Crop size={14} />
                       Wykadruj ponownie
@@ -213,20 +213,20 @@ export function ThumbnailUploader({ onFileSelect, previewUrl, disabled, uploadin
                       type="button"
                       onClick={removeSelection}
                       disabled={disabled}
-                      className="px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 disabled:bg-gray-200"
+                      className="px-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-slate-700 disabled:bg-gray-200 dark:disabled:bg-slate-700 transition-colors"
                     >
                       Usuń
                     </button>
                   </>
                 )}
-                {uploading && <span className="text-sm text-gray-500">Wysyłanie...</span>}
+                {uploading && <span className="text-sm text-gray-500 dark:text-gray-400">Wysyłanie...</span>}
               </div>
             </div>
           </div>
-          {disabled && <div className="absolute inset-0 bg-white/40 rounded-lg" />}
+          {disabled && <div className="absolute inset-0 bg-white/40 dark:bg-slate-900/40 rounded-lg" />}
         </div>
         {error && (
-          <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-100 rounded-md p-2">
+          <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-md p-2">
             <XCircle size={16} />
             <span>{error}</span>
           </div>

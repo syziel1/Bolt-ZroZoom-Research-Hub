@@ -166,7 +166,7 @@ export function AiAssistant({
     }
 
     return (
-        <div className="fixed bottom-6 right-6 w-full max-w-md bg-white rounded-2xl shadow-2xl border border-gray-200 z-50 flex flex-col overflow-hidden max-h-[600px] h-[80vh]">
+        <div className="fixed bottom-6 right-6 w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-slate-700 z-50 flex flex-col overflow-hidden max-h-[600px] h-[80vh]">
             {/* Header */}
             <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-4 flex items-center justify-between text-white">
                 <div className="flex items-center gap-2">
@@ -199,7 +199,7 @@ export function AiAssistant({
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-slate-900">
                 {messages.map((msg, idx) => (
                     <div
                         key={idx}
@@ -208,7 +208,7 @@ export function AiAssistant({
                         <div
                             className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm ${msg.role === 'user'
                                 ? 'bg-blue-600 text-white rounded-br-none'
-                                : 'bg-white text-gray-800 border border-gray-200 rounded-bl-none shadow-sm'
+                                : 'bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-slate-700 rounded-bl-none shadow-sm'
                                 }`}
                         >
                             {msg.role === 'assistant' ? (
@@ -223,14 +223,14 @@ export function AiAssistant({
                                         code: ({ node, ...props }) => {
                                             const isInline = !node?.position || node.position.start.line === node.position.end.line;
                                             return isInline
-                                                ? <code className="bg-purple-100 text-purple-800 px-1 py-0.5 rounded text-xs" {...props} />
-                                                : <code className="block bg-gray-100 p-2 rounded my-2 text-xs overflow-x-auto" {...props} />;
+                                                ? <code className="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 px-1 py-0.5 rounded text-xs" {...props} />
+                                                : <code className="block bg-gray-100 dark:bg-slate-900 p-2 rounded my-2 text-xs overflow-x-auto text-gray-800 dark:text-gray-200" {...props} />;
                                         },
-                                        strong: ({ children }) => <strong className="font-bold text-gray-900">{children}</strong>,
+                                        strong: ({ children }) => <strong className="font-bold text-gray-900 dark:text-gray-100">{children}</strong>,
                                         em: ({ children }) => <em className="italic">{children}</em>,
-                                        h1: ({ children }) => <h1 className="text-lg font-bold mb-2">{children}</h1>,
-                                        h2: ({ children }) => <h2 className="text-base font-bold mb-2">{children}</h2>,
-                                        h3: ({ children }) => <h3 className="text-sm font-bold mb-1">{children}</h3>,
+                                        h1: ({ children }) => <h1 className="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100">{children}</h1>,
+                                        h2: ({ children }) => <h2 className="text-base font-bold mb-2 text-gray-900 dark:text-gray-100">{children}</h2>,
+                                        h3: ({ children }) => <h3 className="text-sm font-bold mb-1 text-gray-900 dark:text-gray-100">{children}</h3>,
                                     }}
                                 >
                                     {msg.content}
@@ -243,7 +243,7 @@ export function AiAssistant({
                 ))}
                 {isLoading && (
                     <div className="flex justify-start">
-                        <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-none px-4 py-3 shadow-sm flex items-center gap-2">
+                        <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl rounded-bl-none px-4 py-3 shadow-sm flex items-center gap-2">
                             <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                             <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
                             <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
@@ -254,7 +254,7 @@ export function AiAssistant({
             </div>
 
             {/* Input */}
-            <div className="p-4 bg-white border-t border-gray-100">
+            <div className="p-4 bg-white dark:bg-slate-800 border-t border-gray-100 dark:border-slate-700">
                 <form
                     onSubmit={(e) => {
                         e.preventDefault();
@@ -267,7 +267,7 @@ export function AiAssistant({
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="Zapytaj o cokolwiek..."
-                        className="flex-1 px-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-50"
+                        className="flex-1 px-4 py-2 border border-gray-200 dark:border-slate-600 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                         disabled={isLoading}
                     />
                     <button
@@ -278,7 +278,7 @@ export function AiAssistant({
                         <Send size={20} />
                     </button>
                 </form>
-                <p className="text-[10px] text-gray-400 text-center mt-2">
+                <p className="text-[10px] text-gray-400 dark:text-gray-500 text-center mt-2">
                     AI (wersja Beta) może generować niedokładne informacje. Weryfikuj ważne dane.
                 </p>
             </div>

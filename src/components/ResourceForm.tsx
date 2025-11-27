@@ -451,18 +451,18 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
     <>
       <form onSubmit={handleSubmit} className="p-6 space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">{initialData ? 'Edytuj zasób' : 'Dodaj nowy zasób'}</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{initialData ? 'Edytuj zasób' : 'Dodaj nowy zasób'}</h2>
           <div className="flex gap-2">
             <button
               type="button"
               onClick={handleAiAnalysis}
               disabled={analyzing}
-              className="flex items-center gap-2 px-3 py-1.5 bg-purple-100 text-purple-700 rounded-md hover:bg-purple-200 transition-colors text-sm font-medium disabled:opacity-50"
+              className="flex items-center gap-2 px-3 py-1.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-md hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors text-sm font-medium disabled:opacity-50"
               title="Wypełnij automatycznie przy użyciu AI"
             >
               {analyzing ? (
                 <>
-                  <div className="animate-spin h-4 w-4 border-2 border-purple-700 border-t-transparent rounded-full"></div>
+                  <div className="animate-spin h-4 w-4 border-2 border-purple-700 dark:border-purple-300 border-t-transparent rounded-full"></div>
                   Analizuję...
                 </>
               ) : (
@@ -474,7 +474,7 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
             <button
               type="button"
               onClick={handleCancel}
-              className="text-gray-500 hover:text-gray-700"
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             >
               <X size={24} />
             </button>
@@ -494,7 +494,7 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
         />
 
         <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Tytuł *
           </label>
           <input
@@ -503,12 +503,12 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100"
           />
         </div>
 
         <div>
-          <label htmlFor="url" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="url" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             URL *
           </label>
           <input
@@ -517,12 +517,12 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100"
           />
         </div>
 
         <div>
-          <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Typ *
           </label>
           <select
@@ -530,7 +530,7 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
             value={type}
             onChange={(e) => setType(e.target.value)}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100"
           >
             <option value="article">Artykuł</option>
             <option value="video">Wideo</option>
@@ -543,7 +543,7 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
         </div>
 
         <div>
-          <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="subject" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Przedmiot *
           </label>
           <select
@@ -554,7 +554,7 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
               setSelectedTopics([]);
             }}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100"
           >
             <option value="">Wybierz przedmiot</option>
             {subjects.map((subject) => (
@@ -567,10 +567,10 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
 
         {subjectId && filteredTopics.length > 0 && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Tematy (opcjonalnie)
             </label>
-            <div className="border border-gray-300 rounded-md p-3 max-h-60 overflow-y-auto">
+            <div className="border border-gray-300 dark:border-slate-600 rounded-md p-3 max-h-60 overflow-y-auto bg-white dark:bg-slate-900">
               <TopicTree
                 nodes={topicTree}
                 selectedTopics={selectedTopics}
@@ -581,10 +581,10 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
         )}
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Poziomy (opcjonalnie)
           </label>
-          <div className="border border-gray-300 rounded-md p-3 max-h-40 overflow-y-auto space-y-2">
+          <div className="border border-gray-300 dark:border-slate-600 rounded-md p-3 max-h-40 overflow-y-auto space-y-2 bg-white dark:bg-slate-900">
             {levels.map((level) => (
               <label
                 key={level.id}
@@ -600,16 +600,16 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
                       setSelectedLevels(selectedLevels.filter((id) => id !== level.id));
                     }
                   }}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="rounded border-gray-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"
                 />
-                <span className="text-sm text-gray-700">{level.name}</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">{level.name}</span>
               </label>
             ))}
           </div>
         </div>
 
         <div>
-          <label htmlFor="language" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="language" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Język *
           </label>
           <select
@@ -617,7 +617,7 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100"
           >
             <option value="pl">Polski</option>
             <option value="en">English</option>
@@ -634,19 +634,19 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
               type="checkbox"
               checked={aiGenerated}
               onChange={(e) => setAiGenerated(e.target.checked)}
-              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              className="rounded border-gray-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"
             />
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Treść wygenerowana przez AI
             </span>
           </label>
-          <p className="text-xs text-gray-500 mt-1 ml-6">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-6">
             Zaznacz, jeśli zasób został stworzony lub znacząco wspomagany przez sztuczną inteligencję
           </p>
         </div>
 
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Opis (opcjonalnie)
           </label>
           <textarea
@@ -654,18 +654,18 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100"
           />
         </div>
 
         {error && (
-          <div className="text-red-600 text-sm bg-red-50 p-3 rounded-md">
+          <div className="text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 p-3 rounded-md">
             {error}
           </div>
         )}
 
         {successMessage && (
-          <div className="text-green-600 text-sm bg-green-50 p-3 rounded-md">
+          <div className="text-green-600 dark:text-green-400 text-sm bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800 p-3 rounded-md">
             {successMessage}
           </div>
         )}
@@ -674,14 +674,14 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
           <button
             type="submit"
             disabled={loading}
-            className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400"
+            className="flex-1 bg-blue-600 dark:bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 disabled:bg-gray-400 dark:disabled:bg-slate-600 transition-colors"
           >
             {loading ? 'Zapisywanie...' : (initialData ? 'Zaktualizuj zasób' : 'Zapisz zasób')}
           </button>
           <button
             type="button"
             onClick={handleCancel}
-            className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+            className="px-6 py-2 border border-gray-300 dark:border-slate-600 rounded-md hover:bg-gray-50 dark:hover:bg-slate-700 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 transition-colors"
           >
             Anuluj
           </button>

@@ -137,7 +137,7 @@ export function DashboardGrid({
                     <button
                         onClick={() => onPageChange(currentPage - 1)}
                         disabled={currentPage === 1}
-                        className="p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600"
+                        className="p-2 rounded-md border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600 dark:text-gray-300"
                     >
                         <ChevronLeft size={20} />
                     </button>
@@ -156,8 +156,8 @@ export function DashboardGrid({
                                         onClick={() => onPageChange(page)}
                                         className={`w-10 h-10 rounded-md flex-shrink-0 flex items-center justify-center text-sm font-medium transition-colors
                       ${currentPage === page
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                                                ? 'bg-blue-600 dark:bg-blue-500 text-white'
+                                                : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 border border-gray-300 dark:border-slate-600'
                                             }`}
                                     >
                                         {page}
@@ -167,7 +167,7 @@ export function DashboardGrid({
                                 page === currentPage - 2 ||
                                 page === currentPage + 2
                             ) {
-                                return <span key={page} className="w-10 h-10 flex items-center justify-center text-gray-400">...</span>;
+                                return <span key={page} className="w-10 h-10 flex items-center justify-center text-gray-400 dark:text-gray-500">...</span>;
                             }
                             return null;
                         })}
@@ -176,7 +176,7 @@ export function DashboardGrid({
                     <button
                         onClick={() => onPageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
-                        className="p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600"
+                        className="p-2 rounded-md border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600 dark:text-gray-300"
                     >
                         <ChevronRight size={20} />
                     </button>

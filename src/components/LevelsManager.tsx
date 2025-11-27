@@ -60,7 +60,7 @@ export function LevelsManager() {
     return (
         <div className="space-y-4">
             <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">Zarządzanie Poziomami</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Zarządzanie Poziomami</h2>
                 <button
                     onClick={() => setIsAdding(true)}
                     className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
@@ -71,15 +71,15 @@ export function LevelsManager() {
             </div>
 
             {error && (
-                <div className="bg-red-50 text-red-600 p-3 rounded-md">
+                <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-md border border-red-100 dark:border-red-800">
                     {error}
                     <button onClick={() => setError('')} className="ml-2 underline">Zamknij</button>
                 </div>
             )}
 
             {isAdding && (
-                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                    <h3 className="font-semibold mb-3">Nowy Poziom</h3>
+                <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg border border-gray-200 dark:border-slate-700">
+                    <h3 className="font-semibold mb-3 text-gray-900 dark:text-gray-100">Nowy Poziom</h3>
                     <EntityFormFields
                         formData={formData}
                         onChange={setFormData}
@@ -96,7 +96,7 @@ export function LevelsManager() {
                         </button>
                         <button
                             onClick={cancelEdit}
-                            className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 flex items-center gap-2"
+                            className="bg-gray-300 dark:bg-slate-600 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-md hover:bg-gray-400 dark:hover:bg-slate-500 flex items-center gap-2"
                         >
                             <X size={16} />
                             Anuluj
@@ -120,7 +120,7 @@ export function LevelsManager() {
                                     className="w-full px-2 py-1 border border-gray-300 rounded"
                                 />
                             ) : (
-                                <span className="text-sm font-medium text-gray-900">{entity.name}</span>
+                                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{entity.name}</span>
                             ),
                     },
                     {
@@ -135,7 +135,7 @@ export function LevelsManager() {
                                     className="w-full px-2 py-1 border border-gray-300 rounded"
                                 />
                             ) : (
-                                <span className="text-sm text-gray-500">{entity.slug}</span>
+                                <span className="text-sm text-gray-500 dark:text-gray-400">{entity.slug}</span>
                             ),
                     },
                 ]}

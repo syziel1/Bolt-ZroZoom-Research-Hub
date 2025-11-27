@@ -32,14 +32,14 @@ function TopicItem({ node, level, subjectId, onEdit, onDelete, onAddChild, onRel
     return (
         <div className="select-none">
             <div
-                className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-50 border border-transparent hover:border-gray-200 transition-colors"
+                className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-50 dark:hover:bg-slate-800 border border-transparent hover:border-gray-200 dark:hover:border-slate-700 transition-colors"
                 style={{ marginLeft: `${level * 24}px` }}
             >
                 <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
                     {hasChildren && (
                         <button
                             onClick={() => setIsExpanded(!isExpanded)}
-                            className="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                            className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
                             aria-label={isExpanded ? `Zwiń ${node.name}` : `Rozwiń ${node.name}`}
                         >
                             {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
@@ -48,28 +48,28 @@ function TopicItem({ node, level, subjectId, onEdit, onDelete, onAddChild, onRel
                 </div>
 
                 <div className="flex-1 min-w-0">
-                    <div className="font-medium text-gray-900">{node.name}</div>
-                    <div className="text-xs text-gray-500">{node.slug}</div>
+                    <div className="font-medium text-gray-900 dark:text-gray-100">{node.name}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">{node.slug}</div>
                 </div>
 
                 <div className="flex items-center gap-1">
                     <button
                         onClick={() => onAddChild(node.id)}
-                        className="p-1.5 text-green-600 hover:bg-green-50 rounded-md transition-colors"
+                        className="p-1.5 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-md transition-colors"
                         title="Dodaj podtemat"
                     >
                         <Plus size={16} />
                     </button>
                     <button
                         onClick={() => onEdit(node)}
-                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                        className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors"
                         title="Edytuj temat"
                     >
                         <Edit2 size={16} />
                     </button>
                     <button
                         onClick={() => onDelete(node.id, node.name)}
-                        className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                        className="p-1.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors"
                         title="Usuń temat"
                     >
                         <Trash2 size={16} />
@@ -320,7 +320,7 @@ export function TopicTreeManager() {
     return (
         <div className="space-y-4">
             <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">Zarządzanie Tematami</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Zarządzanie Tematami</h2>
                 <button
                     onClick={() => {
                         setIsAdding(true);
@@ -336,20 +336,20 @@ export function TopicTreeManager() {
             </div>
 
             {error && (
-                <div className="bg-red-50 text-red-600 p-3 rounded-md flex justify-between items-center">
+                <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-md flex justify-between items-center border border-red-100 dark:border-red-800">
                     <span>{error}</span>
-                    <button onClick={() => setError('')} className="text-red-800 hover:text-red-900 font-medium">
+                    <button onClick={() => setError('')} className="text-red-800 dark:text-red-300 hover:text-red-900 dark:hover:text-red-200 font-medium">
                         Zamknij
                     </button>
                 </div>
             )}
 
-            <div className="bg-white p-4 rounded-lg shadow">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Wybierz Przedmiot</label>
+            <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow border border-gray-200 dark:border-slate-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Wybierz Przedmiot</label>
                 <select
                     value={selectedSubjectId}
                     onChange={(e) => setSelectedSubjectId(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100"
                 >
                     <option value="">-- Wybierz przedmiot --</option>
                     {subjects.map((subject) => (
@@ -361,29 +361,29 @@ export function TopicTreeManager() {
             </div>
 
             {(isAdding || editingId) && (
-                <div className="bg-blue-50 p-4 rounded-lg border-2 border-blue-200">
-                    <h3 className="font-semibold mb-3 text-blue-900">
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border-2 border-blue-200 dark:border-blue-800">
+                    <h3 className="font-semibold mb-3 text-blue-900 dark:text-blue-100">
                         {editingId ? 'Edytuj Temat' : formData.parent_topic_id ? 'Nowy Podtemat' : 'Nowy Temat Główny'}
                     </h3>
                     <div className="space-y-3">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Nazwa</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nazwa</label>
                             <input
                                 type="text"
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                 placeholder="np. Algebra"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Slug</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Slug</label>
                             <input
                                 type="text"
                                 value={formData.slug}
                                 onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                                 placeholder="np. algebra"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100"
                             />
                         </div>
                         <div className="flex gap-2 pt-2">
@@ -396,7 +396,7 @@ export function TopicTreeManager() {
                             </button>
                             <button
                                 onClick={cancelForm}
-                                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 flex items-center gap-2 transition-colors"
+                                className="bg-gray-300 dark:bg-slate-600 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-md hover:bg-gray-400 dark:hover:bg-slate-500 flex items-center gap-2 transition-colors"
                             >
                                 <X size={16} />
                                 Anuluj
@@ -407,9 +407,9 @@ export function TopicTreeManager() {
             )}
 
             {selectedSubjectId && (
-                <div className="bg-white p-4 rounded-lg shadow">
+                <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow border border-gray-200 dark:border-slate-700">
                     {topics.length === 0 ? (
-                        <div className="text-center py-8 text-gray-500">
+                        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                             Brak tematów dla tego przedmiotu. Dodaj pierwszy temat.
                         </div>
                     ) : (

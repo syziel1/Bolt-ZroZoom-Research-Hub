@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Session } from '@supabase/supabase-js';
 import { supabase, Resource, Subject, ResourceTopic, ResourceLevel } from '../lib/supabase';
 import { ResourceCard } from './ResourceCard';
 import { Navigation } from './Navigation';
 import { Footer } from './Footer';
-import { BookOpen, Layers, TrendingUp, Award, Sparkles, ArrowRight, Calculator, Globe, Clock, Languages, Code, Palette, Dumbbell, Music, Microscope, Atom, Beaker, ChevronDown, ShieldCheck, Users, Search } from 'lucide-react';
+import { BookOpen, Layers, TrendingUp, Award, Sparkles, ArrowRight, Calculator, Globe, Clock, Languages, Code, Palette, Dumbbell, Music, Microscope, Atom, Beaker, ChevronDown, ShieldCheck, Users, Search, LayoutDashboard } from 'lucide-react';
 import { SEO } from './SEO';
 
 type Stats = {
@@ -15,6 +16,7 @@ type Stats = {
 
 export function LandingPage() {
   const navigate = useNavigate();
+  const [session, setSession] = useState<Session | null>(null);
   const [stats, setStats] = useState<Stats>({ topicsCount: 0, subjectsCount: 0, levelsCount: 0 });
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [latestResources, setLatestResources] = useState<Resource[]>([]);
@@ -62,7 +64,19 @@ export function LandingPage() {
   };
 
   useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
     loadLandingPageData();
+
+    return () => subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -210,22 +224,27 @@ export function LandingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 text-lg">Loading...</p>
+          <p className="text-gray-600 dark:text-gray-400 text-lg">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-slate-900">
       <SEO
         title="Darmowe zasoby edukacyjne: Matematyka, Fizyka, AI"
         description="Szkoła Przyszłości z AI to największa baza darmowych materiałów edukacyjnych. Przygotuj się do matury i egzaminu ósmoklasisty z pomocą sztucznej inteligencji."
       />
-      <Navigation onNavigateToAuth={() => navigate('/auth')} onScrollToSubjects={scrollToSubjects} onBrowseAsGuest={() => navigate('/zasoby')} />
+      <Navigation
+        onNavigateToAuth={() => navigate('/auth')}
+        onScrollToSubjects={scrollToSubjects}
+        onBrowseAsGuest={() => navigate('/zasoby')}
+        session={session}
+      />
       <section className="relative min-h-[70vh] bg-gradient-to-br from-violet-600 via-purple-600 to-violet-700 flex items-center justify-center px-4 pt-24 pb-12 overflow-hidden">
         <div className="max-w-6xl w-full text-center relative z-10">
           <div className="mb-8">
@@ -252,7 +271,7 @@ export function LandingPage() {
                   placeholder="Czego chcesz się dzisiaj nauczyć?"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-6 py-4 rounded-full text-gray-900 text-lg shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-400/50 pl-14"
+                  className="w-full px-6 py-4 rounded-full text-gray-900 dark:text-gray-100 bg-white dark:bg-slate-800 text-lg shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-400/50 pl-14 placeholder-gray-500 dark:placeholder-gray-400"
                 />
                 <Search className="absolute left-5 text-gray-400" size={24} />
                 <button
@@ -274,85 +293,85 @@ export function LandingPage() {
             </button>
           </div>
         </div>
-        <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 120" preserveAspectRatio="none" style={{ height: '120px' }}>
-          <path d="M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,64C960,75,1056,85,1152,80C1248,75,1344,53,1392,42.7L1440,32L1440,120L1392,120C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120L0,120Z" fill="#ffffff"></path>
+        <svg className="absolute bottom-0 left-0 w-full text-white dark:text-slate-900 fill-current" viewBox="0 0 1440 120" preserveAspectRatio="none" style={{ height: '120px' }}>
+          <path d="M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,64C960,75,1056,85,1152,80C1248,75,1344,53,1392,42.7L1440,32L1440,120L1392,120C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120L0,120Z"></path>
         </svg>
       </section>
 
-      <section className="py-8 bg-white border-b border-gray-100 relative z-20 -mt-8 mx-4">
+      <section className="py-8 bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 relative z-20 -mt-8 mx-4">
         <div className="max-w-6xl mx-auto">
-          <div className="bg-white rounded-xl shadow-2xl p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="flex items-center justify-center gap-4">
-              <div className="bg-blue-50 p-3 rounded-full">
-                <BookOpen size={24} className="text-blue-600" />
+              <div className="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-full">
+                <BookOpen size={24} className="text-blue-600 dark:text-blue-400" />
               </div>
               <div className="text-left">
-                <div className="text-2xl font-bold text-gray-900">{stats.topicsCount}</div>
-                <div className="text-gray-600 text-sm">Tematów</div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.topicsCount}</div>
+                <div className="text-gray-600 dark:text-gray-400 text-sm">Tematów</div>
               </div>
             </div>
-            <div className="flex items-center justify-center gap-4 border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-8">
-              <div className="bg-green-50 p-3 rounded-full">
-                <Layers size={24} className="text-green-600" />
+            <div className="flex items-center justify-center gap-4 border-t md:border-t-0 md:border-l border-gray-100 dark:border-slate-700 pt-4 md:pt-0 md:pl-8">
+              <div className="bg-green-50 dark:bg-green-900/30 p-3 rounded-full">
+                <Layers size={24} className="text-green-600 dark:text-green-400" />
               </div>
               <div className="text-left">
-                <div className="text-2xl font-bold text-gray-900">{stats.subjectsCount}</div>
-                <div className="text-gray-600 text-sm">Przedmiotów</div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.subjectsCount}</div>
+                <div className="text-gray-600 dark:text-gray-400 text-sm">Przedmiotów</div>
               </div>
             </div>
-            <div className="flex items-center justify-center gap-4 border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-8">
-              <div className="bg-purple-50 p-3 rounded-full">
-                <Award size={24} className="text-purple-600" />
+            <div className="flex items-center justify-center gap-4 border-t md:border-t-0 md:border-l border-gray-100 dark:border-slate-700 pt-4 md:pt-0 md:pl-8">
+              <div className="bg-purple-50 dark:bg-purple-900/30 p-3 rounded-full">
+                <Award size={24} className="text-purple-600 dark:text-purple-400" />
               </div>
               <div className="text-left">
-                <div className="text-2xl font-bold text-gray-900">{stats.levelsCount}</div>
-                <div className="text-gray-600 text-sm">Poziomów</div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.levelsCount}</div>
+                <div className="text-gray-600 dark:text-gray-400 text-sm">Poziomów</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-16 px-4 bg-gray-50">
+      <section className="py-16 px-4 bg-gray-50 dark:bg-slate-900">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Dlaczego warto?</h2>
-            <p className="text-lg text-gray-600">Tworzymy edukację przyszłości razem... ze sztuczną inteligencją!</p>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">Dlaczego warto?</h2>
+            <p className="text-lg text-gray-600 dark:text-gray-400">Tworzymy edukację przyszłości razem... ze sztuczną inteligencją!</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow text-center group">
-              <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <ShieldCheck size={32} className="text-blue-600" />
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow text-center group">
+              <div className="bg-blue-100 dark:bg-blue-900/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                <ShieldCheck size={32} className="text-blue-600 dark:text-blue-400" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Sprawdzone materiały</h3>
-              <p className="text-gray-600">Wszystkie zasoby są weryfikowane przez społeczność i ekspertów.</p>
+              <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">Sprawdzone materiały</h3>
+              <p className="text-gray-600 dark:text-gray-400">Wszystkie zasoby są weryfikowane przez społeczność i ekspertów.</p>
             </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow text-center group">
-              <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <Clock size={32} className="text-purple-600" />
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow text-center group">
+              <div className="bg-purple-100 dark:bg-purple-900/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                <Clock size={32} className="text-purple-600 dark:text-purple-400" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Oszczędność czasu</h3>
-              <p className="text-gray-600">Szybko znajdź gotowe materiały na lekcje dzięki zaawansowanym filtrom.</p>
+              <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">Oszczędność czasu</h3>
+              <p className="text-gray-600 dark:text-gray-400">Szybko znajdź gotowe materiały na lekcje dzięki zaawansowanym filtrom.</p>
             </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow text-center group">
-              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <Users size={32} className="text-green-600" />
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow text-center group">
+              <div className="bg-green-100 dark:bg-green-900/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                <Users size={32} className="text-green-600 dark:text-green-400" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Społeczność</h3>
-              <p className="text-gray-600">Wymieniaj się doświadczeniami i inspiracjami z innymi nauczycielami.</p>
+              <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">Społeczność</h3>
+              <p className="text-gray-600 dark:text-gray-400">Wymieniaj się doświadczeniami i inspiracjami z innymi nauczycielami.</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="latest-resources" className="py-12 px-4 bg-white scroll-mt-24">
+      <section id="latest-resources" className="py-12 px-4 bg-white dark:bg-slate-900 scroll-mt-24">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 flex items-center justify-center gap-3">
-              <TrendingUp size={32} className="text-blue-600" />
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center justify-center gap-3">
+              <TrendingUp size={32} className="text-blue-600 dark:text-blue-400" />
               Ostatnio dodane materiały
             </h2>
-            <p className="text-lg text-gray-600">Odkryj najnowsze zasoby dodane przez społeczność</p>
+            <p className="text-lg text-gray-600 dark:text-gray-400">Odkryj najnowsze zasoby dodane przez społeczność</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -375,18 +394,18 @@ export function LandingPage() {
           </div>
 
           {latestResources.length === 0 && (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-gray-500 dark:text-gray-400">
               <p>Brak dostępnych zasobów</p>
             </div>
           )}
         </div>
       </section>
 
-      <section id="available-subjects" className="py-20 px-4 bg-gray-50 scroll-mt-24">
+      <section id="available-subjects" className="py-20 px-4 bg-gray-50 dark:bg-slate-800 scroll-mt-24">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Dostępne przedmioty</h2>
-            <p className="text-lg text-gray-600">Wybierz przedmiot i rozpocznij naukę</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">Dostępne przedmioty</h2>
+            <p className="text-lg text-gray-600 dark:text-gray-400">Wybierz przedmiot i rozpocznij naukę</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -445,7 +464,7 @@ export function LandingPage() {
           </div>
 
           {subjects.length === 0 && (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-gray-500 dark:text-gray-400">
               <p>Brak dostępnych przedmiotów</p>
             </div>
           )}
@@ -460,13 +479,23 @@ export function LandingPage() {
           <p className="text-xl mb-8 text-blue-100">
             Dołącz do społeczności uczących się i odkrywaj sprawdzone materiały edukacyjne
           </p>
-          <button
-            onClick={() => navigate('/auth')}
-            className="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-50 transition-all hover:scale-105 shadow-lg inline-flex items-center gap-2"
-          >
-            Zarejestruj się teraz
-            <ArrowRight size={20} />
-          </button>
+          {session ? (
+            <button
+              onClick={() => navigate('/zasoby')}
+              className="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-50 transition-all hover:scale-105 shadow-lg inline-flex items-center gap-2"
+            >
+              Przejdź do panelu
+              <LayoutDashboard size={20} />
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate('/auth')}
+              className="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-50 transition-all hover:scale-105 shadow-lg inline-flex items-center gap-2"
+            >
+              Zarejestruj się teraz
+              <ArrowRight size={20} />
+            </button>
+          )}
         </div>
       </section>
 
