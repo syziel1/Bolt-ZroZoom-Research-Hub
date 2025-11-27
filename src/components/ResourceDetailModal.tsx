@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { supabase, Resource, ResourceTopic } from '../lib/supabase';
+import { useRecentResources } from '../hooks/useRecentResources';
 import { getThumbnailUrl } from '../lib/storage';
 import { X, Star, MessageSquare, Edit, Trash2, ExternalLink, Video, FileText, Presentation, Beaker, Wrench, User, Globe, Calendar, Sparkles } from 'lucide-react';
 import { ConfirmationModal } from './ConfirmationModal';
@@ -171,17 +172,20 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     }
   }, [resource]);
 
+  const { addRecent } = useRecentResources();
+
   useEffect(() => {
     if (isOpen && resource) {
       if (!isGuestMode) {
         loadUserData();
         checkUserRating();
+        addRecent(resource.id);
       }
       loadRatings();
       loadComments();
       loadTopics();
     }
-  }, [isOpen, resource, isGuestMode, loadUserData, checkUserRating, loadRatings, loadComments, loadTopics]);
+  }, [isOpen, resource, isGuestMode, loadUserData, checkUserRating, loadRatings, loadComments, loadTopics, addRecent]);
 
   const handleSubmitRating = async () => {
     if (!resource || !currentUserId) return;

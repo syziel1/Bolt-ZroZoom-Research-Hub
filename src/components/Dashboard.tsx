@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, Resource } from '../lib/supabase';
 import { logger } from '../lib/logger';
@@ -93,12 +93,62 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
   // Favorites functionality
   const { isFavorite, toggleFavorite, isLoggedIn, favoritesCount } = useFavorites();
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
+  const [showOnlyRated, setShowOnlyRated] = useState(false);
+  const [showOnlyMine, setShowOnlyMine] = useState(false);
+  const [ratedResourceIds, setRatedResourceIds] = useState<Set<string>>(new Set());
 
-  // Apply favorites filter on top of existing filters
+  // Parse URL query params for filters
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('favorites') === 'true') {
+      setShowOnlyFavorites(true);
+      setShowOnlyRated(false);
+      setShowOnlyMine(false);
+    } else if (params.get('rated') === 'true') {
+      setShowOnlyRated(true);
+      setShowOnlyFavorites(false);
+      setShowOnlyMine(false);
+    } else if (params.get('mine') === 'true') {
+      setShowOnlyMine(true);
+      setShowOnlyFavorites(false);
+      setShowOnlyRated(false);
+    }
+  }, [window.location.search]);
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      supabase
+        .from('ratings')
+        .select('resource_id')
+        .eq('author_id', session.user.id)
+        .then(({ data }) => {
+          if (data) {
+            setRatedResourceIds(new Set(data.map(r => r.resource_id)));
+          }
+        });
+    }
+  }, [session]);
+
+  // Apply filters on top of existing filters
   const finalFilteredResources = useMemo(() => {
-    if (!showOnlyFavorites) return sortedResources;
-    return sortedResources.filter(resource => isFavorite(resource.id));
-  }, [sortedResources, showOnlyFavorites, isFavorite]);
+    let result = sortedResources;
+
+    if (showOnlyFavorites) {
+      result = result.filter(resource => isFavorite(resource.id));
+    }
+
+    if (showOnlyRated) {
+      result = result.filter(resource => ratedResourceIds.has(resource.id));
+    }
+
+    if (showOnlyMine) {
+      if (session?.user?.id) {
+        result = result.filter(resource => resource.contributor_id === session.user.id);
+      }
+    }
+
+    return result;
+  }, [sortedResources, showOnlyFavorites, showOnlyRated, showOnlyMine, isFavorite, session, ratedResourceIds]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
