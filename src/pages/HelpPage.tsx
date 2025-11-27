@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { ArrowLeft, Book, HelpCircle } from 'lucide-react';
+import { Footer } from '../components/Footer';
 import faqContent from '../content/help/faq.md?raw';
 import guideContent from '../content/help/guide.md?raw';
 
@@ -46,8 +47,8 @@ export function HelpPage() {
                                 key={topic.id}
                                 to={`/pomoc/${topic.id}`}
                                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTopic.id === topic.id
-                                        ? 'bg-blue-50 text-blue-700 font-medium'
-                                        : 'text-gray-600 hover:bg-gray-100'
+                                    ? 'bg-blue-50 text-blue-700 font-medium'
+                                    : 'text-gray-600 hover:bg-gray-100'
                                     }`}
                             >
                                 <topic.icon size={20} />
@@ -64,6 +65,7 @@ export function HelpPage() {
                     </article>
                 </main>
             </div>
+            <Footer className="border-t border-gray-200 bg-white" />
         </div>
     );
 }

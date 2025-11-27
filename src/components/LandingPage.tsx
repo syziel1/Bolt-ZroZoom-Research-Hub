@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase, Resource, Subject, ResourceTopic, ResourceLevel } from '../lib/supabase';
 import { ResourceCard } from './ResourceCard';
 import { Navigation } from './Navigation';
+import { Footer } from './Footer';
 import { BookOpen, Layers, TrendingUp, Award, Sparkles, ArrowRight, Calculator, Globe, Clock, Languages, Code, Palette, Dumbbell, Music, Microscope, Atom, Beaker, ChevronDown, ShieldCheck, Users, Search } from 'lucide-react';
 
 type Stats = {
@@ -464,16 +465,7 @@ export function LandingPage() {
         </div>
       </section>
 
-      <footer className="py-8 px-4 bg-gray-900 text-gray-400 text-center">
-        <div className="max-w-6xl mx-auto">
-          <p className="mb-2">Szkoła Przyszłości z AI - Twoja baza wiedzy edukacyjnej</p>
-          <div className="flex justify-center gap-4 mb-2 text-sm">
-            <button onClick={() => navigate('/o-nas')} className="hover:text-white transition-colors">O nas</button>
-            <button onClick={() => navigate('/polityka-prywatnosci')} className="hover:text-white transition-colors">Polityka Prywatności</button>
-          </div>
-          <p className="text-sm">&copy; {new Date().getFullYear()} Sylwester Zieliński. All rights reserved</p>
-        </div>
-      </footer>
+      <Footer theme="dark" />
     </div >
   );
 }

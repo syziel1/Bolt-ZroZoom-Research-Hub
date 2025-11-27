@@ -19,3 +19,17 @@ Nasza platforma to centralna baza wiedzy, współtworzona przez społeczność n
 
 ## Jak korzystać z Asystenta AI?
 Kliknij ikonę robota w prawym dolnym rogu, aby otworzyć czat. Możesz pytać o wyjaśnienie trudnych zagadnień, prosić o streszczenia materiałów lub generowanie quizów. Asystent ma kontekst aktualnie wybranego przedmiotu i tematu.
+
+## Nawigacja po portalu
+
+### Główne sekcje
+- **Strona główna** (`/`) - Witamy nowych użytkowników, prezentujemy statystyki i najnowsze materiały.
+- **Zasoby** (`/zasoby`) - Główny panel z filtrami, wyszukiwarką i kartami zasobów.
+- **Centrum Pomocy** (`/pomoc`) - Przewodnik użytkownika i FAQ (ta strona).
+
+### Stopka
+Na dole każdej strony znajdziesz linki do:
+- **O nas** - Informacje o projekcie.
+- **Pomoc** - Centrum Pomocy.
+- **Polityka Prywatności** - Zasady ochrony danych.
+

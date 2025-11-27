@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { Footer } from './Footer';
 
 type MarkdownPageProps = {
     fileName: string;
@@ -103,6 +104,7 @@ export function MarkdownPage({ fileName, onBack }: MarkdownPageProps) {
                     </div>
                 )}
             </div>
+            <Footer className="mt-12" />
         </div>
     );
 }

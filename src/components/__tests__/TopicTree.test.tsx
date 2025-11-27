@@ -8,11 +8,17 @@ const mockNodes: TopicNode[] = [
         id: '1',
         name: 'Matematyka',
         slug: 'matematyka',
+        subject_id: 'subject-1',
+        parent_topic_id: null,
+        order_index: 1,
         children: [
             {
                 id: '2',
                 name: 'Algebra',
                 slug: 'algebra',
+                subject_id: 'subject-1',
+                parent_topic_id: '1',
+                order_index: 1,
                 children: []
             }
         ]
@@ -21,6 +27,9 @@ const mockNodes: TopicNode[] = [
         id: '3',
         name: 'Fizyka',
         slug: 'fizyka',
+        subject_id: 'subject-2',
+        parent_topic_id: null,
+        order_index: 2,
         children: []
     }
 ];

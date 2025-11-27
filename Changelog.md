@@ -9,6 +9,20 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 - `uploadResourceThumbnail` logic in the service layer.
 - Image display handling in `ResourceCard`.
 
+## [1.6.1] - 2025-11-27
+**Added**
+- **Footer Component**: Reusable footer with theme support (light/dark).
+
+**Changed**
+- **UI Consistency**: Standardized footer across all pages (Landing Page, Dashboard, Help Center, static pages).
+
+## [1.6.0] - 2025-11-27
+**Added**
+- **Help Center**: New `/pomoc` route with sidebar navigation.
+- **Help Content**: Markdown-based user guide and FAQ.
+- **Components**: `HelpPage` component with `react-markdown` integration.
+
+
 ## [1.5.0] - 2025-11-27
 **Added**
 - **Automated Testing**: Setup Vitest + React Testing Library.

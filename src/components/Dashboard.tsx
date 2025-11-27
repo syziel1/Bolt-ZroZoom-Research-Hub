@@ -13,6 +13,7 @@ import { useFavorites } from '../hooks/useFavorites';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardGrid } from './DashboardGrid';
 import { AiAssistant } from './AiAssistant';
+import { Footer } from './Footer';
 
 type DashboardProps = {
   isGuestMode?: boolean;
@@ -319,19 +320,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
             isLoggedIn={!isGuestMode && isLoggedIn}
           />
 
-          <footer className="mt-12 pt-8 border-t border-gray-200">
-            <div className="text-center text-sm text-gray-600">
-              <p className="mb-2">Szkoła Przyszłości z AI - Twoja baza wiedzy edukacyjnej</p>
-              <div className="flex justify-center gap-4 mb-2 text-xs text-gray-500">
-                <button onClick={() => navigate('/o-nas')} className="hover:text-gray-700 transition-colors">O nas</button>
-                <button onClick={() => navigate('/pomoc')} className="hover:text-gray-700 transition-colors">Pomoc</button>
-                <button onClick={() => navigate('/polityka-prywatnosci')} className="hover:text-gray-700 transition-colors">Polityka Prywatności</button>
-              </div>
-              <p className="text-xs text-gray-500">
-                © {new Date().getFullYear()} Sylwester Zieliński. All rights reserved
-              </p>
-            </div>
-          </footer>
+          <Footer className="mt-12" />
         </main>
       </div>
 
