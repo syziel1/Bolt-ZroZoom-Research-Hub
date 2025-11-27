@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, Resource } from '../lib/supabase';
 import { logger } from '../lib/logger';
@@ -29,7 +29,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
   const [sessionChecked, setSessionChecked] = useState(false);
   const isGuestMode = sessionChecked ? !session : propIsGuestMode;
 
-  useState(() => {
+  useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setSessionChecked(true);
@@ -41,7 +41,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
     });
 
     return () => subscription.unsubscribe();
-  });
+  }, []);
 
   const {
     resources,
