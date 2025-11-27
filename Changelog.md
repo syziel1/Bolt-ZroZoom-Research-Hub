@@ -9,6 +9,14 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 - `uploadResourceThumbnail` logic in the service layer.
 - Image display handling in `ResourceCard`.
 
+## [1.4.0] - 2025-11-27
+**Added**
+- **AI Tutor**: Interactive chat assistant powered by Google Gemini (Edge Function).
+- **Edge Functions**: Integration with Supabase Edge Functions (`chat-with-ai`).
+- **Rich Text Support**: Markdown and LaTeX rendering for AI responses (`react-markdown`, `rehype-katex`).
+- **Video Search**: Integrated YouTube video search (`search-youtube` Edge Function).
+- **UI**: Floating AI Assistant button and chat interface.
+
 ## [1.3.0] - 2025-11-26
 **Added**
 - React Router DOM integration with declarative routing.

@@ -10,6 +10,7 @@ Minimalna dokumentacja techniczna dla repozytorium.
 - **Routing:** React Router DOM — deklaratywne routy, protected routes
 - **Publiczne odczytywanie:** materiały, tematy, poziomy, przedmioty
 - **Modyfikacje:** tylko zalogowani użytkownicy (z RLS)
+- **AI:** Supabase Edge Functions + Google Gemini API
 
 ---
 
@@ -154,6 +155,28 @@ Minimalna dokumentacja techniczna dla repozytorium.
 - backendowy workflow: ekspert → review → approve/reject
 - leaderboard współpracowników
 - log aktywności (kto dodał, kto zrecenzował)
+
+---
+
+---
+
+## 9. Edge Functions & AI
+
+### chat-with-ai
+- **Runtime:** Deno
+- **Model:** Google Gemini 2.5 Flash
+- **Funkcja:** Edukacyjny asystent AI (AI Tutor)
+- **Input:** Historia czatu (JSON)
+- **Output:** Streaming text / Markdown + LaTeX
+- **Security:** Weryfikacja klucza API po stronie serwera (Edge)
+
+### search-youtube
+- **Runtime:** Deno
+- **API:** YouTube Data API v3
+- **Funkcja:** Wyszukiwanie filmów i pobieranie metadanych (czas trwania)
+- **Input:** Query string
+- **Output:** Znormalizowana lista wideo (JSON)
+- **Env:** `YOUTUBE_API_KEY`
 
 ---
 

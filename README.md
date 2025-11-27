@@ -36,6 +36,8 @@ ZroZoom Research Hub to platforma do gromadzenia, organizowania i udostępniania
 - 🔍 Wyszukiwanie pełnotekstowe (klient)
 - 🃏 Różne widoki kart (Hero, Lista, Siatka)
 - 🔗 Routing z URL parametrami
+- 🤖 AI Tutor - inteligentny asystent edukacyjny (Gemini 2.5 Flash)
+- 🎥 Wyszukiwanie wideo (YouTube API)
 
 ### Dla zalogowanych użytkowników
 - ➕ Dodawanie nowych zasobów
@@ -57,6 +59,7 @@ ZroZoom Research Hub to platforma do gromadzenia, organizowania i udostępniania
 - **Tailwind CSS** - stylowanie
 - **Lucide React** - ikony
 - **React Router DOM** - routing i nawigacja
+- **React Markdown** + **Katex** - renderowanie treści AI
 
 ### Backend
 - **Supabase** - Backend-as-a-Service
@@ -64,6 +67,7 @@ ZroZoom Research Hub to platforma do gromadzenia, organizowania i udostępniania
   - Authentication - uwierzytelnianie
   - Row Level Security (RLS) - bezpieczeństwo
   - Real-time subscriptions - aktualizacje na żywo
+- **Supabase Edge Functions** - serverless functions (Deno)
 
 ## 📦 Instalacja
 
