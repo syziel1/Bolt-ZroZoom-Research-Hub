@@ -266,17 +266,132 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
     }
   };
 
+  const [analyzing, setAnalyzing] = useState(false);
+
+  const handleAiAnalysis = async () => {
+    if (!title && !url && !description) {
+      setError('Wprowadź tytuł, URL lub opis, aby AI miało co analizować.');
+      return;
+    }
+
+    setAnalyzing(true);
+    setError('');
+    setSuccessMessage('');
+
+    try {
+      const { data, error } = await supabase.functions.invoke('analyze-content', {
+        body: { title, description, url }
+      });
+
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+
+      // 1. Match Subject
+      if (data.subject) {
+        const matchedSubject = subjects.find(s =>
+          s.subject_name.toLowerCase() === data.subject.toLowerCase() ||
+          s.subject_name.toLowerCase().includes(data.subject.toLowerCase()) ||
+          data.subject.toLowerCase().includes(s.subject_name.toLowerCase())
+        );
+        if (matchedSubject) {
+          setSubjectId(matchedSubject.subject_id);
+          // Clear topics if subject changes, as topics are subject-specific
+          if (matchedSubject.subject_id !== subjectId) {
+            setSelectedTopics([]);
+          }
+        }
+      }
+
+      // 2. Match Topics (after subject is potentially set/found)
+      // We need to look for topics within the matched subject (or current subject if not found)
+      // But wait, if we just setSubjectId, the 'filteredTopics' memo won't update immediately in this closure.
+      // We should use the found subject ID or current subjectId.
+      const targetSubjectId = subjects.find(s =>
+        s.subject_name.toLowerCase() === (data.subject || '').toLowerCase() ||
+        s.subject_name.toLowerCase().includes((data.subject || '').toLowerCase())
+      )?.subject_id || subjectId;
+
+      if (targetSubjectId && data.topics && Array.isArray(data.topics)) {
+        const subjectTopics = topics.filter(t => t.subject_id === targetSubjectId);
+        const matchedTopicIds: string[] = [];
+
+        data.topics.forEach((suggestedTopic: string) => {
+          const normalizedSuggestion = suggestedTopic.toLowerCase();
+          const match = subjectTopics.find(t =>
+            t.name.toLowerCase() === normalizedSuggestion ||
+            t.name.toLowerCase().includes(normalizedSuggestion) ||
+            normalizedSuggestion.includes(t.name.toLowerCase())
+          );
+          if (match) {
+            matchedTopicIds.push(match.id);
+          }
+        });
+
+        // Add new matches to existing selection or replace? Let's add unique ones.
+        setSelectedTopics(prev => [...new Set([...prev, ...matchedTopicIds])]);
+      }
+
+      // 3. Match Level
+      if (data.level) {
+        const matchedLevel = levels.find(l =>
+          l.name.toLowerCase() === data.level.toLowerCase() ||
+          data.level.toLowerCase().includes(l.name.toLowerCase())
+        );
+        if (matchedLevel) {
+          setSelectedLevels(prev => [...new Set([...prev, matchedLevel.id])]);
+        }
+      }
+
+      // 4. Match Language
+      if (data.language) {
+        // Simple check for supported languages
+        if (['pl', 'en', 'de', 'fr', 'es'].includes(data.language)) {
+          setLanguage(data.language);
+        }
+      }
+
+      setAiGenerated(true);
+      setSuccessMessage('AI przeanalizowało treść i uzupełniło formularz! ✨');
+
+    } catch (err: any) {
+      console.error('AI analysis error:', err);
+      setError(err.message || 'Nie udało się uzyskać sugestii AI.');
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="p-6 space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold text-gray-900">{initialData ? 'Edytuj zasób' : 'Dodaj nowy zasób'}</h2>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="text-gray-500 hover:text-gray-700"
-        >
-          <X size={24} />
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={handleAiAnalysis}
+            disabled={analyzing}
+            className="flex items-center gap-2 px-3 py-1.5 bg-purple-100 text-purple-700 rounded-md hover:bg-purple-200 transition-colors text-sm font-medium disabled:opacity-50"
+            title="Wypełnij automatycznie przy użyciu AI"
+          >
+            {analyzing ? (
+              <>
+                <div className="animate-spin h-4 w-4 border-2 border-purple-700 border-t-transparent rounded-full"></div>
+                Analizuję...
+              </>
+            ) : (
+              <>
+                ✨ Wypełnij z AI
+              </>
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <X size={24} />
+          </button>
+        </div>
       </div>
 
       <ThumbnailUploader

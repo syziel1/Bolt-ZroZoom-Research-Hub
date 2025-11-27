@@ -1,6 +1,6 @@
 import { Resource, ResourceTopic, ResourceLevel } from '../lib/supabase';
 import { ResourceCard } from './ResourceCard';
-import { ChevronLeft, ChevronRight, Loader } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader, Sparkles } from 'lucide-react';
 import { SortOption } from '../hooks/useDashboardFilters';
 
 type DashboardGridProps = {
@@ -21,6 +21,8 @@ type DashboardGridProps = {
     onPageChange: (page: number) => void;
     onTopicClick: (topicName: string) => void;
     onCardClick: (resource: Resource) => void;
+    searchQuery: string;
+    onAskAi: (query: string) => void;
 };
 
 export function DashboardGrid({
@@ -40,7 +42,9 @@ export function DashboardGrid({
     indexOfLastResource,
     onPageChange,
     onTopicClick,
-    onCardClick
+    onCardClick,
+    searchQuery,
+    onAskAi
 }: DashboardGridProps) {
 
     if (loading) {
@@ -168,8 +172,17 @@ export function DashboardGrid({
             )}
 
             {filteredResources.length === 0 && (
-                <div className="text-center py-12 text-gray-500">
-                    Nie znaleziono zasobów pasujących do filtrów
+                <div className="text-center py-12 text-gray-500 flex flex-col items-center gap-4">
+                    <p>Nie znaleziono zasobów pasujących do filtrów</p>
+                    {searchQuery && (
+                        <button
+                            onClick={() => onAskAi(searchQuery)}
+                            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full shadow-md hover:shadow-lg transition-all transform hover:scale-105"
+                        >
+                            <Sparkles size={18} />
+                            Nie znalazłeś tego, czego szukasz? Zapytaj AI!
+                        </button>
+                    )}
                 </div>
             )}
         </>

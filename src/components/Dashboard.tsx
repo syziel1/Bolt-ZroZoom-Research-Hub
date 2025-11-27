@@ -11,6 +11,7 @@ import { useDashboardData } from '../hooks/useDashboardData';
 import { useDashboardFilters } from '../hooks/useDashboardFilters';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardGrid } from './DashboardGrid';
+import { AiAssistant } from './AiAssistant';
 
 type DashboardProps = {
   isGuestMode?: boolean;
@@ -95,6 +96,15 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
   // YouTube Integration State
   const [isYouTubeModalOpen, setIsYouTubeModalOpen] = useState(false);
   const [prefilledResource, setPrefilledResource] = useState<Partial<Resource> | null>(null);
+
+  // AI Assistant State
+  const [isAiAssistantOpen, setIsAiAssistantOpen] = useState(false);
+  const [aiInitialQuery, setAiInitialQuery] = useState('');
+
+  const handleAskAi = (query: string) => {
+    setAiInitialQuery(query);
+    setIsAiAssistantOpen(true);
+  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -286,6 +296,8 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
             onPageChange={handlePageChange}
             onTopicClick={handleTopicClick}
             onCardClick={handleCardClick}
+            searchQuery={searchQuery}
+            onAskAi={handleAskAi}
           />
 
           <footer className="mt-12 pt-8 border-t border-gray-200">
@@ -331,6 +343,11 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
         initialQuery={searchQuery}
         onAddVideo={handleYouTubeVideoAdd}
         isGuestMode={isGuestMode}
+      />
+      <AiAssistant
+        isOpen={isAiAssistantOpen}
+        onToggle={setIsAiAssistantOpen}
+        initialQuery={aiInitialQuery}
       />
     </div>
   );

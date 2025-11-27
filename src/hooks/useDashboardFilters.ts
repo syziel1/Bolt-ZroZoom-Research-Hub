@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 import { Resource, Subject, Topic, TopicNode, ResourceTopic, ResourceLevel } from '../lib/supabase';
 import { useTopics } from './useTopics';
+import Fuse from 'fuse.js';
 
 export type SortOption = 'newest' | 'rating' | 'popular' | 'alphabetical';
 
@@ -125,8 +126,37 @@ export function useDashboardFilters({
         }
     };
 
+    const fuse = useMemo(() => {
+        const options = {
+            keys: [
+                { name: 'title', weight: 0.7 },
+                { name: 'description', weight: 0.3 },
+                { name: 'topic_names', weight: 0.4 }
+            ],
+            threshold: 0.4, // 0.0 = perfect match, 1.0 = match anything
+            ignoreLocation: true,
+            includeScore: true
+        };
+
+        // Prepare data with flattened topics for searching
+        const searchableData = resources.map(resource => ({
+            ...resource,
+            topic_names: (resourceTopics.get(resource.id) || []).map(t => t.topic_name)
+        }));
+
+        return new Fuse(searchableData, options);
+    }, [resources, resourceTopics]);
+
     const filteredResources = useMemo(() => {
-        return resources.filter((resource) => {
+        let baseResources = resources;
+
+        if (searchQuery) {
+            const fuseResults = fuse.search(searchQuery);
+            // Map back to the original resource structure (though searchableData is compatible)
+            baseResources = fuseResults.map(result => result.item as Resource);
+        }
+
+        return baseResources.filter((resource) => {
             if (selectedSubject) {
                 if (resource.subject_id !== selectedSubject) {
                     return false;
@@ -166,24 +196,9 @@ export function useDashboardFilters({
                 }
             }
 
-            if (searchQuery) {
-                const query = searchQuery.toLowerCase();
-                const titleMatch = resource.title.toLowerCase().includes(query);
-                const descriptionMatch = resource.description?.toLowerCase().includes(query);
-
-                const currentResourceTopics = resourceTopics.get(resource.id) || [];
-                const topicMatch = currentResourceTopics.some(topic =>
-                    topic.topic_name.toLowerCase().includes(query)
-                );
-
-                if (!titleMatch && !descriptionMatch && !topicMatch) {
-                    return false;
-                }
-            }
-
             return true;
         });
-    }, [resources, selectedSubject, selectedTopics, selectedLevels, selectedLanguages, searchQuery, topicNodes, resourceTopics, resourceLevels]);
+    }, [resources, selectedSubject, selectedTopics, selectedLevels, selectedLanguages, searchQuery, topicNodes, resourceTopics, resourceLevels, fuse]);
 
     // Reset page when filters change
     useEffect(() => {

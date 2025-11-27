@@ -50,7 +50,7 @@ serve(async (req) => {
 
     // 3. Zapytanie do YouTube Data API
     // A. Search -> list of IDs
-    const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=10&q=${encodeURIComponent(query)}&key=${apiKey}`
+    const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=10&safeSearch=strict&q=${encodeURIComponent(query)}&key=${apiKey}`
     const searchResponse = await fetch(searchUrl)
     const searchData = await searchResponse.json()
 
