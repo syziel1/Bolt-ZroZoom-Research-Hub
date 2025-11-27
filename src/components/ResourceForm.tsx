@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { X } from 'lucide-react';
+import { ConfirmationModal } from './ConfirmationModal';
 import { supabase, Subject, Topic, Level, Resource } from '../lib/supabase';
 import { uploadResourceThumbnail, getThumbnailUrl } from '../lib/storage';
 import { ThumbnailUploader } from './ThumbnailUploader';
@@ -34,6 +35,19 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [showExitConfirmation, setShowExitConfirmation] = useState(false);
+  const [initialValues, setInitialValues] = useState<{
+    title: string;
+    url: string;
+    type: string;
+    description: string;
+    subjectId: string;
+    language: string;
+    aiGenerated: boolean;
+    thumbnailUrl: string | null;
+    topics: string[];
+    levels: string[];
+  } | null>(null);
 
   const filteredTopics = useMemo(() => (subjectId ? topics.filter((t) => t.subject_id === subjectId) : []), [subjectId, topics]);
   const topicTree = useMemo(() => buildTopicTree(filteredTopics), [filteredTopics]);
@@ -41,14 +55,8 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
   const handleTopicToggle = (topicId: string) => {
     setSelectedTopics(prev => {
       if (prev.includes(topicId)) {
-        // If clicking the same topic, deselect it (optional, but good for radio buttons if we want to allow unchecking)
-        // Actually for radio buttons, usually you can't uncheck by clicking again, but let's allow it or just switch.
-        // Let's make it behave like a radio button: always select the new one.
-        // But if it's already selected, maybe we want to keep it selected?
-        // If we want standard radio behavior:
         return [topicId];
       } else {
-        // If clicking a new topic, replace the old selection
         return [topicId];
       }
     });
@@ -79,21 +87,36 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
       setSelectedTopics([]);
       setSelectedLevels([]);
     }
+
+    // Set initial values for comparison
+    setInitialValues({
+      title: data?.title || '',
+      url: data?.url || '',
+      type: data?.type || 'article',
+      description: data?.description || '',
+      subjectId: data?.subject_id || '',
+      language: data?.language || 'pl',
+      aiGenerated: data?.ai_generated || false,
+      thumbnailUrl: initialData?.thumbnail_path ? getThumbnailUrl(initialData.thumbnail_path) : (data?.thumbnail_url || null),
+      topics: [], // Will be updated by relations useEffect
+      levels: []  // Will be updated by relations useEffect
+    });
   }, [initialData, prefillData]);
 
   useEffect(() => {
     if (initialData) {
       let isMounted = true;
 
-      // Load initial relations
       const loadRelations = async () => {
         const { data: topicData } = await supabase
           .from('resource_topics')
           .select('topic_id')
           .eq('resource_id', initialData.id);
 
-        if (isMounted && topicData) {
-          setSelectedTopics(topicData.map(t => t.topic_id));
+        const loadedTopics = topicData ? topicData.map(t => t.topic_id) : [];
+
+        if (isMounted) {
+          setSelectedTopics(loadedTopics);
         }
 
         const { data: levelData } = await supabase
@@ -101,8 +124,17 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
           .select('level_id')
           .eq('resource_id', initialData.id);
 
-        if (isMounted && levelData) {
-          setSelectedLevels(levelData.map(l => l.level_id));
+        const loadedLevels = levelData ? levelData.map(l => l.level_id) : [];
+
+        if (isMounted) {
+          setSelectedLevels(loadedLevels);
+
+          // Update initial values with loaded relations
+          setInitialValues(prev => prev ? ({
+            ...prev,
+            topics: loadedTopics,
+            levels: loadedLevels
+          }) : null);
         }
       };
       loadRelations();
@@ -110,8 +142,43 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
       return () => {
         isMounted = false;
       };
+    } else {
+      // For new resources, topics and levels start empty
+      setInitialValues(prev => prev ? ({ ...prev, topics: [], levels: [] }) : null);
     }
   }, [initialData]);
+
+  const handleCancel = () => {
+    if (!initialValues) {
+      onCancel();
+      return;
+    }
+
+    const currentThumbnailUrl = thumbnailPreview;
+    // Check if thumbnail changed. 
+    // If it's a blob, it changed. 
+    // If it's null and initial was null, no change.
+    // If it's string and matches initial, no change.
+    const thumbnailChanged = thumbnailFile !== null || (currentThumbnailUrl !== initialValues.thumbnailUrl);
+
+    const hasChanges =
+      title !== initialValues.title ||
+      url !== initialValues.url ||
+      type !== initialValues.type ||
+      description !== initialValues.description ||
+      subjectId !== initialValues.subjectId ||
+      language !== initialValues.language ||
+      aiGenerated !== initialValues.aiGenerated ||
+      thumbnailChanged ||
+      JSON.stringify(selectedTopics.sort()) !== JSON.stringify(initialValues.topics.sort()) ||
+      JSON.stringify(selectedLevels.sort()) !== JSON.stringify(initialValues.levels.sort());
+
+    if (hasChanges) {
+      setShowExitConfirmation(true);
+    } else {
+      onCancel();
+    }
+  };
 
   const resetForm = () => {
     setTitle('');
@@ -283,7 +350,25 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
         body: { title, description, url }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase Function Error:', error);
+        // Try to parse the error body if it exists and is JSON
+        let errorMessage = error.message;
+        try {
+          if (error instanceof Error && 'context' in error) {
+            // @ts-ignore
+            const context = error.context as any;
+            if (context && context.json) {
+              const body = await context.json();
+              if (body.error) errorMessage = body.error;
+            }
+          }
+        } catch (e) {
+          console.error('Error parsing error response:', e);
+        }
+        throw new Error(errorMessage || 'Błąd wywołania funkcji AI');
+      }
+
       if (data.error) throw new Error(data.error);
 
       // 1. Match Subject
@@ -362,243 +447,256 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-gray-900">{initialData ? 'Edytuj zasób' : 'Dodaj nowy zasób'}</h2>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={handleAiAnalysis}
-            disabled={analyzing}
-            className="flex items-center gap-2 px-3 py-1.5 bg-purple-100 text-purple-700 rounded-md hover:bg-purple-200 transition-colors text-sm font-medium disabled:opacity-50"
-            title="Wypełnij automatycznie przy użyciu AI"
-          >
-            {analyzing ? (
-              <>
-                <div className="animate-spin h-4 w-4 border-2 border-purple-700 border-t-transparent rounded-full"></div>
-                Analizuję...
-              </>
-            ) : (
-              <>
-                ✨ Wypełnij z AI
-              </>
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={onCancel}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <X size={24} />
-          </button>
-        </div>
-      </div>
-
-      <ThumbnailUploader
-        onFileSelect={(file) => {
-          if (thumbnailPreview?.startsWith('blob:')) {
-            URL.revokeObjectURL(thumbnailPreview);
-          }
-          setThumbnailFile(file);
-          setThumbnailPreview(file ? URL.createObjectURL(file) : null);
-        }}
-        previewUrl={thumbnailPreview ?? undefined}
-        uploading={uploading}
-      />
-
-      <div>
-        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-          Tytuł *
-        </label>
-        <input
-          id="title"
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="url" className="block text-sm font-medium text-gray-700 mb-1">
-          URL *
-        </label>
-        <input
-          id="url"
-          type="url"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
-          Typ *
-        </label>
-        <select
-          id="type"
-          value={type}
-          onChange={(e) => setType(e.target.value)}
-          required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="article">Artykuł</option>
-          <option value="video">Wideo</option>
-          <option value="pdf">PDF</option>
-          <option value="presentation">Prezentacja</option>
-          <option value="quiz">Quiz</option>
-          <option value="simulation">Symulacja</option>
-          <option value="tool">Narzędzie</option>
-        </select>
-      </div>
-
-      <div>
-        <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
-          Przedmiot *
-        </label>
-        <select
-          id="subject"
-          value={subjectId}
-          onChange={(e) => {
-            setSubjectId(e.target.value);
-            setSelectedTopics([]);
-          }}
-          required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="">Wybierz przedmiot</option>
-          {subjects.map((subject) => (
-            <option key={subject.subject_id} value={subject.subject_id}>
-              {subject.subject_name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {subjectId && filteredTopics.length > 0 && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Tematy (opcjonalnie)
-          </label>
-          <div className="border border-gray-300 rounded-md p-3 max-h-60 overflow-y-auto">
-            <TopicTree
-              nodes={topicTree}
-              selectedTopics={selectedTopics}
-              onTopicToggle={handleTopicToggle}
-            />
+    <>
+      <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold text-gray-900">{initialData ? 'Edytuj zasób' : 'Dodaj nowy zasób'}</h2>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={handleAiAnalysis}
+              disabled={analyzing}
+              className="flex items-center gap-2 px-3 py-1.5 bg-purple-100 text-purple-700 rounded-md hover:bg-purple-200 transition-colors text-sm font-medium disabled:opacity-50"
+              title="Wypełnij automatycznie przy użyciu AI"
+            >
+              {analyzing ? (
+                <>
+                  <div className="animate-spin h-4 w-4 border-2 border-purple-700 border-t-transparent rounded-full"></div>
+                  Analizuję...
+                </>
+              ) : (
+                <>
+                  ✨ Wypełnij z AI
+                </>
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <X size={24} />
+            </button>
           </div>
         </div>
-      )}
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Poziomy (opcjonalnie)
-        </label>
-        <div className="border border-gray-300 rounded-md p-3 max-h-40 overflow-y-auto space-y-2">
-          {levels.map((level) => (
-            <label
-              key={level.id}
-              className="flex items-center gap-2 cursor-pointer"
-            >
-              <input
-                type="checkbox"
-                checked={selectedLevels.includes(level.id)}
-                onChange={(e) => {
-                  if (e.target.checked) {
-                    setSelectedLevels([...selectedLevels, level.id]);
-                  } else {
-                    setSelectedLevels(selectedLevels.filter((id) => id !== level.id));
-                  }
-                }}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="text-sm text-gray-700">{level.name}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <label htmlFor="language" className="block text-sm font-medium text-gray-700 mb-1">
-          Język *
-        </label>
-        <select
-          id="language"
-          value={language}
-          onChange={(e) => setLanguage(e.target.value)}
-          required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="pl">Polski</option>
-          <option value="en">English</option>
-          <option value="de">Deutsch</option>
-          <option value="fr">Français</option>
-          <option value="es">Español</option>
-          <option value="other">Inny</option>
-        </select>
-      </div>
-
-      <div>
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={aiGenerated}
-            onChange={(e) => setAiGenerated(e.target.checked)}
-            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-          />
-          <span className="text-sm font-medium text-gray-700">
-            Treść wygenerowana przez AI
-          </span>
-        </label>
-        <p className="text-xs text-gray-500 mt-1 ml-6">
-          Zaznacz, jeśli zasób został stworzony lub znacząco wspomagany przez sztuczną inteligencję
-        </p>
-      </div>
-
-      <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-          Opis (opcjonalnie)
-        </label>
-        <textarea
-          id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={3}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        <ThumbnailUploader
+          onFileSelect={(file) => {
+            if (thumbnailPreview?.startsWith('blob:')) {
+              URL.revokeObjectURL(thumbnailPreview);
+            }
+            setThumbnailFile(file);
+            setThumbnailPreview(file ? URL.createObjectURL(file) : null);
+          }}
+          previewUrl={thumbnailPreview ?? undefined}
+          uploading={uploading}
         />
-      </div>
 
-      {error && (
-        <div className="text-red-600 text-sm bg-red-50 p-3 rounded-md">
-          {error}
+        <div>
+          <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+            Tytuł *
+          </label>
+          <input
+            id="title"
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
-      )}
 
-      {successMessage && (
-        <div className="text-green-600 text-sm bg-green-50 p-3 rounded-md">
-          {successMessage}
+        <div>
+          <label htmlFor="url" className="block text-sm font-medium text-gray-700 mb-1">
+            URL *
+          </label>
+          <input
+            id="url"
+            type="url"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            required
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
-      )}
 
-      <div className="flex gap-3 pt-4">
-        <button
-          type="submit"
-          disabled={loading}
-          className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400"
-        >
-          {loading ? 'Zapisywanie...' : (initialData ? 'Zaktualizuj zasób' : 'Zapisz zasób')}
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-        >
-          Anuluj
-        </button>
-      </div>
-    </form>
+        <div>
+          <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
+            Typ *
+          </label>
+          <select
+            id="type"
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            required
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="article">Artykuł</option>
+            <option value="video">Wideo</option>
+            <option value="pdf">PDF</option>
+            <option value="presentation">Prezentacja</option>
+            <option value="quiz">Quiz</option>
+            <option value="simulation">Symulacja</option>
+            <option value="tool">Narzędzie</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
+            Przedmiot *
+          </label>
+          <select
+            id="subject"
+            value={subjectId}
+            onChange={(e) => {
+              setSubjectId(e.target.value);
+              setSelectedTopics([]);
+            }}
+            required
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Wybierz przedmiot</option>
+            {subjects.map((subject) => (
+              <option key={subject.subject_id} value={subject.subject_id}>
+                {subject.subject_name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {subjectId && filteredTopics.length > 0 && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Tematy (opcjonalnie)
+            </label>
+            <div className="border border-gray-300 rounded-md p-3 max-h-60 overflow-y-auto">
+              <TopicTree
+                nodes={topicTree}
+                selectedTopics={selectedTopics}
+                onTopicToggle={handleTopicToggle}
+              />
+            </div>
+          </div>
+        )}
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Poziomy (opcjonalnie)
+          </label>
+          <div className="border border-gray-300 rounded-md p-3 max-h-40 overflow-y-auto space-y-2">
+            {levels.map((level) => (
+              <label
+                key={level.id}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedLevels.includes(level.id)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedLevels([...selectedLevels, level.id]);
+                    } else {
+                      setSelectedLevels(selectedLevels.filter((id) => id !== level.id));
+                    }
+                  }}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">{level.name}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor="language" className="block text-sm font-medium text-gray-700 mb-1">
+            Język *
+          </label>
+          <select
+            id="language"
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+            required
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="pl">Polski</option>
+            <option value="en">English</option>
+            <option value="de">Deutsch</option>
+            <option value="fr">Français</option>
+            <option value="es">Español</option>
+            <option value="other">Inny</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={aiGenerated}
+              onChange={(e) => setAiGenerated(e.target.checked)}
+              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span className="text-sm font-medium text-gray-700">
+              Treść wygenerowana przez AI
+            </span>
+          </label>
+          <p className="text-xs text-gray-500 mt-1 ml-6">
+            Zaznacz, jeśli zasób został stworzony lub znacząco wspomagany przez sztuczną inteligencję
+          </p>
+        </div>
+
+        <div>
+          <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+            Opis (opcjonalnie)
+          </label>
+          <textarea
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={3}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        {error && (
+          <div className="text-red-600 text-sm bg-red-50 p-3 rounded-md">
+            {error}
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="text-green-600 text-sm bg-green-50 p-3 rounded-md">
+            {successMessage}
+          </div>
+        )}
+
+        <div className="flex gap-3 pt-4">
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400"
+          >
+            {loading ? 'Zapisywanie...' : (initialData ? 'Zaktualizuj zasób' : 'Zapisz zasób')}
+          </button>
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+          >
+            Anuluj
+          </button>
+        </div>
+      </form>
+
+      <ConfirmationModal
+        isOpen={showExitConfirmation}
+        title="Niezapisane zmiany"
+        message="Masz niezapisane zmiany. Czy na pewno chcesz wyjść? Utracone dane nie zostaną zapisane."
+        confirmLabel="Wyjdź bez zapisywania"
+        cancelLabel="Wróć do edycji"
+        onConfirm={onCancel}
+        onCancel={() => setShowExitConfirmation(false)}
+        variant="warning"
+      />
+    </>
   );
 }

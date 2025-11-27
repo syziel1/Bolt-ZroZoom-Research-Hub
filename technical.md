@@ -67,7 +67,8 @@ Minimalna dokumentacja techniczna dla repozytorium.
 - description
 - language
 - ai_generated (bool)
-- thumbnail_path (text, nullable)
+- thumbnail_path (text, nullable) - dla uploadu
+- thumbnail_url (text, nullable) - dla linków zewnętrznych
 - review_required (bool)
 - review_status (text)
 - timestamps
@@ -94,6 +95,12 @@ Minimalna dokumentacja techniczna dla repozytorium.
 - content
 - parent_comment_id (nullable)
 - timestamps
+
+### user_favorites
+- id
+- user_id → profiles.id
+- resource_id → resources.id
+- created_at
 
 ---
 
@@ -139,6 +146,7 @@ Minimalna dokumentacja techniczna dla repozytorium.
 ## 7. TODO (MVP)
 - Endpoint / frontend do dodawania materiałów
 - UI do filtrowania: subject + topic + level + type
+- **Wyszukiwanie:** Client-side (Fuse.js) - szybkie wyszukiwanie w załadowanych danych
 - Cache średnich ocen po stronie widoku lub materialized view
 
 ---
@@ -162,6 +170,13 @@ Minimalna dokumentacja techniczna dla repozytorium.
 - **Input:** Historia czatu (JSON)
 - **Output:** Streaming text / Markdown + LaTeX
 - **Security:** Weryfikacja klucza API po stronie serwera (Edge)
+
+### analyze-content
+- **Runtime:** Deno
+- **Model:** Google Gemini 2.5 Flash
+- **Funkcja:** Automatyczne uzupełnianie metadanych (tytuł, opis, sugerowane tematy) na podstawie URL
+- **Input:** URL zasobu
+- **Output:** JSON z metadanymi
 
 ### search-youtube
 - **Runtime:** Deno

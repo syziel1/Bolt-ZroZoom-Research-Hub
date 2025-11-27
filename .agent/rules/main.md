@@ -1,3 +1,7 @@
+---
+trigger: always_on
+---
+
 # Zasady współpracy z AI Agent
 
 ## Wersjonowanie (Semantic Versioning)

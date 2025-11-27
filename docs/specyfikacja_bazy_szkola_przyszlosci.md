@@ -1,4 +1,9 @@
-# Specyfikacja bazy danych Szkoła Przyszłości
+# Wstępna specyfikacja projektu bazy danych Szkoła Przyszłości
+
+> [!WARNING]
+> Ten dokument stanowi **wstępną specyfikację projektową** i może nie odzwierciedlać aktualnego stanu bazy danych.
+> Aktualnym źródłem prawdy jest plik [`technical.md`](../technical.md) oraz migracje SQL w katalogu `supabase/migrations`.
+
 
 ## 1. Cel bazy danych
 

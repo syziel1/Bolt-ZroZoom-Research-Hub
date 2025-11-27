@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Bot, Send, X, Sparkles } from 'lucide-react';
+import { Bot, Send, X, Sparkles, RotateCcw } from 'lucide-react';
 import { supabase, Resource, Subject } from '../lib/supabase';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
@@ -35,9 +35,8 @@ export function AiAssistant({
     const [internalIsOpen, setInternalIsOpen] = useState(false);
     const isOpen = propIsOpen !== undefined ? propIsOpen : internalIsOpen;
 
-    const [messages, setMessages] = useState<Message[]>([
-        { role: 'assistant', content: 'Cześć! Jestem Twoim AI Korepetytorem. W czym mogę Ci dzisiaj pomóc? Możesz pytać o dowolne zagadnienie szkolne!' }
-    ]);
+    const initialMessage: Message = { role: 'assistant', content: 'Cześć! Jestem AI Korepetytorem. W czym mogę pomóc?' };
+    const [messages, setMessages] = useState<Message[]>([initialMessage]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -67,6 +66,12 @@ export function AiAssistant({
         } else {
             setInternalIsOpen(newState);
         }
+    };
+
+    const handleClearChat = () => {
+        setMessages([initialMessage]);
+        setInput('');
+        scrollToBottom();
     };
 
     const handleSend = async (text: string = input) => {
@@ -168,16 +173,28 @@ export function AiAssistant({
                         <Bot size={20} />
                     </div>
                     <div>
-                        <h3 className="font-bold">AI Korepetytor</h3>
+                        <div className="flex items-center gap-2">
+                            <h3 className="font-bold">AI Korepetytor</h3>
+                            <span className="bg-white/20 text-xs px-1.5 py-0.5 rounded text-white font-medium">BETA</span>
+                        </div>
                         <p className="text-xs text-purple-100">Zawsze gotowy do pomocy</p>
                     </div>
                 </div>
-                <button
-                    onClick={() => handleToggle(false)}
-                    className="text-white/80 hover:text-white hover:bg-white/10 p-1 rounded-full transition-colors"
-                >
-                    <X size={20} />
-                </button>
+                <div className="flex items-center gap-1">
+                    <button
+                        onClick={handleClearChat}
+                        className="hover:bg-white/10 p-2 rounded-full transition"
+                        title="Nowy czat"
+                    >
+                        <RotateCcw size={18} />
+                    </button>
+                    <button
+                        onClick={() => handleToggle(false)}
+                        className="hover:bg-white/10 p-2 rounded-full transition"
+                    >
+                        <X size={20} />
+                    </button>
+                </div>
             </div>
 
             {/* Messages */}
@@ -260,6 +277,9 @@ export function AiAssistant({
                         <Send size={20} />
                     </button>
                 </form>
+                <p className="text-[10px] text-gray-400 text-center mt-2">
+                    AI (wersja Beta) może generować niedokładne informacje. Weryfikuj ważne dane.
+                </p>
             </div>
         </div>
     );
