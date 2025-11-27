@@ -36,9 +36,6 @@ ZroZoom Research Hub to platforma do gromadzenia, organizowania i udostępniania
 - 🔍 Wyszukiwanie pełnotekstowe (klient)
 - 🃏 Różne widoki kart (Hero, Lista, Siatka)
 - 🔗 Routing z URL parametrami
-- 🤖 AI Tutor - inteligentny asystent edukacyjny (Gemini 2.5 Flash)
-- 🎥 Wyszukiwanie wideo (YouTube API)
-- 🧪 Automatyczne testy komponentów (Vitest)
 
 ### Dla zalogowanych użytkowników
 - ➕ Dodawanie nowych zasobów

@@ -6,20 +6,11 @@ Minimalna dokumentacja techniczna dla repozytorium.
 
 ## 1. Architektura
 - **Backend / DB:** Supabase (PostgreSQL + Auth + RLS)
-- **Frontend:** Next.js / React (Vite) — modułowa architektura z custom hookami (`useDashboardData`, `useDashboardFilters`)
+- **Frontend:** Next.js / React (np. bolt.new) — czytelne API przez supabase-js
 - **Routing:** React Router DOM — deklaratywne routy, protected routes
 - **Publiczne odczytywanie:** materiały, tematy, poziomy, przedmioty
 - **Modyfikacje:** tylko zalogowani użytkownicy (z RLS)
 - **AI:** Supabase Edge Functions + Google Gemini API
-
-## 1a. Role i Uprawnienia
-- **admin**: Pełny dostęp do edycji, usuwania i zarządzania treścią.
-- **user**: Może dodawać zasoby, oceniać i komentować.
-- **guest** (niezalogowany):
-  - Może wyłącznie przeszukiwać i przeglądać zasoby.
-  - **Nie może** dodawać ani modyfikować zasobów.
-  - **Nie może** oceniać, komentować ani dodawać do ulubionych.
-  - Każdy zasób w systemie musi mieć przypisanego autora (`contributor_id`).
 
 ---
 
@@ -102,11 +93,30 @@ Minimalna dokumentacja techniczna dla repozytorium.
 - resource_id → resources.id
 - created_at
 
+### Automatyzacja (Triggers)
+- **increment_reputation_on_resource_add**: Automatycznie dodaje +10 punktów reputacji autorowi po dodaniu nowego zasobu.
+
 ---
 
 ## 3. Polityki RLS (skrót)
 
 ### Public SELECT
+- subjects, topics, levels → pełny dostęp odczytu
+- resources → SELECT dla wszystkich
+
+### INSERT — tylko WITH CHECK
+- użytkownik może dodać rekord tylko z własnym `author_id` / `contributor_id`
+
+### UPDATE / DELETE
+- użytkownik modyfikuje **wyłącznie własne** materiały, oceny i komentarze
+
+### Admin / service_role
+- pełny dostęp do subjects, topics, levels (zarządzanie słownikami)
+
+### Optymalizacja
+- wszystkie `auth.uid()` i `auth.role()` zapisane jako:
+  ```sql
+  (select auth.uid())
   (select auth.role())
   ```
 - widoki używają `SQL SECURITY INVOKER`
@@ -146,7 +156,6 @@ Minimalna dokumentacja techniczna dla repozytorium.
 ## 7. TODO (MVP)
 - Endpoint / frontend do dodawania materiałów
 - UI do filtrowania: subject + topic + level + type
-- **Wyszukiwanie:** Client-side (Fuse.js) - szybkie wyszukiwanie w załadowanych danych
 - Cache średnich ocen po stronie widoku lub materialized view
 
 ---
@@ -156,8 +165,6 @@ Minimalna dokumentacja techniczna dla repozytorium.
 - backendowy workflow: ekspert → review → approve/reject
 - leaderboard współpracowników
 - log aktywności (kto dodał, kto zrecenzował)
-
----
 
 ---
 
@@ -174,9 +181,10 @@ Minimalna dokumentacja techniczna dla repozytorium.
 ### analyze-content
 - **Runtime:** Deno
 - **Model:** Google Gemini 2.5 Flash
-- **Funkcja:** Automatyczne uzupełnianie metadanych (tytuł, opis, sugerowane tematy) na podstawie URL
-- **Input:** URL zasobu
-- **Output:** JSON z metadanymi
+- **Funkcja:** Automatyczna analiza treści (tytuł, opis, URL) i sugestia metadanych (przedmiot, temat, poziom)
+- **Input:** `{ title, description, url }`
+- **Output:** JSON z sugestiami
+- **Env:** `GEMINI_API_KEY`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`
 
 ### search-youtube
 - **Runtime:** Deno
@@ -188,24 +196,4 @@ Minimalna dokumentacja techniczna dla repozytorium.
 
 ---
 
-## 10. Testowanie
-
-### Stack testowy
-- **Runner:** Vitest (kompatybilny z Vite)
-- **Environment:** jsdom (symulacja przeglądarki)
-- **Utilities:** React Testing Library (testowanie komponentów z perspektywy użytkownika)
-
-### Struktura testów
-- Testy znajdują się w katalogu `src/components/__tests__/` (lub obok komponentów)
-- Plik konfiguracyjny: `src/test/setup.ts` (rozszerza matchery `jest-dom`)
-
-### Uruchamianie
-```bash
-npm test        # Uruchomienie wszystkich testów
-npm test -- ui  # Uruchomienie z interfejsem graficznym Vitest
-```
-
----
-
-Dokument gotowy do umieszczenia w głównym repozytorium jako `technical.md`. 
-
+Dokument gotowy do umieszczenia w głównym repozytorium jako `technical.md`.

@@ -10,6 +10,7 @@ Ten dokument opisuje plany rozwoju platformy ZroZoom Research Hub. Cele podzielo
 - [ ] **Seed Danych:** Import 50–100 quizów z Matzoo.pl oraz wybranych kanałów YouTube (automatyzacja przez AI/SQL).
 - [ ] **SEO & Meta:** Dodanie dynamicznych tytułów stron i opisów dla lepszego indeksowania w Google.
 - [ ] **Deployment:** Podpięcie własnej domeny (np. hub.zrozoom.pl) i konfiguracja HTTPS.
+- [x] **Wyszukiwanie (MVP):** Implementacja wyszukiwania po stronie klienta (Fuse.js).
 
 🟡 **Faza 2: Społeczność i Grywalizacja (Q1 2026)**
 **Cel:** Zachęcenie użytkowników do aktywności i powrotów.

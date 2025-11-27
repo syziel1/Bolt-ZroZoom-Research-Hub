@@ -38,6 +38,8 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 - **Edge Functions**: Integration with Supabase Edge Functions (`chat-with-ai`).
 - **Rich Text Support**: Markdown and LaTeX rendering for AI responses (`react-markdown`, `rehype-katex`).
 - **Video Search**: Integrated YouTube video search (`search-youtube` Edge Function).
+- **Metadata Analysis**: AI-powered metadata suggestions (`analyze-content` Edge Function).
+- **Favorites**: User favorites system (`user_favorites` table).
 - **UI**: Floating AI Assistant button and chat interface.
 
 ## [1.3.0] - 2025-11-26
