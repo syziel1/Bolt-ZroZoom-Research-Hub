@@ -1,15 +1,19 @@
 export const TRUSTED_DOMAINS = [
-    'wikipedia.org',
-    'geogebra.org',
-    'khanacademy.org',
-    'youtube.com',
-    'youtu.be',
+    'cke.gov.pl',
+    'commons.wikimedia.org',
+    'creativecommons.org',
+    'en.wikipedia.org',
     'gemini.google.com',
-    'openai.com',
-    'microsoft.com',
+    'geogebra.org',
     'google.com',
     'gov.pl',
-    'cke.gov.pl'
+    'khanacademy.org',
+    'microsoft.com',
+    'openai.com',
+    'pl.wikipedia.org',
+    'wikipedia.org',
+    'youtu.be',
+    'youtube.com'
 ];
 
 export function isTrustedDomain(url: string): boolean {

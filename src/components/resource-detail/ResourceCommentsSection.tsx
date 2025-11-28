@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import { MessageSquare, Edit, Trash2 } from 'lucide-react';
 import { ConfirmationModal } from '../ConfirmationModal';
+import { containsProfanity } from '../../lib/profanity';
 
 type Comment = {
     id: string;
@@ -73,6 +74,11 @@ export function ResourceCommentsSection({ resourceId, isGuestMode, onUpdate }: R
 
     const handleSubmitComment = async () => {
         if (!currentUserId || !commentText.trim()) return;
+
+        if (containsProfanity(commentText)) {
+            alert('Twój komentarz zawiera niedozwolone słowa. Proszę, zachowaj kulturę wypowiedzi.');
+            return;
+        }
 
         setSubmitting(true);
 

@@ -8,6 +8,7 @@ import { logger } from '../lib/logger';
 import { ThumbnailUploader } from './ThumbnailUploader';
 import { buildTopicTree } from '../utils/topicTree';
 import { TopicTree } from './TopicTree';
+import { containsProfanity } from '../lib/profanity';
 
 type ResourceFormProps = {
   subjects: Subject[];
@@ -211,6 +212,12 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
     setLoading(true);
     setError('');
     setSuccessMessage('');
+
+    if (containsProfanity(title) || containsProfanity(description)) {
+      setError('Tytuł lub opis zawiera niedozwolone słowa. Proszę, popraw treść.');
+      setLoading(false);
+      return;
+    }
 
     try {
       const {
