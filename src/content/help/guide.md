@@ -1,6 +1,6 @@
 # Przewodnik użytkownika
 
-## Witaj w Szkole Przyszłości z AI!
+## Witaj w Szkole Przyszłości z AI
 Nasza platforma to centralna baza wiedzy, współtworzona przez społeczność nauczycieli i uczniów.
 
 ## Role w systemie

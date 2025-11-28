@@ -17,7 +17,7 @@ Minimalna dokumentacja techniczna dla repozytorium.
 ## 2. Struktura bazy danych (skrót)
 
 ### profiles
-- id (uuid, PK)
+- ID (uuid, PK)
 - nick
 - name
 - role
@@ -25,35 +25,35 @@ Minimalna dokumentacja techniczna dla repozytorium.
 - timestamps
 
 ### subjects
-- id (uuid)
+- ID (uuid)
 - name
 - slug
 - order_index
 - timestamps
 
 ### topics
-- id (uuid)
-- subject_id → subjects.id
+- ID (uuid)
+- subject_id → subjects.ID
 - name, slug
-- parent_topic_id → topics.id (nullable)
+- parent_topic_id → topics.ID (nullable)
 - order_index
 - timestamps
 
 ### levels
-- id
+- ID
 - name
 - slug
 - order_index
 - timestamps
 
 ### resources
-- id
+- ID
 - title
 - author
-- url
+- URL
 - type
-- subject_id → subjects.id
-- contributor_id → profiles.id
+- subject_id → subjects.ID
+- contributor_id → profiles.ID
 - embedded (bool)
 - description
 - language
@@ -65,8 +65,8 @@ Minimalna dokumentacja techniczna dla repozytorium.
 - timestamps
 
 ### resource_topics
-- resource_id → resources.id
-- topic_id → topics.id
+- resource_id → resources.ID
+- topic_id → topics.ID
 
 ### resource_levels
 - resource_id
@@ -88,9 +88,9 @@ Minimalna dokumentacja techniczna dla repozytorium.
 - timestamps
 
 ### user_favorites
-- id
-- user_id → profiles.id
-- resource_id → resources.id
+- ID
+- user_id → profiles.ID
+- resource_id → resources.ID
 - created_at
 
 ### Automatyzacja (Triggers)
@@ -135,7 +135,7 @@ Minimalna dokumentacja techniczna dla repozytorium.
 - pełna struktura tematów (drzewo)
 
 ### v_subjects_basic
-- id + name + slug + order_index
+- ID + name + slug + order_index
 
 ---
 
