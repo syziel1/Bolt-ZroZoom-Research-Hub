@@ -45,7 +45,7 @@ Po dokładnym przetestowaniu aplikacji Szkoła Przyszłości z AI w wersji 2.0.0
 - Funkcja "Zawsze gotowy do pomocy"
 - Pozwala studentom zadawać pytania na dowolny temat edukacyjny
 - Interface: elegancki panel z gradientem purpurowo-niebieskim
-- Automatyczne wypełnianie danych za pomocą "Wyelinji z AI"
+- Automatyczne wypełnianie danych za pomocą "Wypełnij z AI"
 
 
 ### 5. **Dodawanie Zasobów**
@@ -59,7 +59,7 @@ Po dokładnym przetestowaniu aplikacji Szkoła Przyszłości z AI w wersji 2.0.0
     - Przedmiot
     - Poziomy edukacji (checkboxy)
     - Język
-- Przycisk "Wyelinji z AI" do automatycznego uzupełniania metadanych
+- Przycisk "Wypełnij z AI" do automatycznego uzupełniania metadanych
 
 
 ## 🎨 Interfejs i Design
@@ -121,7 +121,7 @@ W porównaniu do poprzednich wersji, aplikacja zawiera:
 - Wsparcie dla ciemnego motywu
 - Rozszerzona baza zasobów
 - Ulepszone filtry i podkategorie
-- Przycisk "Wyelinji z AI" do automatycznego uzupełniania metadanych zasobów
+- Przycisk "Wypełnij z AI" do automatycznego uzupełniania metadanych zasobów
 
 
 ## 💡 Rekomendacje i Obserwacje

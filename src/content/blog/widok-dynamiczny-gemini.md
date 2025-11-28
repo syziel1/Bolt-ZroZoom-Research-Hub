@@ -152,7 +152,7 @@ Proces:
    - Przygotowuje pytania dla uczniów
    - Tworzy nieortodoksyjne przykłady
    - Przygotowuje warianty zadań
-   - Wymieniania się materiałami z innymi nauczycielami
+   - Wymienia się materiałami z innymi nauczycielami
 5. Integruje materiały z planów lekcji
 ```
 
