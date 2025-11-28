@@ -26,6 +26,7 @@ export function Footer({ className = '', theme }: FooterProps) {
                 <p className="mb-2 text-sm">Szkoła Przyszłości z AI - Twoja baza wiedzy edukacyjnej</p>
                 <div className="flex justify-center gap-4 mb-2 text-xs md:text-sm">
                     <button onClick={() => navigate('/o-nas')} className={linkClasses}>O nas</button>
+                    <button onClick={() => navigate('/blog')} className={linkClasses}>Blog</button>
                     <button onClick={() => navigate('/pomoc')} className={linkClasses}>Pomoc</button>
                     <button onClick={() => navigate('/polityka-prywatnosci')} className={linkClasses}>Polityka Prywatności</button>
                 </div>

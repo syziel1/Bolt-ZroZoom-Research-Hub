@@ -1,4 +1,4 @@
-import { Menu, ArrowLeft, LogOut, Settings, Plus, Heart } from 'lucide-react';
+import { Menu, ArrowLeft, LogOut, Settings, Plus, Heart, BookOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ThemeToggle } from './ThemeToggle';
 
@@ -120,6 +120,14 @@ export function DashboardHeader({
                                     )}
                                 </button>
                             )}
+                            <button
+                                onClick={() => navigate('/blog')}
+                                className="bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-gray-200 px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 flex items-center gap-2"
+                                title="Blog Edukacyjny"
+                            >
+                                <BookOpen size={20} />
+                                <span className="hidden lg:inline">Blog</span>
+                            </button>
                             <button
                                 onClick={onOpenAddResource}
                                 className="bg-blue-600 text-white px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
