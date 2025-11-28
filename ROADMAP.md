@@ -9,23 +9,28 @@ Ten dokument opisuje plany rozwoju platformy Szkoła Przyszłości z AI. Cele po
 - [x] **SEO & Meta (PRIORYTET):** Wdrożenie `react-helmet-async` (dynamiczne tytuły/opisy) i Open Graph.
 - [ ] **Sitemap.xml:** Generowanie mapy strony dla Google.
 - [ ] **Blog Edukacyjny:** Uruchomienie sekcji blogowej (CMS w Supabase + Markdown) dla Content Marketingu.
-- [ ] **Konfiguracja Storage:** Uruchomienie bucketu `resource-thumbnails` i `avatars` w Supabase.
+- [x] **Konfiguracja Storage:** Uruchomienie bucketu `resource-thumbnails` w Supabase.
 - [ ] **Seed Danych:** Import 50–100 quizów i kanałów YouTube.
-- [ ] **Deployment:** Podpięcie własnej domeny (np. szkolaprzyszlosciai.pl) i konfiguracja HTTPS.
+- [/] **Deployment:** Podpięcie własnej domeny `szkolaprzyszlosciai.pl` (Instrukcja w `docs/DEPLOYMENT.md`).
 - [x] **Wyszukiwanie (MVP):** Implementacja wyszukiwania po stronie klienta (Fuse.js).
-- [ ] **Dark Mode:** Wdrożenie trybu ciemnego (Tailwind).
+- [x] **Dark Mode:** Wdrożenie trybu ciemnego (Tailwind).
+- [ ] **Refaktoryzacja (Dług Techniczny):**
+  - [ ] Dekompozycja `Dashboard.tsx` (wydzielenie modali i logiki filtrów).
+  - [ ] Nowe formularze: Wdrożenie `React Hook Form` + `Zod` w `ResourceForm.tsx`.
+  - [ ] **Centralizacja Typów:** Generowanie typów TS z bazy danych (Supabase CLI).
 
 🟡 **Faza 2: Społeczność i Grywalizacja (Q1 2026)**
 **Cel:** Zachęcenie użytkowników do aktywności, powrotów i budowania profilu.
-- [ ] **Profile Publiczne:** Edycja profilu (Avatar, Bio, Social Media).
+- [ ] **Profile Publiczne:** Edycja profilu (Avatar, Bio, Social Media) + bucket `avatars`.
 - [ ] **Powiadomienia:** System notyfikacji (wewn. + email) o komentarzach i ocenach.
 - [ ] **System Odznak (Badges):** Automatyczne przyznawanie odznak (np. "Debiutant", "Krytyk").
 - [ ] **Leaderboard:** Rankingi "Top Kontrybutorów" (miesięczne i ogólne).
 - [ ] **Poziomy Użytkownika:** Gamifikacja oparta o punkty reputacji (Nowicjusz -> Mentor).
+- [ ] **Internacjonalizacja (i18n):** Wydzielenie hardcodowanych tekstów do plików tłumaczeń.
 
 🔵 **Faza 3: Skalowalność i AI (Q2 2026)**
 **Cel:** Obsługa tysięcy zasobów i inteligentne wsparcie.
-- [ ] **Server-Side Pagination:** Przejście z filtrowania w przeglądarce na paginację w Supabase.
+- [ ] **Server-Side Pagination & Optymalizacja:** Przeniesienie filtrowania do Supabase (zamiast pobierania wszystkich danych).
 - [ ] **Inteligentne Tagi:** AI sugerujące tematy na podstawie tytułu i opisu zasobu.
 - [ ] **Wyszukiwanie Pełnotekstowe:** Wdrożenie Supabase Full Text Search.
 - [ ] **AI Recommendations:** Sugerowanie materiałów na podstawie historii.
@@ -37,4 +42,4 @@ Ten dokument opisuje plany rozwoju platformy Szkoła Przyszłości z AI. Cele po
 - [ ] **Ścieżki Nauki:** Tworzenie playlist edukacyjnych.
 - [ ] **Moduł Mentorski:** Konsultacje z ekspertami.
 
-**Status:** Dokument żywy. Ostatnia aktualizacja: Listopad 2025.
+**Status:** Dokument żywy. Ostatnia aktualizacja: 28 Listopada 2025.
