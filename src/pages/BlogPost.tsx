@@ -21,23 +21,6 @@ export function BlogPost() {
 
         post.content()
             .then((module) => {
-                // Vite imports markdown as a module with default export containing the string if configured with ?raw
-                // But here we are using standard import which might need adjustment based on vite config
-                // Let's assume ?raw is needed in the import in posts.ts, but wait, posts.ts uses import()
-                // Usually for markdown in Vite: import content from './file.md?raw'
-                // In posts.ts we did: content: () => import('./recenzja-wersja-2-0.md')
-                // This returns a module. If we want raw text, we might need to adjust posts.ts or how we access it.
-                // Let's try to handle the default export or the module content.
-                // If the file is imported as a module, it might have 'default' property if using some plugin,
-                // or we need to use ?raw in posts.ts.
-                // Let's check posts.ts again. It uses `import('./recenzja-wersja-2-0.md')`.
-                // Without ?raw, this might be processed by a plugin or return a URL.
-                // Given the previous usage in WhatsNew.tsx: `import changelog from '../../Changelog.md?raw';`
-                // I should probably update posts.ts to use ?raw for consistency and easier handling.
-                // But let's handle what we have. If it's a module, it might have 'default' as the content or path.
-                // Let's assume we need to fetch it if it returns a URL, or it is the string.
-                // Actually, let's fix posts.ts to use ?raw to be safe and consistent.
-                // But for now, let's try to read 'default'.
                 const text = module.default;
                 setContent(text);
                 setLoading(false);
