@@ -5,11 +5,20 @@ import { ArrowLeft, Calendar, User, Clock } from 'lucide-react';
 import { blogPosts } from '../content/blog/posts';
 import { Footer } from '../components/Footer';
 
+// Calculate reading time based on content (200-250 words per minute average)
+function calculateReadingTime(text: string): number {
+    const wordsPerMinute = 225; // Average reading speed
+    const wordCount = text.trim().split(/\s+/).length;
+    const readingTime = Math.ceil(wordCount / wordsPerMinute);
+    return readingTime;
+}
+
 export function BlogPost() {
     const { slug } = useParams<{ slug: string }>();
     const navigate = useNavigate();
     const [content, setContent] = useState('');
     const [loading, setLoading] = useState(true);
+    const [readingTime, setReadingTime] = useState(5); // Default fallback
 
     const post = blogPosts.find((p) => p.slug === slug);
 
@@ -23,6 +32,7 @@ export function BlogPost() {
             .then((module) => {
                 const text = module.default;
                 setContent(text);
+                setReadingTime(calculateReadingTime(text));
                 setLoading(false);
             })
             .catch((err) => {
@@ -72,7 +82,7 @@ export function BlogPost() {
                             </div>
                             <div className="flex items-center gap-1.5">
                                 <Clock size={16} />
-                                <span>5 min czytania</span>
+                                <span>{readingTime} min czytania</span>
                             </div>
                         </div>
 

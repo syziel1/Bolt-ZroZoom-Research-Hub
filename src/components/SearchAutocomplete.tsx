@@ -13,8 +13,8 @@ export function SearchAutocomplete({ resources, searchQuery, onSelectSuggestion 
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     // Generate suggestions based on search query
-    const suggestions = searchQuery.length >= 2
-        ? [
+    const uniqueSuggestions = searchQuery.length >= 2
+        ? Array.from(new Set([
             ...resources
                 .filter(resource =>
                     resource.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -25,11 +25,8 @@ export function SearchAutocomplete({ resources, searchQuery, onSelectSuggestion 
                     post.title.toLowerCase().includes(searchQuery.toLowerCase())
                 )
                 .map(post => post.title)
-        ].slice(0, 5) // Limit to 5 suggestions
+        ])).slice(0, 5) // Deduplicate first, then limit to 5 unique suggestions
         : [];
-
-    // Remove duplicates
-    const uniqueSuggestions = Array.from(new Set(suggestions));
 
     // Handle keyboard navigation
     useEffect(() => {

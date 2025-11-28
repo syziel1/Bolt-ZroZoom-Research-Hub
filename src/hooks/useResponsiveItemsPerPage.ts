@@ -7,6 +7,9 @@ export function useResponsiveItemsPerPage() {
         const calculateItemsPerPage = () => {
             const width = window.innerWidth;
 
+            // Custom breakpoints based on actual grid behavior with minmax(320px, 1fr)
+            // These differ from Tailwind's standard breakpoints to align with how the grid
+            // naturally reflows based on minimum card width (320px) rather than viewport size.
             // Grid uses minmax(320px, 1fr)
             // < 640px: 1 column -> 2 rows = 2 items
             // 640px - 960px: 2 columns -> 2 rows = 4 items
