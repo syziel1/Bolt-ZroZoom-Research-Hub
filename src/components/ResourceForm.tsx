@@ -443,7 +443,7 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
         }
       }
 
-      setAiGenerated(true);
+
       setSuccessMessage('AI przeanalizowało treść i uzupełniło formularz! ✨');
 
     } catch (err: unknown) {
