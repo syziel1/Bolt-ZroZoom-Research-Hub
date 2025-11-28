@@ -33,7 +33,10 @@ export function BlogIndex() {
                         <article
                             key={post.slug}
                             onClick={() => navigate(`/blog/${post.slug}`)}
-                            className="bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200 dark:border-slate-700 overflow-hidden cursor-pointer group flex flex-col h-full"
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/blog/${post.slug}`); }}
+                            role="link"
+                            tabIndex={0}
+                            className="bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200 dark:border-slate-700 overflow-hidden cursor-pointer group flex flex-col h-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
                         >
                             {post.coverImage && (
                                 <div className="h-48 overflow-hidden bg-gray-100 dark:bg-slate-700">
