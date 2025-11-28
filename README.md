@@ -40,6 +40,9 @@ Szkoła Przyszłości z AI to platforma do gromadzenia, organizowania i udostęp
 
 ### Dla zalogowanych użytkowników
 - ➕ Dodawanie nowych zasobów
+- 🏠 Personalizowany pulpit (User Home Page)
+- 📈 Statystyki aktywności (ulubione, oceny, dodane)
+- 🕰️ Historia ostatnio otwieranych zasobów
 - ⭐ Ocenianie materiałów (użyteczność, poprawność, trudność)
 - 💬 Komentowanie zasobów
 - 👤 Profil użytkownika z nickiem
@@ -174,6 +177,7 @@ Szkola-Przyszlosci-AI/
 ├── src/
 │   ├── components/          # Komponenty React
 │   │   ├── AuthForm.tsx     # Formularz logowania/rejestracji
+│   │   ├── UserHomePage.tsx # Pulpit użytkownika (zalogowany)
 │   │   ├── Dashboard.tsx    # Główny widok (kontener)
 │   │   ├── DashboardHeader.tsx # Nagłówek dashboardu
 │   │   ├── DashboardGrid.tsx   # Siatka zasobów
@@ -260,6 +264,13 @@ Aplikacja jest w pełni responsywna:
 
 #### AuthForm
 Formularz logowania i rejestracji z integracją Supabase Auth.
+
+#### UserHomePage
+Spersonalizowany pulpit dla zalogowanych użytkowników zawierający:
+- Powitanie z nickiem
+- Wyszukiwarkę
+- Karuzelę "Ostatnio otwierane"
+- Karty statystyk (ulubione, oceny, dodane)
 
 #### Dashboard
 Główny widok aplikacji z:

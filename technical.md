@@ -96,6 +96,9 @@ Minimalna dokumentacja techniczna dla repozytorium.
 ### Automatyzacja (Triggers)
 - **increment_reputation_on_resource_add**: Automatycznie dodaje +10 punktów reputacji autorowi po dodaniu nowego zasobu.
 
+### Funkcje (RPC)
+- **get_user_stats**: Oblicza statystyki użytkownika (liczba ulubionych, ocen, dodanych zasobów) po stronie serwera dla wydajności.
+
 ---
 
 ## 3. Polityki RLS (skrót)

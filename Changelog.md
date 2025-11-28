@@ -9,6 +9,14 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 - `uploadResourceThumbnail` logic in the service layer.
 - Image display handling in `ResourceCard`.
 
+## [1.9.0] - 2025-11-28
+**Added**
+- **User Home Page**: Personalized landing page for logged-in users.
+- **Statistics**: User statistics (favorites, ratings, added resources) with navigation to filtered Dashboard.
+- **Recently Opened**: Carousel of recently viewed resources with auto-scroll and persistence.
+- **Hooks**: `useUserStats` and `useRecentResources` for data management.
+- **Database**: `get_user_stats` RPC function for efficient stats calculation.
+
 ## [1.8.0] - 2025-11-28
 **Added**
 - **Wikipedia Integration**: Search and add articles from Polish Wikipedia (`search-wikipedia` Edge Function).
