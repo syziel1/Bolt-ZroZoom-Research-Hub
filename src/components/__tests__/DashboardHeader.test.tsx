@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect } from 'vitest';
 
 describe('DashboardHeader', () => {
-    it('renders user name correctly', () => {
+    it('renders logged in state correctly', () => {
         render(
             <BrowserRouter>
                 <DashboardHeader
@@ -20,7 +20,7 @@ describe('DashboardHeader', () => {
             </BrowserRouter>
         );
 
-        expect(screen.getByText(/Witaj, Jan/i)).toBeInTheDocument();
+        expect(screen.getByText(/Wyloguj się/i)).toBeInTheDocument();
     });
 
     it('renders guest mode correctly', () => {

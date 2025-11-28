@@ -3,7 +3,7 @@ import { Resource, ResourceTopic, ResourceLevel } from '../lib/supabase';
 import { getThumbnailUrl } from '../lib/storage';
 import { YouTubeModal } from './YouTubeModal';
 import { ResourceActionButton } from './ResourceActionButton';
-import { Star, ImageIcon, MessageSquare, Heart, Globe, Calendar, User } from 'lucide-react';
+import { Star, ImageIcon, MessageSquare, Heart, Globe, Calendar, User, LucideIcon } from 'lucide-react';
 
 export type ResourceCardVariant = 'default' | 'hero' | 'list';
 
@@ -73,7 +73,7 @@ export function ResourceCard({ resource, topics = [], levels = [], onCardClick, 
     });
   };
 
-  const InfoBadge = ({ icon: Icon, text }: { icon: any, text: string }) => (
+  const InfoBadge = ({ icon: Icon, text }: { icon: LucideIcon, text: string }) => (
     <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
       <Icon size={14} />
       <span>{text}</span>

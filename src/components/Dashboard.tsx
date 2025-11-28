@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase, Resource } from '../lib/supabase';
 import { logger } from '../lib/logger';
 import { Sidebar } from './Sidebar';
@@ -47,6 +47,7 @@ type DashboardProps = {
 
 export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardProps) {
   const navigate = useNavigate();
+  const routerLocation = useLocation();
 
   // Check auth session
   const [session, setSession] = useState<Session | null>(null);
@@ -120,7 +121,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
 
   // Parse URL query params for filters and resource sharing
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(routerLocation.search);
 
     // Handle resource sharing (?r=RESOURCE_ID)
     const resourceId = params.get('r');
@@ -160,7 +161,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
       setShowOnlyFavorites(false);
       setShowOnlyRated(false);
     }
-  }, [window.location.search, resources]); // Add resources dependency to retry if loaded later
+  }, [routerLocation.search, resources]); // Add resources dependency to retry if loaded later
 
   useEffect(() => {
     if (session?.user?.id) {
@@ -209,7 +210,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
   // Reset page when local filters change
   useEffect(() => {
     handlePageChange(1);
-  }, [showOnlyFavorites, showOnlyRated, showOnlyMine]);
+  }, [showOnlyFavorites, showOnlyRated, showOnlyMine, handlePageChange]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);

@@ -40,7 +40,7 @@ export function ThemeProvider({
 
             const applySystemTheme = () => {
                 const systemTheme = mediaQuery.matches ? 'dark' : 'light';
-                console.log('ThemeContext: System theme detected:', systemTheme, 'Matches dark:', mediaQuery.matches);
+
                 cleanClasses();
                 root.classList.add(systemTheme);
             };
@@ -70,7 +70,7 @@ export function ThemeProvider({
             };
         }
 
-        console.log('ThemeContext: Manual theme set:', theme);
+
         cleanClasses();
         root.classList.add(theme);
     }, [theme]);
@@ -90,6 +90,7 @@ export function ThemeProvider({
     );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useTheme = () => {
     const context = useContext(ThemeContext);
 
