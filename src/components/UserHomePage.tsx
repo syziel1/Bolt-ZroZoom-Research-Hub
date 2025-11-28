@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Star, MessageSquare, Plus, Clock, BookOpen, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Search, Star, Plus, Clock, BookOpen, ChevronRight, ChevronLeft } from 'lucide-react';
 import { useUserStats } from '../hooks/useUserStats';
 import { useRecentResources } from '../hooks/useRecentResources';
 import { Session } from '@supabase/supabase-js';
