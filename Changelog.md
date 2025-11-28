@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 The project follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 2025-11-28
+**Added**
+- **Filter Chips**: Interaktywne "chipsy" filtrów w nagłówku dashboardu
+  - Wyświetlanie aktywnych filtrów (wyszukiwanie, przedmiot, temat, poziom, język) jako usuwalne chipy
+  - Przycisk X na każdym chipie umożliwiający szybkie usunięcie filtru
+  - Dynamiczny nagłówek: "Wszystkie zasoby" vs "Wyniki filtrowania:"
+- **Blog Posts in Search**: Dodano wyświetlanie artykułów z bloga w wynikach wyszukiwania
+  - Sekcja "Artykuły z Bloga" pojawia się pod zasobami gdy znaleziono pasujące posty
+  - Grid z postami (responsywny: 1/2/3 kolumny)
+  - Hover effects i animacje
+
+**Changed**
+- **Sorting Position**: Sortowanie zawsze widoczne niezależnie od stanu filtrów
+
 ## [2.0.0] - 2025-11-28
 **Added**
 - **AI Chat Enhancements**: Major upgrade to AI Assistant functionality.

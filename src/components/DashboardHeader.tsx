@@ -69,23 +69,6 @@ export function DashboardHeader({
                         </>
                     ) : (
                         <>
-                            <div className="flex flex-col items-end mr-4 hidden md:flex">
-                                <span className="text-lg font-bold text-gray-800 dark:text-gray-100">
-                                    Witaj, {userName ? userName.split(' ')[0] : userNick}
-                                </span>
-                                <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
-                                    {(() => {
-                                        const date = new Date();
-                                        const day = date.getDay();
-                                        const hour = date.getHours();
-
-                                        if (day === 0 || day === 6) return "Nie zapominaj o nauce! 🏖️";
-                                        if (hour >= 5 && hour < 12) return "Czas się uczyć! 🌅";
-                                        if (hour >= 12 && hour < 18) return "Już bez pauzy! ☀️";
-                                        return "Ostatnia szansa na dzisiaj 🌙";
-                                    })()}
-                                </span>
-                            </div>
                             <ThemeToggle />
                             {isAdmin && (
                                 <button

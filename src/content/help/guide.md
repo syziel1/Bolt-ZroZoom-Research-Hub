@@ -22,11 +22,13 @@ Nasza platforma to centralna baza wiedzy, współtworzona przez społeczność n
 ## Funkcje i Możliwości
 
 ### 1. Wyszukiwanie i Filtrowanie
-Nasza wyszukiwarka działa w czasie rzeczywistym. Możesz filtrować zasoby według:
-- **Przedmiotu**: Matematyka, Fizyka, Informatyka, Biologia, Chemia, AI.
-- **Poziomu**: Od Szkoły Podstawowej, przez Maturę, aż po materiały dla Nauczycieli i Dorosłych.
-- **Języka**: Polski i Angielski.
-- **Podkategorii**: Szczegółowe działy dla każdego przedmiotu.
+Panel Zasobów oferuje zaawansowane możliwości wyszukiwania i filtrowania materiałów.
+> **Szczegółowe instrukcje znajdziesz w sekcji [Panel Zasobów](/pomoc/dashboard).**
+
+Możesz filtrować zasoby według:
+- Przedmiotu i Tematu
+- Poziomu nauczania
+- Języka (PL/EN)
 
 ### 2. Integracje
 Platforma łączy zasoby z wielu źródeł:

@@ -66,7 +66,7 @@ export function Navigation({ onNavigateToAuth, onScrollToSubjects, onBrowseAsGue
                   : 'bg-white text-violet-600 hover:bg-violet-50'
                   }`}
               >
-                Panel Użytkownika
+                Panel zasobów
                 <LayoutDashboard size={18} />
               </button>
             ) : (
@@ -135,7 +135,7 @@ export function Navigation({ onNavigateToAuth, onScrollToSubjects, onBrowseAsGue
                   : 'bg-white text-violet-600 hover:bg-violet-50'
                   }`}
               >
-                Panel Użytkownika
+                Panel zasobów
                 <LayoutDashboard size={18} />
               </button>
             ) : (
