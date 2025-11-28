@@ -107,30 +107,6 @@ export function Sidebar({
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Czego szukasz?</h2>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={onOpenYouTube}
-                className="bg-red-600 text-white px-3 py-2 rounded-md hover:bg-red-700 transition-colors flex items-center gap-2"
-                title="Szukaj wideo na YouTube"
-              >
-                <span className="text-sm font-medium">YouTube</span>
-                <Video size={18} />
-              </button>
-              <button
-                onClick={onOpenWikipedia}
-                className="bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-gray-200 px-3 py-2 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors flex items-center gap-2"
-                title="Szukaj w Wikipedii"
-              >
-                <span className="text-sm font-medium">Wiki</span>
-                <BookOpen size={18} />
-              </button>
-              <button
-                onClick={onClose}
-                className="md:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-              >
-                <X size={24} />
-              </button>
-            </div>
           </div>
 
           {/* Search field */}
@@ -188,6 +164,33 @@ export function Sidebar({
                 </div>
               </div>
             )}
+          </div>
+
+          <div className="mb-6">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={onOpenYouTube}
+                className="bg-red-600 text-white px-3 py-2 rounded-md hover:bg-red-700 transition-colors flex items-center gap-2"
+                title="Szukaj wideo na YouTube"
+              >
+                <span className="text-sm font-medium">YouTube</span>
+                <Video size={18} />
+              </button>
+              <button
+                onClick={onOpenWikipedia}
+                className="bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-gray-200 px-3 py-2 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors flex items-center gap-2"
+                title="Szukaj w Wikipedii"
+              >
+                <span className="text-sm font-medium">Wikipedia</span>
+                <BookOpen size={18} />
+              </button>
+              <button
+                onClick={onClose}
+                className="md:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <X size={24} />
+              </button>
+            </div>
           </div>
 
           <div className="mb-6">

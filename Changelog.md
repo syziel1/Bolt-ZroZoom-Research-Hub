@@ -9,6 +9,12 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 - `uploadResourceThumbnail` logic in the service layer.
 - Image display handling in `ResourceCard`.
 
+## [1.8.0] - 2025-11-28
+**Added**
+- **Wikipedia Integration**: Search and add articles from Polish Wikipedia (`search-wikipedia` Edge Function).
+- **UI**: Wikipedia search button in Sidebar.
+- **Components**: `WikipediaSearchModal` for browsing and selecting articles.
+
 ## [1.7.0] - 2025-11-27
 **Added**
 - **Dark Mode**: Full dark mode support with system preference detection and manual toggle.

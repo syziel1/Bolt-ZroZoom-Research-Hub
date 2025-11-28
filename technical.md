@@ -194,6 +194,14 @@ Minimalna dokumentacja techniczna dla repozytorium.
 - **Output:** Znormalizowana lista wideo (JSON)
 - **Env:** `YOUTUBE_API_KEY`
 
+### search-wikipedia
+- **Runtime:** Deno
+- **API:** Wikipedia Action API (Polish)
+- **Funkcja:** Wyszukiwanie artykułów w polskiej Wikipedii
+- **Input:** Query string
+- **Output:** Lista artykułów z miniaturami i opisami (JSON)
+- **Env:** Brak (publiczne API)
+
 ---
 
 Dokument gotowy do umieszczenia w głównym repozytorium jako `technical.md`.

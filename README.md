@@ -48,6 +48,7 @@ Szkoła Przyszłości z AI to platforma do gromadzenia, organizowania i udostęp
 - ⚙️ Panel administracyjny
 - 📝 Zarządzanie przedmiotami, tematami i poziomami
 - 🔍 Moderacja treści
+- 🌐 Integracja z Wikipedią (wyszukiwanie i dodawanie artykułów)
 
 ## 🛠 Stack technologiczny
 
