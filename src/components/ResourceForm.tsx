@@ -357,7 +357,7 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
         let errorMessage = error.message;
         try {
           if (error instanceof Error && 'context' in error) {
-            const context = error.context as Record<string, any>;
+            const context = error.context as { json?: () => Promise<{ error?: string }> };
             if (context && context.json) {
               const body = await context.json();
               if (body.error) errorMessage = body.error;
