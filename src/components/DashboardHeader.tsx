@@ -4,8 +4,6 @@ import { ThemeToggle } from './ThemeToggle';
 
 type DashboardHeaderProps = {
     isGuestMode: boolean;
-    userNick: string;
-    userName: string;
     userRole: string;
     onOpenSidebar: () => void;
     onSignOut: () => void;

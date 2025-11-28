@@ -4,13 +4,11 @@ import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect } from 'vitest';
 
 describe('DashboardHeader', () => {
-    it('renders user name correctly', () => {
+    it('renders application title correctly', () => {
         render(
             <BrowserRouter>
                 <DashboardHeader
                     isGuestMode={false}
-                    userNick="TestUser"
-                    userName="Jan Testowy"
                     userRole="user"
                     onOpenSidebar={() => { }}
                     onSignOut={() => { }}
@@ -20,7 +18,7 @@ describe('DashboardHeader', () => {
             </BrowserRouter>
         );
 
-        expect(screen.getByText(/Witaj, Jan/i)).toBeInTheDocument();
+        expect(screen.getByText(/Szkoła Przyszłości z AI/i)).toBeInTheDocument();
     });
 
     it('renders guest mode correctly', () => {
@@ -28,8 +26,6 @@ describe('DashboardHeader', () => {
             <BrowserRouter>
                 <DashboardHeader
                     isGuestMode={true}
-                    userNick=""
-                    userName=""
                     userRole=""
                     onOpenSidebar={() => { }}
                     onSignOut={() => { }}
