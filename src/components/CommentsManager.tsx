@@ -109,70 +109,70 @@ export function CommentsManager({ onCommentDeleted }: CommentsManagerProps) {
     return (
         <div className="space-y-4">
             <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">Zarządzanie Komentarzami</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Zarządzanie Komentarzami</h2>
             </div>
 
             {error && (
-                <div className="bg-red-50 text-red-600 p-3 rounded-md flex justify-between items-center">
+                <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-md flex justify-between items-center border border-red-100 dark:border-red-800">
                     <span>{error}</span>
                     <button onClick={() => setError('')} className="underline text-sm">Zamknij</button>
                 </div>
             )}
 
-            <div className="bg-white shadow overflow-hidden rounded-lg border border-gray-200">
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+            <div className="bg-white dark:bg-slate-800 shadow overflow-hidden rounded-lg border border-gray-200 dark:border-slate-700">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+                    <thead className="bg-gray-50 dark:bg-slate-900/50">
                         <tr>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-32">
                                 Data
                             </th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-40">
                                 Autor
                             </th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-48">
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-48">
                                 Zasób
                             </th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                 Treść
                             </th>
-                            <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
+                            <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-24">
                                 Akcje
                             </th>
                         </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
                         {comments.length === 0 ? (
                             <tr>
-                                <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
-                                    <MessageSquare className="mx-auto h-12 w-12 text-gray-300 mb-3" />
+                                <td colSpan={5} className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                                    <MessageSquare className="mx-auto h-12 w-12 text-gray-300 dark:text-gray-600 mb-3" />
                                     <p>Brak komentarzy do wyświetlenia</p>
                                 </td>
                             </tr>
                         ) : (
                             comments.map((comment) => (
-                                <tr key={comment.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <tr key={comment.id} className="hover:bg-gray-50 dark:hover:bg-slate-700/50">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                         {new Date(comment.created_at).toLocaleDateString()}
                                         <br />
-                                        <span className="text-xs text-gray-400">
+                                        <span className="text-xs text-gray-400 dark:text-gray-500">
                                             {new Date(comment.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
                                         {comment.author_nick}
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-gray-600">
+                                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
                                         <span className="line-clamp-2" title={comment.resource_title}>
                                             {comment.resource_title}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-gray-700">
+                                    <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
                                         <p className="whitespace-pre-wrap">{comment.content}</p>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <button
                                             onClick={() => handleDeleteClick(comment)}
-                                            className="text-red-600 hover:text-red-900 p-2 rounded hover:bg-red-50 transition-colors"
+                                            className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 p-2 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                                             title="Usuń komentarz"
                                         >
                                             <Trash2 size={18} />

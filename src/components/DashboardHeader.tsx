@@ -1,5 +1,6 @@
 import { Menu, ArrowLeft, LogOut, Settings, Plus, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { ThemeToggle } from './ThemeToggle';
 
 type DashboardHeaderProps = {
     isGuestMode: boolean;
@@ -32,18 +33,18 @@ export function DashboardHeader({
     const isAdmin = userRole === 'admin';
 
     return (
-        <header className="bg-white border-b border-gray-200 px-4 md:px-8 py-4">
+        <header className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 px-4 md:px-8 py-4">
             <div className="flex items-center justify-between">
                 <div className="flex items-center">
                     <button
                         onClick={onOpenSidebar}
-                        className="md:hidden mr-4 text-gray-600 hover:text-gray-900"
+                        className="md:hidden mr-4 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
                     >
                         <Menu size={24} />
                     </button>
                     <div>
-                        <h1 className="text-xl md:text-2xl font-bold text-gray-900">Szkoła Przyszłości z AI</h1>
-                        <p className="text-xs md:text-sm text-gray-600 mt-1 hidden sm:block">
+                        <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100">Szkoła Przyszłości z AI</h1>
+                        <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1 hidden sm:block">
                             Odkrywaj i dziel się zasobami edukacyjnymi
                         </p>
                     </div>
@@ -53,7 +54,7 @@ export function DashboardHeader({
                         <>
                             <button
                                 onClick={() => navigate('/')}
-                                className="text-gray-600 hover:text-gray-900 flex items-center gap-2"
+                                className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 flex items-center gap-2"
                                 title="Powrót do strony głównej"
                             >
                                 <ArrowLeft size={20} />
@@ -69,10 +70,10 @@ export function DashboardHeader({
                     ) : (
                         <>
                             <div className="flex flex-col items-end mr-4 hidden md:flex">
-                                <span className="text-lg font-bold text-gray-800">
+                                <span className="text-lg font-bold text-gray-800 dark:text-gray-100">
                                     Witaj, {userName ? userName.split(' ')[0] : userNick}
                                 </span>
-                                <span className="text-xs font-medium text-blue-600">
+                                <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
                                     {(() => {
                                         const date = new Date();
                                         const day = date.getDay();
@@ -85,6 +86,7 @@ export function DashboardHeader({
                                     })()}
                                 </span>
                             </div>
+                            <ThemeToggle />
                             {isAdmin && (
                                 <button
                                     onClick={onOpenAdmin}
@@ -100,7 +102,7 @@ export function DashboardHeader({
                                     onClick={onFavoritesToggle}
                                     className={`px-3 py-2 md:px-4 md:py-2 rounded-md flex items-center gap-2 font-medium transition-all ${showOnlyFavorites
                                         ? 'bg-red-500 text-white hover:bg-red-600'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-slate-700 dark:text-gray-200 dark:hover:bg-slate-600'
                                         }`}
                                     title={showOnlyFavorites ? 'Pokaż wszystkie zasoby' : 'Pokaż tylko ulubione'}
                                 >
@@ -128,7 +130,7 @@ export function DashboardHeader({
                             </button>
                             <button
                                 onClick={onSignOut}
-                                className="text-gray-600 hover:text-gray-900 flex items-center gap-2"
+                                className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 flex items-center gap-2"
                                 title="Wyloguj się"
                             >
                                 <LogOut size={20} />

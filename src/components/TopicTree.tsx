@@ -28,7 +28,7 @@ function TopicItem({ node, selectedTopics, onTopicToggle, level = 0 }: TopicItem
     return (
         <div className="select-none">
             <div
-                className={`flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-gray-100 cursor-pointer ${isSelected ? 'bg-blue-50' : ''
+                className={`flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-slate-700 cursor-pointer ${isSelected ? 'bg-blue-50 dark:bg-blue-900/30' : ''
                     }`}
                 style={{ marginLeft: `${level * 16}px` }}
                 onClick={() => {
@@ -53,7 +53,7 @@ function TopicItem({ node, selectedTopics, onTopicToggle, level = 0 }: TopicItem
                         <button
                             type="button"
                             onClick={handleToggle}
-                            className="text-gray-500 hover:text-gray-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded"
+                            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 dark:focus:ring-offset-slate-800 rounded"
                             aria-label={isExpanded ? `Collapse ${node.name}` : `Expand ${node.name}`}
                             aria-expanded={isExpanded}
                         >
@@ -68,10 +68,10 @@ function TopicItem({ node, selectedTopics, onTopicToggle, level = 0 }: TopicItem
                         name="topic-selection"
                         checked={isSelected}
                         onChange={() => onTopicToggle(node.id)}
-                        className="border-gray-300 text-blue-600 focus:ring-blue-500 flex-shrink-0"
+                        className="border-gray-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 bg-white dark:bg-slate-900 flex-shrink-0"
                         onClick={(e) => e.stopPropagation()}
                     />
-                    <span className={`text-sm truncate ${isSelected ? 'text-blue-700 font-medium' : 'text-gray-700'}`}>
+                    <span className={`text-sm truncate ${isSelected ? 'text-blue-700 dark:text-blue-300 font-medium' : 'text-gray-700 dark:text-gray-300'}`}>
                         {node.name}
                     </span>
                 </div>
@@ -96,7 +96,7 @@ function TopicItem({ node, selectedTopics, onTopicToggle, level = 0 }: TopicItem
 
 export function TopicTree({ nodes, selectedTopics, onTopicToggle }: TopicTreeProps) {
     if (nodes.length === 0) {
-        return <div className="text-sm text-gray-500 px-4 py-2">Brak tematów dla tego przedmiotu</div>;
+        return <div className="text-sm text-gray-500 dark:text-gray-400 px-4 py-2">Brak tematów dla tego przedmiotu</div>;
     }
 
     return (

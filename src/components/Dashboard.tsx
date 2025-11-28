@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, Resource } from '../lib/supabase';
 import { logger } from '../lib/logger';
@@ -8,6 +8,7 @@ import { ResourceDetailModal } from './ResourceDetailModal';
 import { AdminPanel } from './AdminPanel';
 import { LogOut } from 'lucide-react';
 import { YouTubeSearchModal } from './YouTubeSearchModal';
+import { WikipediaSearchModal } from './WikipediaSearchModal';
 import { useDashboardData } from '../hooks/useDashboardData';
 import { useDashboardFilters } from '../hooks/useDashboardFilters';
 import { useFavorites } from '../hooks/useFavorites';
@@ -16,6 +17,28 @@ import { DashboardGrid } from './DashboardGrid';
 import { AiAssistant } from './AiAssistant';
 import { Footer } from './Footer';
 import { SEO } from './SEO';
+import type { Session } from '@supabase/supabase-js';
+
+type YouTubeVideo = {
+  title: string;
+  url: string;
+  description: string;
+  duration: string;
+  thumbnailUrl: string;
+};
+
+type WikipediaArticle = {
+  title: string;
+  url: string;
+  description: string;
+  thumbnailUrl: string | null;
+};
+
+type TopicNode = {
+  id: string;
+  name: string;
+  children?: TopicNode[];
+};
 
 type DashboardProps = {
   isGuestMode?: boolean;
@@ -25,7 +48,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
   const navigate = useNavigate();
 
   // Check auth session
-  const [session, setSession] = useState<any>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [sessionChecked, setSessionChecked] = useState(false);
   const isGuestMode = sessionChecked ? !session : propIsGuestMode;
 
@@ -67,13 +90,10 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
     sortBy,
     setSortBy,
     currentPage,
-    totalPages,
     sortedResources,
     topicNodes,
     topicsLoading,
     hasActiveFilters,
-    indexOfFirstResource,
-    indexOfLastResource,
     handleSubjectChange,
     handleTopicToggle,
     handleLevelToggle,
@@ -92,12 +112,76 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
   // Favorites functionality
   const { isFavorite, toggleFavorite, isLoggedIn, favoritesCount } = useFavorites();
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
+  const [showOnlyRated, setShowOnlyRated] = useState(false);
+  const [showOnlyMine, setShowOnlyMine] = useState(false);
+  const [ratedResourceIds, setRatedResourceIds] = useState<Set<string>>(new Set());
 
-  // Apply favorites filter on top of existing filters
+  // Parse URL query params for filters
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('favorites') === 'true') {
+      setShowOnlyFavorites(true);
+      setShowOnlyRated(false);
+      setShowOnlyMine(false);
+    } else if (params.get('rated') === 'true') {
+      setShowOnlyRated(true);
+      setShowOnlyFavorites(false);
+      setShowOnlyMine(false);
+    } else if (params.get('mine') === 'true') {
+      setShowOnlyMine(true);
+      setShowOnlyFavorites(false);
+      setShowOnlyRated(false);
+    }
+  }, [window.location.search]);
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      supabase
+        .from('ratings')
+        .select('resource_id')
+        .eq('author_id', session.user.id)
+        .then(({ data }) => {
+          if (data) {
+            setRatedResourceIds(new Set(data.map(r => r.resource_id)));
+          }
+        });
+    }
+  }, [session]);
+
+  // Apply filters on top of existing filters
   const finalFilteredResources = useMemo(() => {
-    if (!showOnlyFavorites) return sortedResources;
-    return sortedResources.filter(resource => isFavorite(resource.id));
-  }, [sortedResources, showOnlyFavorites, isFavorite]);
+    let result = sortedResources;
+
+    if (showOnlyFavorites) {
+      result = result.filter(resource => isFavorite(resource.id));
+    }
+
+    if (showOnlyRated) {
+      result = result.filter(resource => ratedResourceIds.has(resource.id));
+    }
+
+    if (showOnlyMine) {
+      if (session?.user?.id) {
+        result = result.filter(resource => resource.contributor_id === session.user.id);
+      }
+    }
+
+    return result;
+  }, [sortedResources, showOnlyFavorites, showOnlyRated, showOnlyMine, isFavorite, session, ratedResourceIds]);
+
+  // Pagination for finalFilteredResources
+  const ITEMS_PER_PAGE = 12;
+  const totalFilteredPages = Math.ceil(finalFilteredResources.length / ITEMS_PER_PAGE);
+  const currentFilteredPage = Math.min(currentPage, Math.max(1, totalFilteredPages));
+
+  const indexOfLastFilteredResource = currentFilteredPage * ITEMS_PER_PAGE;
+  const indexOfFirstFilteredResource = indexOfLastFilteredResource - ITEMS_PER_PAGE;
+  const currentFilteredResources = finalFilteredResources.slice(indexOfFirstFilteredResource, indexOfLastFilteredResource);
+
+  // Reset page when local filters change
+  useEffect(() => {
+    handlePageChange(1);
+  }, [showOnlyFavorites, showOnlyRated, showOnlyMine]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -108,6 +192,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
 
   // YouTube Integration State
   const [isYouTubeModalOpen, setIsYouTubeModalOpen] = useState(false);
+  const [isWikipediaModalOpen, setIsWikipediaModalOpen] = useState(false);
   const [prefilledResource, setPrefilledResource] = useState<Partial<Resource> | null>(null);
 
   // AI Assistant State
@@ -150,7 +235,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
     setPrefilledResource(null);
   };
 
-  const handleYouTubeVideoAdd = (video: any) => {
+  const handleYouTubeVideoAdd = (video: YouTubeVideo) => {
     setIsYouTubeModalOpen(false);
     setPrefilledResource({
       title: video.title,
@@ -159,6 +244,19 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
       description: `${video.description}\n\n[Czas trwania: ${video.duration}]`,
       thumbnail_url: video.thumbnailUrl,
       language: 'pl' // Default to PL, user can change
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleWikipediaArticleAdd = (article: WikipediaArticle) => {
+    setIsWikipediaModalOpen(false);
+    setPrefilledResource({
+      title: article.title,
+      url: article.url,
+      type: 'article',
+      description: article.description,
+      thumbnail_url: article.thumbnailUrl ?? undefined,
+      language: 'pl'
     });
     setIsModalOpen(true);
   };
@@ -181,21 +279,21 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
 
   if (showAdminPanel && isAdmin) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="bg-white border-b border-gray-200 px-4 md:px-8 py-4">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+        <div className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 px-4 md:px-8 py-4">
           <div className="flex items-center justify-between max-w-7xl mx-auto">
-            <h1 className="text-xl md:text-2xl font-bold text-gray-900">Szkoła Przyszłości z AI</h1>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100">Szkoła Przyszłości z AI</h1>
             <div className="flex items-center gap-2 md:gap-4">
               <button
                 onClick={() => setShowAdminPanel(false)}
-                className="text-blue-600 hover:text-blue-800 flex items-center gap-2 text-sm md:text-base"
+                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex items-center gap-2 text-sm md:text-base"
               >
                 <span className="hidden md:inline">Powrót do pulpitu</span>
                 <span className="md:hidden">Powrót</span>
               </button>
               <button
                 onClick={handleSignOut}
-                className="text-gray-600 hover:text-gray-900 flex items-center gap-2 text-sm md:text-base"
+                className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 flex items-center gap-2 text-sm md:text-base"
               >
                 <LogOut size={20} />
                 <span className="hidden md:inline">Wyloguj się</span>
@@ -237,7 +335,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50 dark:bg-slate-900">
       <SEO
         title="Pulpit - Przeglądaj zasoby"
         description="Przeglądaj tysiące materiałów edukacyjnych, filtruj po przedmiotach i poziomach. Dołącz do społeczności Szkoły Przyszłości z AI."
@@ -264,6 +362,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
         setSearchQuery={setSearchQuery}
         resources={resources}
         onOpenYouTube={() => setIsYouTubeModalOpen(true)}
+        onOpenWikipedia={() => setIsWikipediaModalOpen(true)}
       />
 
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -283,11 +382,11 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
 
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
           {isGuestMode && (
-            <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="mb-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
               <div className="flex items-start gap-3">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-blue-900 mb-1">Przeglądasz jako gość</h3>
-                  <p className="text-sm text-blue-700">
+                  <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">Przeglądasz jako gość</h3>
+                  <p className="text-sm text-blue-700 dark:text-blue-300">
                     Zaloguj się, aby dodawać własne materiały, oceniać zasoby i mieć dostęp do dodatkowych funkcji.
                   </p>
                 </div>
@@ -305,17 +404,17 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
             loading={loading}
             filteredResources={finalFilteredResources}
             sortedResources={finalFilteredResources}
-            currentResources={finalFilteredResources}
+            currentResources={currentFilteredResources}
             resourceTopics={resourceTopics}
             resourceLevels={resourceLevels}
             hasActiveFilters={hasActiveFilters || showOnlyFavorites}
             recentlyAddedResources={recentlyAddedResources}
             sortBy={sortBy}
             setSortBy={setSortBy}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            indexOfFirstResource={indexOfFirstResource}
-            indexOfLastResource={indexOfLastResource}
+            currentPage={currentFilteredPage}
+            totalPages={totalFilteredPages}
+            indexOfFirstResource={indexOfFirstFilteredResource}
+            indexOfLastResource={indexOfLastFilteredResource}
             onPageChange={handlePageChange}
             onTopicClick={handleTopicClick}
             onCardClick={handleCardClick}
@@ -358,6 +457,13 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
         onAddVideo={handleYouTubeVideoAdd}
         isGuestMode={isGuestMode}
       />
+      <WikipediaSearchModal
+        isOpen={isWikipediaModalOpen}
+        onClose={() => setIsWikipediaModalOpen(false)}
+        initialQuery={searchQuery}
+        onAddArticle={handleWikipediaArticleAdd}
+        isGuestMode={isGuestMode}
+      />
       <AiAssistant
         isOpen={isAiAssistantOpen}
         onToggle={setIsAiAssistantOpen}
@@ -365,7 +471,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
         selectedSubject={subjects.find(s => s.subject_id === selectedSubject) || null}
         selectedTopics={(() => {
           // Convert topic IDs to names
-          const findTopicNames = (nodes: any[], ids: string[]): string[] => {
+          const findTopicNames = (nodes: TopicNode[], ids: string[]): string[] => {
             const names: string[] = [];
             for (const node of nodes) {
               if (ids.includes(node.id)) names.push(node.name);

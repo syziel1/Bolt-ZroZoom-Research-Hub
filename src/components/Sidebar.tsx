@@ -1,5 +1,5 @@
 import { Subject, Level, TopicNode, Resource } from '../lib/supabase';
-import { ChevronDown, ChevronRight, X, Search, Video } from 'lucide-react';
+import { ChevronDown, ChevronRight, X, Search, Video, BookOpen } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { TopicTree } from './TopicTree';
 import { SearchAutocomplete } from './SearchAutocomplete';
@@ -26,6 +26,7 @@ type SidebarProps = {
   setSearchQuery: (query: string) => void;
   resources: Resource[];
   onOpenYouTube: () => void;
+  onOpenWikipedia: () => void;
 };
 
 export function Sidebar({
@@ -50,6 +51,7 @@ export function Sidebar({
   setSearchQuery,
   resources,
   onOpenYouTube,
+  onOpenWikipedia,
 }: SidebarProps) {
   const [topicsExpanded, setTopicsExpanded] = useState(true);
   const [levelsExpanded, setLevelsExpanded] = useState(true);
@@ -98,29 +100,13 @@ export function Sidebar({
 
       {/* Sidebar content */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 w-80 bg-white border-r border-gray-200 h-screen overflow-y-auto transform transition-transform duration-300 ease-in-out
+        fixed inset-y-0 left-0 z-50 w-80 bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 h-screen overflow-y-auto transform transition-transform duration-300 ease-in-out
         md:relative md:translate-x-0
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900">Czego szukasz?</h2>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={onOpenYouTube}
-                className="bg-red-600 text-white px-3 py-2 rounded-md hover:bg-red-700 transition-colors flex items-center gap-2"
-                title="Szukaj wideo na YouTube"
-              >
-                <span className="text-sm font-medium">Szukaj</span>
-                <Video size={18} />
-              </button>
-              <button
-                onClick={onClose}
-                className="md:hidden text-gray-500 hover:text-gray-700"
-              >
-                <X size={24} />
-              </button>
-            </div>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Czego szukasz?</h2>
           </div>
 
           {/* Search field */}
@@ -136,7 +122,7 @@ export function Sidebar({
                   setShowAutocomplete(true);
                 }}
                 onFocus={() => setShowAutocomplete(true)}
-                className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                className="w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
               />
               {searchQuery && (
                 <button
@@ -144,7 +130,7 @@ export function Sidebar({
                     setSearchQuery('');
                     setShowAutocomplete(false);
                   }}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                 >
                   <X size={16} />
                 </button>
@@ -162,18 +148,18 @@ export function Sidebar({
             </div>
             {searchQuery && (
               <div className="mt-2 flex justify-center">
-                <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-300 rounded-full px-3 py-1.5 text-sm">
-                  <Search size={14} className="text-blue-600" />
-                  <span className="text-blue-800 font-medium">"{searchQuery}"</span>
+                <div className="inline-flex items-center gap-2 bg-blue-50 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 rounded-full px-3 py-1.5 text-sm">
+                  <Search size={14} className="text-blue-600 dark:text-blue-400" />
+                  <span className="text-blue-800 dark:text-blue-200 font-medium">"{searchQuery}"</span>
                   <button
                     onClick={() => {
                       setSearchQuery('');
                       setShowAutocomplete(false);
                     }}
-                    className="hover:bg-blue-200 rounded-full p-0.5 transition"
+                    className="hover:bg-blue-200 dark:hover:bg-blue-800 rounded-full p-0.5 transition"
                     title="Wyczyść wyszukiwanie"
                   >
-                    <X size={14} className="text-blue-600" />
+                    <X size={14} className="text-blue-600 dark:text-blue-400" />
                   </button>
                 </div>
               </div>
@@ -181,7 +167,35 @@ export function Sidebar({
           </div>
 
           <div className="mb-6">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Wybierz przedmiot</h3>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={onOpenYouTube}
+                className="bg-red-600 text-white px-3 py-2 rounded-md hover:bg-red-700 transition-colors flex items-center gap-2"
+                title="Szukaj wideo na YouTube"
+              >
+                <span className="text-sm font-medium">YouTube</span>
+                <Video size={18} />
+              </button>
+              <button
+                onClick={onOpenWikipedia}
+                className="bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-gray-200 px-3 py-2 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors flex items-center gap-2"
+                title="Szukaj w Wikipedii"
+              >
+                <span className="text-sm font-medium">Wikipedia</span>
+                <BookOpen size={18} />
+              </button>
+              <button
+                onClick={onClose}
+                className="md:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <X size={24} />
+              </button>
+            </div>
+          </div>
+
+          {/* Search field */}
+          <div className="mb-6">
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Wybierz przedmiot</h3>
             <div className="space-y-2">
               <button
                 onClick={() => {
@@ -189,8 +203,8 @@ export function Sidebar({
                   if (window.innerWidth < 768) onClose();
                 }}
                 className={`w-full text-left px-3 py-2 rounded-md text-sm ${selectedSubject === null
-                  ? 'bg-blue-50 text-blue-700 font-medium'
-                  : 'text-gray-700 hover:bg-gray-50'
+                  ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700'
                   }`}
               >
                 Wszystkie przedmioty
@@ -203,8 +217,8 @@ export function Sidebar({
                     if (window.innerWidth < 768) onClose();
                   }}
                   className={`w-full text-left px-3 py-2 rounded-md text-sm ${selectedSubject === subject.subject_id
-                    ? 'bg-blue-50 text-blue-700 font-medium'
-                    : 'text-gray-700 hover:bg-gray-50'
+                    ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700'
                     }`}
                 >
                   {subject.subject_name}
@@ -217,7 +231,7 @@ export function Sidebar({
             <div className="mb-6">
               <button
                 onClick={() => setTopicsExpanded(!topicsExpanded)}
-                className="flex items-center justify-between w-full text-sm font-semibold text-gray-700 mb-3"
+                className="flex items-center justify-between w-full text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3"
               >
                 <span>Wybierz interesujący Cię temat</span>
                 {topicsExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
@@ -229,12 +243,12 @@ export function Sidebar({
                       type="checkbox"
                       checked={includeSubtopics}
                       onChange={(e) => onIncludeSubtopicsChange?.(e.target.checked)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded border-gray-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 bg-white dark:bg-slate-900"
                     />
-                    <span className="text-sm text-gray-600">Pokaż też podtematy</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Pokaż też podtematy</span>
                   </label>
                   {isLoading ? (
-                    <div className="text-sm text-gray-500 px-2 py-1">Ładowanie tematów...</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400 px-2 py-1">Ładowanie tematów...</div>
                   ) : (
                     <TopicTree
                       nodes={topicNodes}
@@ -250,7 +264,7 @@ export function Sidebar({
           <div className="mb-6">
             <button
               onClick={() => setLevelsExpanded(!levelsExpanded)}
-              className="flex items-center justify-between w-full text-sm font-semibold text-gray-700 mb-3"
+              className="flex items-center justify-between w-full text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3"
             >
               <span>Wybierz poziomy</span>
               {levelsExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
@@ -260,15 +274,15 @@ export function Sidebar({
                 {levels.map((level) => (
                   <label
                     key={level.id}
-                    className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-50 cursor-pointer"
+                    className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer"
                   >
                     <input
                       type="checkbox"
                       checked={selectedLevels.includes(level.id)}
                       onChange={() => onLevelToggle(level.id)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded border-gray-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 bg-white dark:bg-slate-900"
                     />
-                    <span className="text-sm text-gray-700">{level.name}</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">{level.name}</span>
                   </label>
                 ))}
               </div>
@@ -278,7 +292,7 @@ export function Sidebar({
           <div className="mb-6">
             <button
               onClick={() => setLanguagesExpanded(!languagesExpanded)}
-              className="flex items-center justify-between w-full text-sm font-semibold text-gray-700 mb-3"
+              className="flex items-center justify-between w-full text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3"
             >
               <span>Wybierz język</span>
               {languagesExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
@@ -288,15 +302,15 @@ export function Sidebar({
                 {languages.map((language) => (
                   <label
                     key={language}
-                    className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-50 cursor-pointer"
+                    className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer"
                   >
                     <input
                       type="checkbox"
                       checked={selectedLanguages.includes(language)}
                       onChange={() => onLanguageToggle(language)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded border-gray-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 bg-white dark:bg-slate-900"
                     />
-                    <span className="text-sm text-gray-700">{getLanguageName(language)}</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">{getLanguageName(language)}</span>
                   </label>
                 ))}
               </div>

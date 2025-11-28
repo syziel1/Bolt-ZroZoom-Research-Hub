@@ -1,4 +1,4 @@
-# Przewodnik Użytkownika
+# Przewodnik użytkownika
 
 ## Witaj w Szkole Przyszłości z AI!
 Nasza platforma to centralna baza wiedzy, współtworzona przez społeczność nauczycieli i uczniów.

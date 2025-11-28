@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Session } from '@supabase/supabase-js';
 import { supabase } from './lib/supabase';
 import { LandingPage } from './components/LandingPage';
+import { UserHomePage } from './components/UserHomePage';
 import { AuthForm } from './components/AuthForm';
 import { Dashboard } from './components/Dashboard';
 import { MarkdownPage } from './components/MarkdownPage';
@@ -13,7 +14,7 @@ function AppRoutes({ session }: { session: Session | null }) {
   return (
     <Routes>
       {/* Public routes */}
-      <Route path="/" element={<LandingPage />} />
+      <Route path="/" element={session ? <UserHomePage /> : <LandingPage />} />
       <Route path="/auth" element={
         session ? <Navigate to="/zasoby" replace /> : <AuthForm />
       } />

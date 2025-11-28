@@ -66,16 +66,16 @@ export function DashboardGrid({
             {/* Sorting dropdown */}
             {hasActiveFilters && filteredResources.length > 0 && (
                 <div className="mb-4 flex items-center justify-between">
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
                         Znaleziono {filteredResources.length} {filteredResources.length === 1 ? 'zasób' : filteredResources.length < 5 ? 'zasoby' : 'zasobów'}
                     </p>
                     <div className="flex items-center gap-2">
-                        <label htmlFor="sort" className="text-sm text-gray-600">Sortuj:</label>
+                        <label htmlFor="sort" className="text-sm text-gray-600 dark:text-gray-400">Sortuj:</label>
                         <select
                             id="sort"
                             value={sortBy}
                             onChange={(e) => setSortBy(e.target.value as SortOption)}
-                            className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="px-3 py-1.5 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100"
                         >
                             <option value="newest">Najnowsze</option>
                             <option value="rating">Najlepiej oceniane</option>
@@ -88,7 +88,7 @@ export function DashboardGrid({
 
             {!hasActiveFilters && recentlyAddedResources.length > 0 && (
                 <div className="mb-8">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Ostatnio dodane</h2>
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Ostatnio dodane</h2>
                     <div className="grid gap-4 md:gap-6" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))' }}>
                         {recentlyAddedResources.map((resource) => (
                             <ResourceCard
@@ -108,10 +108,10 @@ export function DashboardGrid({
             )}
 
             <div className="mb-4">
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
                     {hasActiveFilters ? 'Wyniki filtrowania' : 'Wszystkie zasoby'}
                 </h2>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
                     Wyświetlanie zasobów {sortedResources.length > 0 ? indexOfFirstResource + 1 : 0}-{Math.min(indexOfLastResource, sortedResources.length)} spośród {sortedResources.length} znalezionych materiałów
                 </p>
             </div>
@@ -137,7 +137,7 @@ export function DashboardGrid({
                     <button
                         onClick={() => onPageChange(currentPage - 1)}
                         disabled={currentPage === 1}
-                        className="p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600"
+                        className="p-2 rounded-md border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600 dark:text-gray-300"
                     >
                         <ChevronLeft size={20} />
                     </button>
@@ -156,8 +156,8 @@ export function DashboardGrid({
                                         onClick={() => onPageChange(page)}
                                         className={`w-10 h-10 rounded-md flex-shrink-0 flex items-center justify-center text-sm font-medium transition-colors
                       ${currentPage === page
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                                                ? 'bg-blue-600 dark:bg-blue-500 text-white'
+                                                : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 border border-gray-300 dark:border-slate-600'
                                             }`}
                                     >
                                         {page}
@@ -167,7 +167,7 @@ export function DashboardGrid({
                                 page === currentPage - 2 ||
                                 page === currentPage + 2
                             ) {
-                                return <span key={page} className="w-10 h-10 flex items-center justify-center text-gray-400">...</span>;
+                                return <span key={page} className="w-10 h-10 flex items-center justify-center text-gray-400 dark:text-gray-500">...</span>;
                             }
                             return null;
                         })}
@@ -176,7 +176,7 @@ export function DashboardGrid({
                     <button
                         onClick={() => onPageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
-                        className="p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600"
+                        className="p-2 rounded-md border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600 dark:text-gray-300"
                     >
                         <ChevronRight size={20} />
                     </button>
@@ -184,7 +184,7 @@ export function DashboardGrid({
             )}
 
             {filteredResources.length === 0 && (
-                <div className="text-center py-12 text-gray-500 flex flex-col items-center gap-4">
+                <div className="text-center py-12 text-gray-500 dark:text-gray-400 flex flex-col items-center gap-4">
                     <p>Nie znaleziono zasobów pasujących do filtrów</p>
                     {searchQuery && (
                         <button

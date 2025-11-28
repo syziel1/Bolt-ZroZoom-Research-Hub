@@ -36,9 +36,13 @@ Szkoła Przyszłości z AI to platforma do gromadzenia, organizowania i udostęp
 - 🔍 Wyszukiwanie pełnotekstowe (klient)
 - 🃏 Różne widoki kart (Hero, Lista, Siatka)
 - 🔗 Routing z URL parametrami
+- 🌓 Tryb ciemny (Dark Mode) z wykrywaniem ustawień systemowych (beta)
 
 ### Dla zalogowanych użytkowników
 - ➕ Dodawanie nowych zasobów
+- 🏠 Personalizowany pulpit (User Home Page)
+- 📈 Statystyki aktywności (ulubione, oceny, dodane)
+- 🕰️ Historia ostatnio otwieranych zasobów
 - ⭐ Ocenianie materiałów (użyteczność, poprawność, trudność)
 - 💬 Komentowanie zasobów
 - 👤 Profil użytkownika z nickiem
@@ -47,6 +51,7 @@ Szkoła Przyszłości z AI to platforma do gromadzenia, organizowania i udostęp
 - ⚙️ Panel administracyjny
 - 📝 Zarządzanie przedmiotami, tematami i poziomami
 - 🔍 Moderacja treści
+- 🌐 Integracja z Wikipedią (wyszukiwanie i dodawanie artykułów)
 
 ## 🛠 Stack technologiczny
 
@@ -172,24 +177,11 @@ Szkola-Przyszlosci-AI/
 ├── src/
 │   ├── components/          # Komponenty React
 │   │   ├── AuthForm.tsx     # Formularz logowania/rejestracji
+│   │   ├── UserHomePage.tsx # Pulpit użytkownika (zalogowany)
 │   │   ├── Dashboard.tsx    # Główny widok (kontener)
 │   │   ├── DashboardHeader.tsx # Nagłówek dashboardu
 │   │   ├── DashboardGrid.tsx   # Siatka zasobów
 │   │   ├── Sidebar.tsx      # Boczne menu z filtrami
-│   │   ├── TopicTree.tsx    # Drzewo tematów
-│   │   ├── ResourceCard.tsx # Karta pojedynczego zasobu
-│   │   ├── YouTubeSearchModal.tsx # Modal wyszukiwania YouTube
-│   │   ├── AddResourceModal.tsx
-│   │   ├── ResourceDetailModal.tsx
-│   │   ├── AdminPanel.tsx
-│   │   └── LandingPage.tsx
-│   ├── hooks/               # Custom React hooks
-│   │   ├── useDashboardData.ts    # Logika pobierania danych
-│   │   ├── useDashboardFilters.ts # Logika filtrowania
-│   │   └── useTopics.ts     # Hook do zarządzania tematami
-│   ├── lib/                 # Biblioteki i konfiguracja
-│   │   └── supabase.ts      # Klient Supabase + typy
-│   ├── test/                # Konfiguracja testów
 │   │   └── setup.ts         # Setup Vitest
 │   ├── App.tsx              # Główny komponent aplikacji
 │   ├── main.tsx             # Entry point
@@ -272,6 +264,13 @@ Aplikacja jest w pełni responsywna:
 
 #### AuthForm
 Formularz logowania i rejestracji z integracją Supabase Auth.
+
+#### UserHomePage
+Spersonalizowany pulpit dla zalogowanych użytkowników zawierający:
+- Powitanie z nickiem
+- Wyszukiwarkę
+- Karuzelę "Ostatnio otwierane"
+- Karty statystyk (ulubione, oceny, dodane)
 
 #### Dashboard
 Główny widok aplikacji z:

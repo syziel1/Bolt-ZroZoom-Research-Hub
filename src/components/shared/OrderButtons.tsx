@@ -13,7 +13,7 @@ export function OrderButtons({ onMoveUp, onMoveDown, canMoveUp, canMoveDown }: O
             <button
                 onClick={onMoveUp}
                 disabled={!canMoveUp}
-                className="p-1 text-gray-600 hover:text-gray-900 disabled:opacity-30"
+                className="p-1 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 disabled:opacity-30"
                 aria-label="Przesuń w górę"
             >
                 <ChevronUp size={16} />
@@ -21,7 +21,7 @@ export function OrderButtons({ onMoveUp, onMoveDown, canMoveUp, canMoveDown }: O
             <button
                 onClick={onMoveDown}
                 disabled={!canMoveDown}
-                className="p-1 text-gray-600 hover:text-gray-900 disabled:opacity-30"
+                className="p-1 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 disabled:opacity-30"
                 aria-label="Przesuń w dół"
             >
                 <ChevronDown size={16} />

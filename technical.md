@@ -96,6 +96,9 @@ Minimalna dokumentacja techniczna dla repozytorium.
 ### Automatyzacja (Triggers)
 - **increment_reputation_on_resource_add**: Automatycznie dodaje +10 punktów reputacji autorowi po dodaniu nowego zasobu.
 
+### Funkcje (RPC)
+- **get_user_stats**: Oblicza statystyki użytkownika (liczba ulubionych, ocen, dodanych zasobów) po stronie serwera dla wydajności.
+
 ---
 
 ## 3. Polityki RLS (skrót)
@@ -172,11 +175,24 @@ Minimalna dokumentacja techniczna dla repozytorium.
 
 ### chat-with-ai
 - **Runtime:** Deno
-- **Model:** Google Gemini 2.5 Flash
-- **Funkcja:** Edukacyjny asystent AI (AI Tutor)
-- **Input:** Historia czatu (JSON)
-- **Output:** Streaming text / Markdown + LaTeX
+- **Model:** Google Gemini 2.5 Pro (upgraded from Flash for better quality)
+- **Funkcja:** Edukacyjny asystent AI (AI Tutor) z personalizacją
+- **Input:** 
+  - `messages`: Historia czatu (JSON array)
+  - `userContext`: Opcjonalny kontekst użytkownika (userName, language)
+- **Output:** JSON `{ content: string }` (Markdown + LaTeX)
+- **System Prompt:** Ładowany z wbudowanej kopii `system-prompt.md`
+- **Token Management:**
+  - Historia: dynamiczny limit ~4000 tokenów
+  - Output: 2048 tokenów (zwiększone z 800)
+  - Fallback: zawsze przynajmniej ostatnia wiadomość
+- **Features:**
+  - Automatyczne wykrywanie języka (polski/angielski)
+  - Personalizacja odpowiedzi na podstawie nazwy użytkownika
+  - Debug logging dla monitorowania
+  - Obsługa błędów API quota i konfiguracji
 - **Security:** Weryfikacja klucza API po stronie serwera (Edge)
+- **Env:** `GEMINI_API_KEY`
 
 ### analyze-content
 - **Runtime:** Deno
@@ -194,6 +210,27 @@ Minimalna dokumentacja techniczna dla repozytorium.
 - **Output:** Znormalizowana lista wideo (JSON)
 - **Env:** `YOUTUBE_API_KEY`
 
+### search-wikipedia
+- **Runtime:** Deno
+- **API:** Wikipedia Action API (Polish)
+- **Funkcja:** Wyszukiwanie artykułów w polskiej Wikipedii
+- **Input:** Query string
+- **Output:** Lista artykułów z miniaturami i opisami (JSON)
+- **Env:** Brak (publiczne API)
+
 ---
 
 Dokument gotowy do umieszczenia w głównym repozytorium jako `technical.md`.
+
+---
+
+## 10. UI & Theming
+
+### Dark Mode
+- **Implementacja:** `ThemeContext` + Tailwind CSS `darkMode: 'class'`
+- **Storage:** `localStorage` (klucz: `vite-ui-theme`)
+- **Tryby:** `light`, `dark`, `system` (auto-wykrywanie do dopracowania i testowania)
+
+### Style
+- **Tailwind:** Globalne style w `index.css` dla scrollbarów i podstawowych elementów.
+- **Komponenty:** Wszystkie komponenty wspierają klasy `dark:` dla spójnego wyglądu.
