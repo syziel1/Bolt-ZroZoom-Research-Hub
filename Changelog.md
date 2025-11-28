@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 The project follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2025-11-28
+### Added
+- **Bezpieczeństwo**: System ostrzegania przed linkami zewnętrznymi (whitelist).
+- **Moderacja**: Automatyczny filtr wulgaryzmów w komentarzach i zasobach.
+- **Legal**: Strona "Zasady korzystania z serwisu" (`/zasady`).
+- **UX**: Aktywne linki i znaczniki czasowe (seek) w opisach wideo.
+- **UI**: Powiększona miniatura w szczegółach zasobu.
+
 ## [2.1.0] - 2025-11-28
 ### Added
 - **System Pomocy**: Nowe przewodniki dla Dashboardu i Formularza Zasobów.

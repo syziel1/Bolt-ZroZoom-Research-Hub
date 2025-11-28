@@ -43,7 +43,10 @@ Szkoła Przyszłości z AI to platforma do gromadzenia, organizowania i udostęp
 - 🔍 Wyszukiwanie pełnotekstowe (klient)
 - 🃏 Różne widoki kart (Hero, Lista, Siatka)
 - 🔗 Routing z URL parametrami
+- 🔗 Routing z URL parametrami
 - 🌓 Tryb ciemny (Dark Mode) z wykrywaniem ustawień systemowych (beta)
+- 🛡️ Ostrzeżenia przed linkami zewnętrznymi
+- 📜 Zasady korzystania z serwisu (`/zasady`)
 
 ### Dla zalogowanych użytkowników
 - ➕ Dodawanie nowych zasobów
@@ -57,7 +60,9 @@ Szkoła Przyszłości z AI to platforma do gromadzenia, organizowania i udostęp
 ### Dla administratorów
 - ⚙️ Panel administracyjny
 - 📝 Zarządzanie przedmiotami, tematami i poziomami
-- 🔍 Moderacja treści
+- ⚙️ Panel administracyjny
+- 📝 Zarządzanie przedmiotami, tematami i poziomami
+- 🔍 Moderacja treści (automatyczny filtr wulgaryzmów)
 - 🌐 Integracja z Wikipedią (wyszukiwanie i dodawanie artykułów)
 
 ## 🛠 Stack technologiczny
@@ -332,5 +337,5 @@ W razie pytań skontaktuj się przez Issues na GitHubie.
 
 ---
 
-**Wersja:** 2.1.0  
+**Wersja:** 2.2.0  
 **Ostatnia aktualizacja:** 2025-11-28

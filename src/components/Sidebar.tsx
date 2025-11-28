@@ -54,8 +54,8 @@ export function Sidebar({
   onOpenWikipedia,
 }: SidebarProps) {
   const [topicsExpanded, setTopicsExpanded] = useState(true);
-  const [levelsExpanded, setLevelsExpanded] = useState(true);
-  const [languagesExpanded, setLanguagesExpanded] = useState(true);
+  const [levelsExpanded, setLevelsExpanded] = useState(false);
+  const [languagesExpanded, setLanguagesExpanded] = useState(false);
   const [showAutocomplete, setShowAutocomplete] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
