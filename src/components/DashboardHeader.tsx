@@ -1,5 +1,5 @@
-import { Menu, ArrowLeft, LogOut, Settings, Plus, Heart, BookOpen } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Menu, LogOut, Settings, Plus, Heart, BookOpen, Sparkles } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
 import { ThemeToggle } from './ThemeToggle';
 
 type DashboardHeaderProps = {
@@ -18,8 +18,6 @@ type DashboardHeaderProps = {
 
 export function DashboardHeader({
     isGuestMode,
-    userNick,
-    userName,
     userRole,
     onOpenSidebar,
     onSignOut,
@@ -43,7 +41,12 @@ export function DashboardHeader({
                         <Menu size={24} />
                     </button>
                     <div>
-                        <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100">Szkoła Przyszłości z AI</h1>
+                        <Link to="/" className="group inline-flex items-center">
+                            <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                Szkoła Przyszłości z AI
+                                <Sparkles className="w-4 h-4 text-blue-500 ml-0.5 -mt-4 animate-pulse" />
+                            </h1>
+                        </Link>
                         <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1 hidden sm:block">
                             Odkrywaj i dziel się zasobami edukacyjnymi
                         </p>
@@ -52,14 +55,6 @@ export function DashboardHeader({
                 <div className="flex items-center gap-2 md:gap-4">
                     {isGuestMode ? (
                         <>
-                            <button
-                                onClick={() => navigate('/')}
-                                className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 flex items-center gap-2"
-                                title="Powrót do strony głównej"
-                            >
-                                <ArrowLeft size={20} />
-                                <span className="hidden lg:inline">Powrót</span>
-                            </button>
                             <button
                                 onClick={() => navigate('/auth')}
                                 className="bg-blue-600 text-white px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
@@ -77,7 +72,7 @@ export function DashboardHeader({
                                     title="Panel Administracyjny"
                                 >
                                     <Settings size={20} />
-                                    <span className="hidden lg:inline">Panel Admina</span>
+                                    <span className="hidden xl:inline">Panel Admina</span>
                                 </button>
                             )}
                             {!isGuestMode && onFavoritesToggle && (
@@ -93,7 +88,7 @@ export function DashboardHeader({
                                         size={20}
                                         className={showOnlyFavorites ? 'fill-current' : ''}
                                     />
-                                    <span className="hidden lg:inline">
+                                    <span className="hidden xl:inline">
                                         {showOnlyFavorites ? 'Ulubione' : 'Pokaż ulubione'}
                                     </span>
                                     {favoritesCount > 0 && (
@@ -109,7 +104,7 @@ export function DashboardHeader({
                                 title="Blog Edukacyjny"
                             >
                                 <BookOpen size={20} />
-                                <span className="hidden lg:inline">Blog</span>
+                                <span className="hidden xl:inline">Blog</span>
                             </button>
                             <button
                                 onClick={onOpenAddResource}
@@ -117,15 +112,15 @@ export function DashboardHeader({
                                 title="Dodaj zasób"
                             >
                                 <Plus size={20} />
-                                <span className="hidden sm:inline">Dodaj zasób</span>
+                                <span className="hidden lg:inline">Dodaj zasób</span>
                             </button>
                             <button
                                 onClick={onSignOut}
-                                className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 flex items-center gap-2"
+                                className="bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-gray-200 px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 flex items-center gap-2"
                                 title="Wyloguj się"
                             >
                                 <LogOut size={20} />
-                                <span className="hidden lg:inline">Wyloguj się</span>
+                                <span className="hidden xl:inline">Wyloguj się</span>
                             </button>
                         </>
                     )}
