@@ -2,7 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { supabase, Resource, ResourceTopic } from '../lib/supabase';
 import { useRecentResources } from '../hooks/useRecentResources';
 import { getThumbnailUrl } from '../lib/storage';
-import { X, Star, MessageSquare, Edit, Trash2, ExternalLink, Video, FileText, Presentation, Beaker, Wrench, User, Globe, Calendar, Sparkles } from 'lucide-react';
+import { getYouTubeEmbedUrl, extractYouTubeVideoId } from '../lib/youtube';
+import { ResourceActionButton } from './ResourceActionButton';
+import { YouTubeModal } from './YouTubeModal';
+import { ResourceRatingSection } from './resource-detail/ResourceRatingSection';
+import { ResourceCommentsSection } from './resource-detail/ResourceCommentsSection';
+import { X, Edit, Trash2, Video, FileText, Presentation, Beaker, Wrench, User, Globe, Calendar, Sparkles, Heart } from 'lucide-react';
 import { ConfirmationModal } from './ConfirmationModal';
 
 type ResourceDetailModalProps = {
@@ -12,23 +17,6 @@ type ResourceDetailModalProps = {
   onResourceUpdated: () => void;
   isGuestMode?: boolean;
   onEdit?: (resource: Resource) => void;
-};
-
-type Rating = {
-  id: string;
-  rating_usefulness: number;
-  rating_correctness: number;
-  difficulty_match: number | null;
-  author_nick: string;
-  created_at: string;
-};
-
-type Comment = {
-  id: string;
-  content: string;
-  author_nick: string;
-  created_at: string;
-  author_id: string;
 };
 
 const typeIcons: Record<string, React.ElementType> = {
@@ -41,41 +29,14 @@ const typeIcons: Record<string, React.ElementType> = {
   tool: Wrench,
 };
 
-const getYouTubeEmbedUrl = (url: string): string | null => {
-  if (!url) return null;
-
-  // Handle various YouTube URL formats
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-  const match = url.match(regExp);
-
-  if (match && match[2].length === 11) {
-    return `https://www.youtube.com/embed/${match[2]}`;
-  }
-
-  return null;
-};
-
 export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdated, isGuestMode = false, onEdit }: ResourceDetailModalProps) {
-  const [ratings, setRatings] = useState<Rating[]>([]);
-  const [comments, setComments] = useState<Comment[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [currentUserRole, setCurrentUserRole] = useState<string>('student');
-  const [showRatingForm, setShowRatingForm] = useState(false);
-  const [showCommentForm, setShowCommentForm] = useState(false);
-  const [ratingData, setRatingData] = useState({
-    usefulness: 5,
-    correctness: 5,
-    difficulty: 3,
-  });
-  const [commentText, setCommentText] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [userHasRated, setUserHasRated] = useState(false);
-  const [deleteCommentConfirm, setDeleteCommentConfirm] = useState<string | null>(null);
   const [deleteResourceConfirm, setDeleteResourceConfirm] = useState(false);
   const [topics, setTopics] = useState<ResourceTopic[]>([]);
-  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
-
-
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [showYouTubeModal, setShowYouTubeModal] = useState(false);
+  const [youTubeVideoId, setYouTubeVideoId] = useState<string | null>(null);
 
   const loadUserData = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -92,73 +53,42 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     }
   }, []);
 
-  const checkUserRating = useCallback(async () => {
-    if (!resource) return;
+  const checkFavoriteStatus = useCallback(async () => {
+    if (!resource || isGuestMode) return;
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       const { data } = await supabase
-        .from('ratings')
-        .select('*')
+        .from('user_favorites')
+        .select('id')
         .eq('resource_id', resource.id)
-        .eq('author_id', user.id)
+        .eq('user_id', user.id)
         .maybeSingle();
+      setIsFavorite(!!data);
+    }
+  }, [resource, isGuestMode]);
 
-      setUserHasRated(!!data);
-      if (data) {
-        setRatingData({
-          usefulness: data.rating_usefulness,
-          correctness: data.rating_correctness,
-          difficulty: data.difficulty_match || 3,
+  const toggleFavorite = async () => {
+    if (!resource || !currentUserId) return;
+
+    if (isFavorite) {
+      const { error } = await supabase
+        .from('user_favorites')
+        .delete()
+        .eq('resource_id', resource.id)
+        .eq('user_id', currentUserId);
+
+      if (!error) setIsFavorite(false);
+    } else {
+      const { error } = await supabase
+        .from('user_favorites')
+        .insert({
+          resource_id: resource.id,
+          user_id: currentUserId
         });
-      }
+
+      if (!error) setIsFavorite(true);
     }
-  }, [resource]);
-
-  const loadRatings = useCallback(async () => {
-    if (!resource) return;
-    const { data } = await supabase
-      .from('ratings')
-      .select(`
-        id,
-        rating_usefulness,
-        rating_correctness,
-        difficulty_match,
-        created_at,
-        author:author_id (nick)
-      `)
-      .eq('resource_id', resource.id)
-      .order('created_at', { ascending: false });
-
-    if (data) {
-      setRatings(data.map(r => ({
-        ...r,
-        author_nick: (r.author as unknown as { nick: string })?.nick || 'Nieznany',
-      })));
-    }
-  }, [resource]);
-
-  const loadComments = useCallback(async () => {
-    if (!resource) return;
-    const { data } = await supabase
-      .from('comments')
-      .select(`
-        id,
-        content,
-        created_at,
-        author_id,
-        author:author_id (nick)
-      `)
-      .eq('resource_id', resource.id)
-      .is('parent_comment_id', null)
-      .order('created_at', { ascending: false });
-
-    if (data) {
-      setComments(data.map(c => ({
-        ...c,
-        author_nick: (c.author as unknown as { nick: string })?.nick || 'Nieznany',
-      })));
-    }
-  }, [resource]);
+  };
 
   const loadTopics = useCallback(async () => {
     if (!resource) return;
@@ -178,96 +108,12 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     if (isOpen && resource) {
       if (!isGuestMode) {
         loadUserData();
-        checkUserRating();
+        checkFavoriteStatus();
         addRecent(resource.id);
       }
-      loadRatings();
-      loadComments();
       loadTopics();
     }
-  }, [isOpen, resource, isGuestMode, loadUserData, checkUserRating, loadRatings, loadComments, loadTopics, addRecent]);
-
-  const handleSubmitRating = async () => {
-    if (!resource || !currentUserId) return;
-
-    setSubmitting(true);
-    const { error } = await supabase
-      .from('ratings')
-      .upsert({
-        resource_id: resource.id,
-        author_id: currentUserId,
-        rating_usefulness: ratingData.usefulness,
-        rating_correctness: ratingData.correctness,
-        difficulty_match: ratingData.difficulty,
-      }, { onConflict: 'resource_id,author_id' });
-
-    if (!error) {
-      setShowRatingForm(false);
-      setUserHasRated(true);
-      loadRatings();
-      onResourceUpdated();
-    }
-    setSubmitting(false);
-  };
-
-  const handleSubmitComment = async () => {
-    if (!resource || !currentUserId || !commentText.trim()) return;
-
-    setSubmitting(true);
-
-    let error;
-
-    if (editingCommentId) {
-      const { error: updateError } = await supabase
-        .from('comments')
-        .update({ content: commentText.trim() })
-        .eq('id', editingCommentId);
-      error = updateError;
-    } else {
-      const { error: insertError } = await supabase
-        .from('comments')
-        .insert({
-          resource_id: resource.id,
-          author_id: currentUserId,
-          content: commentText.trim(),
-        });
-      error = insertError;
-    }
-
-    if (!error) {
-      setCommentText('');
-      setEditingCommentId(null);
-      setShowCommentForm(false);
-      loadComments();
-      onResourceUpdated();
-    }
-    setSubmitting(false);
-  };
-
-  const handleEditCommentClick = (comment: Comment) => {
-    setCommentText(comment.content);
-    setEditingCommentId(comment.id);
-    setShowCommentForm(true);
-  };
-
-  const handleDeleteCommentClick = (commentId: string) => {
-    setDeleteCommentConfirm(commentId);
-  };
-
-  const handleDeleteCommentConfirm = async () => {
-    if (!deleteCommentConfirm) return;
-
-    const { error } = await supabase
-      .from('comments')
-      .delete()
-      .eq('id', deleteCommentConfirm);
-
-    setDeleteCommentConfirm(null);
-    if (!error) {
-      loadComments();
-      onResourceUpdated();
-    }
-  };
+  }, [isOpen, resource, isGuestMode, loadUserData, checkFavoriteStatus, loadTopics, addRecent]);
 
   const handleDeleteResourceClick = () => {
     setDeleteResourceConfirm(true);
@@ -288,6 +134,11 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     }
   };
 
+  const handleYouTubePlay = (videoId: string) => {
+    setYouTubeVideoId(videoId);
+    setShowYouTubeModal(true);
+  };
+
   const canEdit =
     !!resource &&
     !!currentUserId &&
@@ -297,356 +148,192 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
 
   const Icon = typeIcons[resource.type] || FileText;
   const thumbnailUrl = getThumbnailUrl(resource.thumbnail_path) || resource.thumbnail_url;
-  const embedUrl = getYouTubeEmbedUrl(resource.url);
+
+  const videoId = extractYouTubeVideoId(resource.url);
+  const embedUrl = videoId ? getYouTubeEmbedUrl(videoId) : null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-      <div className="bg-white dark:bg-slate-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200 dark:border-slate-700">
-        <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 px-6 py-4 flex items-center justify-between z-10">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Szczegóły zasobu</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
-          >
-            <X size={24} />
-          </button>
-        </div>
+    <>
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div className="bg-white dark:bg-slate-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200 dark:border-slate-700">
+          <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 px-6 py-4 flex items-center justify-between z-10">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Szczegóły zasobu</h2>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
+            >
+              <X size={24} />
+            </button>
+          </div>
 
-        <div className="p-6">
-          <div className="flex flex-col md:flex-row items-start gap-6 mb-6">
-            <div className="flex-shrink-0 w-full md:w-80 aspect-video bg-gradient-to-br from-gray-100 to-gray-50 dark:from-slate-700 dark:to-slate-800 rounded-lg border border-gray-200 dark:border-slate-600 shadow-sm flex items-center justify-center overflow-hidden">
-              {embedUrl ? (
-                <iframe
-                  src={embedUrl}
-                  title={resource.title}
-                  className="w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              ) : thumbnailUrl ? (
-                <img
-                  src={thumbnailUrl}
-                  alt={resource.title}
-                  className="w-full h-full object-contain"
-                />
-              ) : (
-                <div className="bg-blue-50 dark:bg-blue-900/30 p-6 rounded-lg flex items-center justify-center">
-                  <Icon size={48} className="text-blue-600 dark:text-blue-400" />
+          <div className="p-6">
+            <div className="flex flex-col md:flex-row items-start gap-6 mb-6">
+              <div className="flex-shrink-0 w-full md:w-80 aspect-video bg-gradient-to-br from-gray-100 to-gray-50 dark:from-slate-700 dark:to-slate-800 rounded-lg border border-gray-200 dark:border-slate-600 shadow-sm flex items-center justify-center overflow-hidden">
+                {embedUrl ? (
+                  <iframe
+                    src={embedUrl}
+                    title={resource.title}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : thumbnailUrl ? (
+                  <img
+                    src={thumbnailUrl}
+                    alt={resource.title}
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <div className="bg-blue-50 dark:bg-blue-900/30 p-6 rounded-lg flex items-center justify-center">
+                    <Icon size={48} className="text-blue-600 dark:text-blue-400" />
+                  </div>
+                )}
+              </div>
+              <div className="flex-1 w-full">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                  {resource.title}
+                </h3>
+
+                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  <span className="px-2 py-1 bg-gray-100 dark:bg-slate-700 rounded text-gray-700 dark:text-gray-300 font-medium">
+                    {resource.subject_name}
+                  </span>
+
+                  {resource.language && (
+                    <span className="flex items-center gap-1" title="Język">
+                      <Globe size={16} />
+                      {resource.language.toUpperCase()}
+                    </span>
+                  )}
+
+                  {resource.contributor_nick && (
+                    <span className="flex items-center gap-1" title="Dodane przez">
+                      <User size={16} />
+                      {resource.contributor_nick}
+                    </span>
+                  )}
+
+                  {resource.created_at && (
+                    <span className="flex items-center gap-1" title="Data dodania">
+                      <Calendar size={16} />
+                      {new Date(resource.created_at).toLocaleDateString()}
+                    </span>
+                  )}
+
+                  {resource.ai_generated && (
+                    <span className="flex items-center gap-1 px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-xs font-medium border border-purple-200 dark:border-purple-800">
+                      <Sparkles size={12} />
+                      AI
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <ResourceActionButton
+                    url={resource.url}
+                    variant="large"
+                    onYouTubePlay={handleYouTubePlay}
+                  />
+
+                  {!isGuestMode && (
+                    <button
+                      onClick={toggleFavorite}
+                      className={`p-2 rounded-lg border transition-colors ${isFavorite
+                        ? 'bg-red-50 border-red-200 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400'
+                        : 'bg-white border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200 dark:bg-slate-800 dark:border-slate-600 dark:text-gray-500 dark:hover:text-red-400'
+                        }`}
+                      title={isFavorite ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
+                    >
+                      <Heart size={20} className={isFavorite ? "fill-current" : ""} />
+                    </button>
+                  )}
+                </div>
+              </div>
+              {canEdit && (
+                <div className="flex gap-2 ml-auto">
+                  <button
+                    onClick={() => onEdit?.(resource)}
+                    className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 p-2 transition-colors"
+                    title="Edytuj zasób"
+                  >
+                    <Edit size={20} />
+                  </button>
+                  <button
+                    onClick={handleDeleteResourceClick}
+                    className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 p-2 transition-colors"
+                    title="Usuń zasób"
+                  >
+                    <Trash2 size={20} />
+                  </button>
                 </div>
               )}
             </div>
-            <div className="flex-1 w-full">
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                {resource.title}
-              </h3>
 
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
-                <span className="px-2 py-1 bg-gray-100 dark:bg-slate-700 rounded text-gray-700 dark:text-gray-300 font-medium">
-                  {resource.subject_name}
-                </span>
-
-                {resource.language && (
-                  <span className="flex items-center gap-1" title="Język">
-                    <Globe size={16} />
-                    {resource.language.toUpperCase()}
-                  </span>
-                )}
-
-                {resource.contributor_nick && (
-                  <span className="flex items-center gap-1" title="Dodane przez">
-                    <User size={16} />
-                    {resource.contributor_nick}
-                  </span>
-                )}
-
-                {resource.created_at && (
-                  <span className="flex items-center gap-1" title="Data dodania">
-                    <Calendar size={16} />
-                    {new Date(resource.created_at).toLocaleDateString()}
-                  </span>
-                )}
-
-                {resource.ai_generated && (
-                  <span className="flex items-center gap-1 px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-xs font-medium border border-purple-200 dark:border-purple-800">
-                    <Sparkles size={12} />
-                    AI
-                  </span>
-                )}
-              </div>
-
-              <a
-                href={resource.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium shadow-sm hover:shadow"
-              >
-                Otwórz zasób
-                <ExternalLink size={16} />
-              </a>
-            </div>
-            {canEdit && (
-              <div className="flex gap-2 ml-auto">
-                <button
-                  onClick={() => onEdit?.(resource)}
-                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 p-2 transition-colors"
-                  title="Edytuj zasób"
-                >
-                  <Edit size={20} />
-                </button>
-                <button
-                  onClick={handleDeleteResourceClick}
-                  className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 p-2 transition-colors"
-                  title="Usuń zasób"
-                >
-                  <Trash2 size={20} />
-                </button>
+            {resource.description && (
+              <div className="mb-6">
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Opis</h4>
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{resource.description}</p>
               </div>
             )}
-          </div>
 
-          {resource.description && (
             <div className="mb-6">
-              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Opis</h4>
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{resource.description}</p>
-            </div>
-          )}
-
-          <div className="mb-6">
-            <div className="flex flex-wrap gap-2 mb-2">
-              {resource.level_names?.map((level, idx) => (
-                <span
-                  key={idx}
-                  className="px-3 py-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 text-sm rounded-full border border-gray-200 dark:border-slate-600"
-                >
-                  {level}
-                </span>
-              ))}
-            </div>
-            {topics.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {topics.map((topic) => (
+              <div className="flex flex-wrap gap-2 mb-2">
+                {resource.level_names?.map((level, idx) => (
                   <span
-                    key={topic.topic_id}
-                    className="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm rounded border border-blue-100 dark:border-blue-800"
+                    key={idx}
+                    className="px-3 py-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 text-sm rounded-full border border-gray-200 dark:border-slate-600"
                   >
-                    {topic.topic_name}
+                    {level}
                   </span>
                 ))}
               </div>
-            )}
-          </div>
-
-          <div className="border-t border-gray-200 dark:border-slate-700 pt-6 mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                <Star className="text-yellow-500 fill-yellow-500" size={20} />
-                Oceny ({ratings.length})
-              </h4>
-              {!isGuestMode && !userHasRated && (
-                <button
-                  onClick={() => setShowRatingForm(!showRatingForm)}
-                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium transition-colors"
-                >
-                  {showRatingForm ? 'Anuluj' : (userHasRated ? 'Edytuj ocenę' : 'Dodaj ocenę')}
-                </button>
-              )}
-            </div>
-
-            {showRatingForm && (
-              <div className="bg-gray-50 dark:bg-slate-900 p-4 rounded-lg mb-4 border border-gray-200 dark:border-slate-700">
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Przydatność: {ratingData.usefulness}
-                    </label>
-                    <input
-                      type="range"
-                      min="1"
-                      max="5"
-                      value={ratingData.usefulness}
-                      onChange={(e) => setRatingData({ ...ratingData, usefulness: parseInt(e.target.value) })}
-                      className="w-full accent-blue-600"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Poprawność: {ratingData.correctness}
-                    </label>
-                    <input
-                      type="range"
-                      min="1"
-                      max="5"
-                      value={ratingData.correctness}
-                      onChange={(e) => setRatingData({ ...ratingData, correctness: parseInt(e.target.value) })}
-                      className="w-full accent-blue-600"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Dopasowanie trudności: {ratingData.difficulty}
-                    </label>
-                    <input
-                      type="range"
-                      min="1"
-                      max="5"
-                      value={ratingData.difficulty}
-                      onChange={(e) => setRatingData({ ...ratingData, difficulty: parseInt(e.target.value) })}
-                      className="w-full accent-blue-600"
-                    />
-                  </div>
-                  <button
-                    onClick={handleSubmitRating}
-                    disabled={submitting}
-                    className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
-                  >
-                    {submitting ? 'Wysyłanie...' : (userHasRated ? 'Zaktualizuj ocenę' : 'Wyślij ocenę')}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {userHasRated && !showRatingForm && (
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                Twoja ocena została zapisana.
-                <button
-                  onClick={() => setShowRatingForm(true)}
-                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 ml-1 underline"
-                >
-                  Edytuj
-                </button>
-              </p>
-            )}
-
-            <div className="space-y-3">
-              {ratings.map((rating) => (
-                <div key={rating.id} className="bg-gray-50 dark:bg-slate-900 p-3 rounded-lg border border-gray-100 dark:border-slate-700">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{rating.author_nick}</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {new Date(rating.created_at).toLocaleDateString()}
+              {topics.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {topics.map((topic) => (
+                    <span
+                      key={topic.topic_id}
+                      className="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm rounded border border-blue-100 dark:border-blue-800"
+                    >
+                      {topic.topic_name}
                     </span>
-                  </div>
-                  <div className="flex flex-wrap gap-4 text-sm text-gray-700 dark:text-gray-300">
-                    <span>Przydatność: {rating.rating_usefulness}/5</span>
-                    <span>Poprawność: {rating.rating_correctness}/5</span>
-                    {rating.difficulty_match && (
-                      <span>Trudność: {rating.difficulty_match}/5</span>
-                    )}
-                  </div>
+                  ))}
                 </div>
-              ))}
-              {ratings.length === 0 && (
-                <p className="text-sm text-gray-500 dark:text-gray-400 italic">Brak ocen. Dodaj pierwszą ocenę!</p>
-              )}
-            </div>
-          </div>
-
-          <div className="border-t border-gray-200 dark:border-slate-700 pt-6">
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                <MessageSquare size={20} />
-                Komentarze ({comments.length})
-              </h4>
-              {!isGuestMode && (
-                <button
-                  onClick={() => {
-                    if (showCommentForm) {
-                      setShowCommentForm(false);
-                      setEditingCommentId(null);
-                      setCommentText('');
-                    } else {
-                      setShowCommentForm(true);
-                    }
-                  }}
-                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium transition-colors"
-                >
-                  {showCommentForm ? 'Anuluj' : 'Dodaj komentarz'}
-                </button>
               )}
             </div>
 
-            {showCommentForm && (
-              <div className="bg-gray-50 dark:bg-slate-900 p-4 rounded-lg mb-4 border border-gray-200 dark:border-slate-700">
-                <textarea
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                  placeholder="Podziel się swoimi przemyśleniami..."
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
-                  rows={3}
-                />
-                <button
-                  onClick={handleSubmitComment}
-                  disabled={submitting || !commentText.trim()}
-                  className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
-                >
-                  {submitting ? 'Zapisywanie...' : (editingCommentId ? 'Zaktualizuj komentarz' : 'Opublikuj komentarz')}
-                </button>
-              </div>
-            )}
+            <ResourceRatingSection
+              resourceId={resource.id}
+              isGuestMode={isGuestMode}
+              onRatingUpdate={onResourceUpdated}
+            />
 
-            <div className="space-y-3">
-              {comments.map((comment) => (
-                <div key={comment.id} className="bg-gray-50 dark:bg-slate-900 p-3 rounded-lg border border-gray-100 dark:border-slate-700">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{comment.author_nick}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {new Date(comment.created_at).toLocaleDateString()}
-                      </span>
-                      {(comment.author_id === currentUserId || currentUserRole === 'admin') && (
-                        <div className="flex gap-2">
-                          {comment.author_id === currentUserId && (
-                            <button
-                              onClick={() => handleEditCommentClick(comment)}
-                              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                              title="Edytuj komentarz"
-                            >
-                              <Edit size={14} />
-                            </button>
-                          )}
-                          <button
-                            onClick={() => handleDeleteCommentClick(comment.id)}
-                            className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                            title="Usuń komentarz"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{comment.content}</p>
-                </div>
-              ))}
-              {comments.length === 0 && (
-                <p className="text-sm text-gray-500 dark:text-gray-400 italic">Brak komentarzy. Rozpocznij rozmowę!</p>
-              )}
-            </div>
+            <ResourceCommentsSection
+              resourceId={resource.id}
+              isGuestMode={isGuestMode}
+              onUpdate={onResourceUpdated}
+            />
           </div>
         </div>
+
+        <ConfirmationModal
+          isOpen={deleteResourceConfirm}
+          title="Usuń zasób"
+          message="Czy na pewno chcesz usunąć ten zasób?"
+          confirmLabel="Usuń"
+          cancelLabel="Anuluj"
+          onConfirm={handleDeleteResourceConfirm}
+          onCancel={() => setDeleteResourceConfirm(false)}
+          variant="danger"
+        />
       </div>
 
-      <ConfirmationModal
-        isOpen={deleteCommentConfirm !== null}
-        title="Usuń komentarz"
-        message="Czy na pewno chcesz usunąć ten komentarz?"
-        confirmLabel="Usuń"
-        cancelLabel="Anuluj"
-        onConfirm={handleDeleteCommentConfirm}
-        onCancel={() => setDeleteCommentConfirm(null)}
-        variant="danger"
-      />
-
-      <ConfirmationModal
-        isOpen={deleteResourceConfirm}
-        title="Usuń zasób"
-        message="Czy na pewno chcesz usunąć ten zasób?"
-        confirmLabel="Usuń"
-        cancelLabel="Anuluj"
-        onConfirm={handleDeleteResourceConfirm}
-        onCancel={() => setDeleteResourceConfirm(false)}
-        variant="danger"
-      />
-    </div>
+      {showYouTubeModal && youTubeVideoId && (
+        <YouTubeModal
+          videoId={youTubeVideoId}
+          isOpen={showYouTubeModal}
+          onClose={() => setShowYouTubeModal(false)}
+        />
+      )}
+    </>
   );
 }

@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Resource, ResourceTopic, ResourceLevel } from '../lib/supabase';
 import { getThumbnailUrl } from '../lib/storage';
-import { Video, FileText, Presentation, Beaker, Wrench, Star, ExternalLink, ImageIcon, MessageSquare, Heart } from 'lucide-react';
+import { YouTubeModal } from './YouTubeModal';
+import { ResourceActionButton } from './ResourceActionButton';
+import { Video, FileText, Presentation, Beaker, Wrench, Star, ImageIcon, MessageSquare, Heart } from 'lucide-react';
 
 export type ResourceCardVariant = 'default' | 'hero' | 'list';
 
@@ -55,15 +57,20 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
     onTopicClick?.(topicName);
   };
 
-  const handleLinkClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (isLoggedIn && onFavoriteToggle) {
       onFavoriteToggle(resource.id);
     }
+  };
+
+  // YouTube modal state
+  const [showYouTubeModal, setShowYouTubeModal] = useState(false);
+  const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
+
+  const handleYouTubePlay = (videoId: string) => {
+    setPlayingVideoId(videoId);
+    setShowYouTubeModal(true);
   };
 
   if (variant === 'hero') {
@@ -168,20 +175,22 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
                   </div>
                 )}
               </div>
-              <a
-                href={resource.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={handleLinkClick}
-                className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-              >
-                <Icon size={16} />
-                Otwórz
-                <ExternalLink size={14} />
-              </a>
+              <ResourceActionButton
+                url={resource.url}
+                onYouTubePlay={handleYouTubePlay}
+              />
             </div>
           </div>
         </div>
+
+        {/* YouTube Modal */}
+        {showYouTubeModal && playingVideoId && (
+          <YouTubeModal
+            videoId={playingVideoId}
+            isOpen={showYouTubeModal}
+            onClose={() => setShowYouTubeModal(false)}
+          />
+        )}
       </div>
     );
   }
@@ -254,17 +263,21 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
           </div>
         </div>
 
-        <a
-          href={resource.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={handleLinkClick}
-          className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex-shrink-0"
-        >
-          <Icon size={16} />
-          Otwórz
-          <ExternalLink size={14} />
-        </a>
+        <div className="flex-shrink-0">
+          <ResourceActionButton
+            url={resource.url}
+            onYouTubePlay={handleYouTubePlay}
+          />
+        </div>
+
+        {/* YouTube Modal */}
+        {showYouTubeModal && playingVideoId && (
+          <YouTubeModal
+            videoId={playingVideoId}
+            isOpen={showYouTubeModal}
+            onClose={() => setShowYouTubeModal(false)}
+          />
+        )}
       </div>
     );
   }
@@ -376,18 +389,22 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
           </div>
         )}
 
-        <a
-          href={resource.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={handleLinkClick}
-          className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium ml-auto"
-        >
-          <Icon size={16} />
-          Otwórz
-          <ExternalLink size={14} />
-        </a>
+        <div className="ml-auto">
+          <ResourceActionButton
+            url={resource.url}
+            onYouTubePlay={handleYouTubePlay}
+          />
+        </div>
       </div>
+
+      {/* YouTube Modal */}
+      {showYouTubeModal && playingVideoId && (
+        <YouTubeModal
+          videoId={playingVideoId}
+          isOpen={showYouTubeModal}
+          onClose={() => setShowYouTubeModal(false)}
+        />
+      )}
     </div>
   );
 }
