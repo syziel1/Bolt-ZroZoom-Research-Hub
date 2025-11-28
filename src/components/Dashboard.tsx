@@ -75,8 +75,6 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
     loading,
     resourceTopics,
     resourceLevels,
-    userNick,
-    userName,
     userRole,
     refreshData
   } = useDashboardData(isGuestMode);
@@ -361,8 +359,6 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
       <div className="flex-1 flex flex-col overflow-hidden">
         <DashboardHeader
           isGuestMode={isGuestMode}
-          userNick={userNick}
-          userName={userName}
           userRole={userRole}
           onOpenSidebar={() => setIsSidebarOpen(true)}
           onSignOut={handleSignOut}
