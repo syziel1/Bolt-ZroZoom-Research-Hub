@@ -29,6 +29,20 @@ const typeIcons: Record<string, React.ElementType> = {
   tool: Wrench,
 };
 
+const getYouTubeEmbedUrl = (url: string): string | null => {
+  if (!url) return null;
+
+  // Handle various YouTube URL formats
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+
+  if (match && match[2].length === 11) {
+    return `https://www.youtube.com/embed/${match[2]}`;
+  }
+
+  return null;
+};
+
 export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdated, isGuestMode = false, onEdit }: ResourceDetailModalProps) {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [currentUserRole, setCurrentUserRole] = useState<string>('student');

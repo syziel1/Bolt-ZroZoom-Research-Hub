@@ -193,6 +193,7 @@ export function Sidebar({
             </div>
           </div>
 
+          {/* Search field */}
           <div className="mb-6">
             <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Wybierz przedmiot</h3>
             <div className="space-y-2">

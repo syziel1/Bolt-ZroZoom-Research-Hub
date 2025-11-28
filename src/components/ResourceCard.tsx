@@ -62,6 +62,13 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
     setShowYouTubeModal(true);
   };
 
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isLoggedIn && onFavoriteToggle) {
+      onFavoriteToggle(resource.id);
+    }
+  };
+
   if (variant === 'hero') {
     return (
       <div
