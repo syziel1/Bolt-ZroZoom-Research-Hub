@@ -88,7 +88,7 @@ Po dokładnym przetestowaniu aplikacji Szkoła Przyszłości z AI w wersji 2.0 m
 3. ✅ **Filtrowanie**: Kliknięcie na "Matematyka" wyfiltrował 17 zasobów
 4. ✅ **Podgląd zasobów**: Kliknięcie na zasób otwiera modal z szczegółami
 5. ✅ **Integracja AI**: Przycisk "Odtwórz AI" otwiera dzieloną sesję Google Gemini
-6. ✅ **Uluubione**: System ulubionych pokazuje 5 uluubonych zasobów
+6. ✅ **Ulubione**: System ulubionych pokazuje 5 ulubionych zasobów
 7. ✅ **Tryby motywu**: Bezproblemowa zmiana między trybem jasnym i ciemnym
 8. ✅ **Scrollowanie**: Płynne scrollowanie i ładowanie zasobów
 9. ✅ **Formularz**: Dodawanie zasobu ma dobrze zorganizowane pola
