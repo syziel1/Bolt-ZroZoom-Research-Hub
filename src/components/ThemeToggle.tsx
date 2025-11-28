@@ -29,7 +29,7 @@ export function ThemeToggle() {
     return (
         <button
             onClick={cycleTheme}
-            className="bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-gray-200 p-2 md:px-3 md:py-2 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+            className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-600 dark:text-gray-300 transition-colors"
             title={`Zmień motyw (Obecny: ${getLabel()})`}
         >
             {getIcon()}

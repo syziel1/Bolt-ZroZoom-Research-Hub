@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 The project follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2025-11-28
+### Added
+- **System Pomocy**: Nowe przewodniki dla Dashboardu i Formularza Zasobów.
+- **Kontekstowa Pomoc**: Przyciski `[?]` w nagłówku i formularzach kierujące do odpowiednich sekcji.
+- **AI Branding**: Ikonka gwiazdki AI w nagłówku aplikacji.
+
+### Changed
+- **Dashboard Header**: Ulepszona responsywność przycisków (ukrywanie tekstu na mniejszych ekranach).
+- **Theme Toggle**: Zmieniono na pojedynczy, kompaktowy przycisk cykliczny.
+- **Resource Form**: Przycisk pomocy otwiera się w nowej karcie (ochrona danych).
+
 ## [2.0.1] - 2025-11-28
 **Added**
 - **Filter Chips**: Interaktywne "chipsy" filtrów w nagłówku dashboardu

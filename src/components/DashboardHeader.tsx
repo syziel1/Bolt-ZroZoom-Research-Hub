@@ -1,5 +1,5 @@
-import { Menu, LogOut, Settings, Plus, Heart, BookOpen, Sparkles } from 'lucide-react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Menu, LogOut, Settings, Plus, Heart, BookOpen, Sparkles, HelpCircle } from 'lucide-react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { ThemeToggle } from './ThemeToggle';
 
 type DashboardHeaderProps = {
@@ -28,7 +28,11 @@ export function DashboardHeader({
     favoritesCount = 0
 }: DashboardHeaderProps) {
     const navigate = useNavigate();
+    const location = useLocation();
     const isAdmin = userRole === 'admin';
+
+    // Determine help link based on current path
+    const helpLink = location.pathname === '/zasoby' ? '/pomoc/dashboard' : '/pomoc/guide';
 
     return (
         <header className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 px-4 md:px-8 py-4">
@@ -89,10 +93,10 @@ export function DashboardHeader({
                                         className={showOnlyFavorites ? 'fill-current' : ''}
                                     />
                                     <span className="hidden xl:inline">
-                                        {showOnlyFavorites ? 'Ulubione' : 'Pokaż ulubione'}
+                                        {showOnlyFavorites ? 'Ulubione' : 'Pokaż'}
                                     </span>
                                     {favoritesCount > 0 && (
-                                        <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-bold">
+                                        <span>
                                             {favoritesCount}
                                         </span>
                                     )}
@@ -107,12 +111,20 @@ export function DashboardHeader({
                                 <span className="hidden xl:inline">Blog</span>
                             </button>
                             <button
+                                onClick={() => navigate(helpLink)}
+                                className="bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-gray-200 px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 flex items-center gap-2"
+                                title="Pomoc"
+                            >
+                                <HelpCircle size={20} />
+                                <span className="hidden xl:inline">Pomoc</span>
+                            </button>
+                            <button
                                 onClick={onOpenAddResource}
                                 className="bg-blue-600 text-white px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
                                 title="Dodaj zasób"
                             >
                                 <Plus size={20} />
-                                <span className="hidden lg:inline">Dodaj zasób</span>
+                                <span className="hidden xl:inline">Dodaj zasób</span>
                             </button>
                             <button
                                 onClick={onSignOut}

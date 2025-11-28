@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { X } from 'lucide-react';
+import { X, HelpCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { ConfirmationModal } from './ConfirmationModal';
 import { supabase, Subject, Topic, Level, Resource } from '../lib/supabase';
 import { uploadResourceThumbnail, getThumbnailUrl } from '../lib/storage';
@@ -452,7 +453,16 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
       <form onSubmit={handleSubmit} className="p-6 space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{initialData ? 'Edytuj zasób' : 'Dodaj nowy zasób'}</h2>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            <Link
+              to="/pomoc/resource-form"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 mr-2"
+              title="Pomoc do formularza"
+            >
+              <HelpCircle size={24} />
+            </Link>
             <button
               type="button"
               onClick={handleAiAnalysis}
