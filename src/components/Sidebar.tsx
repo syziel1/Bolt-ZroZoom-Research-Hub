@@ -146,24 +146,6 @@ export function Sidebar({
                 />
               )}
             </div>
-            {searchQuery && (
-              <div className="mt-2 flex justify-center">
-                <div className="inline-flex items-center gap-2 bg-blue-50 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 rounded-full px-3 py-1.5 text-sm">
-                  <Search size={14} className="text-blue-600 dark:text-blue-400" />
-                  <span className="text-blue-800 dark:text-blue-200 font-medium">"{searchQuery}"</span>
-                  <button
-                    onClick={() => {
-                      setSearchQuery('');
-                      setShowAutocomplete(false);
-                    }}
-                    className="hover:bg-blue-200 dark:hover:bg-blue-800 rounded-full p-0.5 transition"
-                    title="Wyczyść wyszukiwanie"
-                  >
-                    <X size={14} className="text-blue-600 dark:text-blue-400" />
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
 
           <div className="mb-6">

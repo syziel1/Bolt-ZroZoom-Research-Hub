@@ -3,6 +3,8 @@ import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 import { Resource, Subject, Topic, TopicNode, ResourceTopic, ResourceLevel } from '../lib/supabase';
 import { useTopics } from './useTopics';
 import Fuse from 'fuse.js';
+import { blogPosts, BlogPost } from '../content/blog/posts';
+import { useResponsiveItemsPerPage } from './useResponsiveItemsPerPage';
 
 export type SortOption = 'newest' | 'rating' | 'popular' | 'alphabetical';
 
@@ -36,7 +38,7 @@ export function useDashboardFilters({
 
     const [includeSubtopics, setIncludeSubtopics] = useState(true);
 
-    const ITEMS_PER_PAGE = 12;
+    const itemsPerPage = useResponsiveItemsPerPage();
 
     // Read search query from URL params
     useEffect(() => {
@@ -149,6 +151,14 @@ export function useDashboardFilters({
         return new Fuse(searchableData, options);
     }, [resources, resourceTopics]);
 
+    const blogFuse = useMemo(() => {
+        const options = {
+            keys: ['title', 'excerpt'],
+            threshold: 0.4,
+        };
+        return new Fuse(blogPosts, options);
+    }, []);
+
     const filteredResources = useMemo(() => {
         let baseResources = resources;
 
@@ -221,6 +231,11 @@ export function useDashboardFilters({
         });
     }, [resources, selectedSubject, selectedTopics, selectedLevels, selectedLanguages, searchQuery, topicNodes, resourceTopics, resourceLevels, fuse, includeSubtopics]);
 
+    const filteredBlogPosts = useMemo(() => {
+        if (!searchQuery) return [];
+        return blogFuse.search(searchQuery).map(result => result.item);
+    }, [searchQuery, blogFuse]);
+
     // Reset page when filters change
     useEffect(() => {
         setCurrentPage(1);
@@ -263,10 +278,10 @@ export function useDashboardFilters({
         }
     }, [filteredResources, sortBy]);
 
-    const indexOfLastResource = currentPage * ITEMS_PER_PAGE;
-    const indexOfFirstResource = indexOfLastResource - ITEMS_PER_PAGE;
+    const indexOfLastResource = currentPage * itemsPerPage;
+    const indexOfFirstResource = indexOfLastResource - itemsPerPage;
     const currentResources = sortedResources.slice(indexOfFirstResource, indexOfLastResource);
-    const totalPages = Math.ceil(sortedResources.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(sortedResources.length / itemsPerPage);
 
     const handlePageChange = (pageNumber: number) => {
         setCurrentPage(pageNumber);
@@ -303,6 +318,7 @@ export function useDashboardFilters({
         handleLanguageToggle,
         handlePageChange,
         includeSubtopics,
-        setIncludeSubtopics
+        setIncludeSubtopics,
+        filteredBlogPosts
     };
 }

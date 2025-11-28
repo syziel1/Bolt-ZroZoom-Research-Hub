@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Resource } from '../lib/supabase';
+import { blogPosts } from '../content/blog/posts';
 
 type SearchAutocompleteProps = {
     resources: Resource[];
@@ -13,12 +14,18 @@ export function SearchAutocomplete({ resources, searchQuery, onSelectSuggestion 
 
     // Generate suggestions based on search query
     const suggestions = searchQuery.length >= 2
-        ? resources
-            .filter(resource =>
-                resource.title.toLowerCase().includes(searchQuery.toLowerCase())
-            )
-            .slice(0, 5) // Limit to 5 suggestions
-            .map(resource => resource.title)
+        ? [
+            ...resources
+                .filter(resource =>
+                    resource.title.toLowerCase().includes(searchQuery.toLowerCase())
+                )
+                .map(resource => resource.title),
+            ...blogPosts
+                .filter(post =>
+                    post.title.toLowerCase().includes(searchQuery.toLowerCase())
+                )
+                .map(post => post.title)
+        ].slice(0, 5) // Limit to 5 suggestions
         : [];
 
     // Remove duplicates

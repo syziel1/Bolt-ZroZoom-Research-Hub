@@ -12,6 +12,7 @@ import { WikipediaSearchModal } from './WikipediaSearchModal';
 import { useDashboardData } from '../hooks/useDashboardData';
 import { useDashboardFilters } from '../hooks/useDashboardFilters';
 import { useFavorites } from '../hooks/useFavorites';
+import { useResponsiveItemsPerPage } from '../hooks/useResponsiveItemsPerPage';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardGrid } from './DashboardGrid';
 import { AiAssistant } from './AiAssistant';
@@ -100,7 +101,8 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
     handleLanguageToggle,
     handlePageChange,
     includeSubtopics,
-    setIncludeSubtopics
+    setIncludeSubtopics,
+    filteredBlogPosts
   } = useDashboardFilters({
     resources,
     subjects,
@@ -170,12 +172,12 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
   }, [sortedResources, showOnlyFavorites, showOnlyRated, showOnlyMine, isFavorite, session, ratedResourceIds]);
 
   // Pagination for finalFilteredResources
-  const ITEMS_PER_PAGE = 12;
-  const totalFilteredPages = Math.ceil(finalFilteredResources.length / ITEMS_PER_PAGE);
+  const itemsPerPage = useResponsiveItemsPerPage();
+  const totalFilteredPages = Math.ceil(finalFilteredResources.length / itemsPerPage);
   const currentFilteredPage = Math.min(currentPage, Math.max(1, totalFilteredPages));
 
-  const indexOfLastFilteredResource = currentFilteredPage * ITEMS_PER_PAGE;
-  const indexOfFirstFilteredResource = indexOfLastFilteredResource - ITEMS_PER_PAGE;
+  const indexOfLastFilteredResource = currentFilteredPage * itemsPerPage;
+  const indexOfFirstFilteredResource = indexOfLastFilteredResource - itemsPerPage;
   const currentFilteredResources = finalFilteredResources.slice(indexOfFirstFilteredResource, indexOfLastFilteredResource);
 
   // Reset page when local filters change
@@ -264,15 +266,6 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
   const languages = useMemo(() => {
     const langs = new Set(resources.map((r) => r.language).filter(Boolean));
     return Array.from(langs) as string[];
-  }, [resources]);
-
-  const recentlyAddedResources = useMemo(() => {
-    const sorted = [...resources].sort((a, b) => {
-      const dateA = new Date(a.created_at || 0).getTime();
-      const dateB = new Date(b.created_at || 0).getTime();
-      return dateB - dateA;
-    });
-    return sorted.slice(0, 3);
   }, [resources]);
 
   const isAdmin = userRole === 'admin';
@@ -408,7 +401,6 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
             resourceTopics={resourceTopics}
             resourceLevels={resourceLevels}
             hasActiveFilters={hasActiveFilters || showOnlyFavorites}
-            recentlyAddedResources={recentlyAddedResources}
             sortBy={sortBy}
             setSortBy={setSortBy}
             currentPage={currentFilteredPage}
@@ -423,6 +415,19 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
             isFavorite={isFavorite}
             onFavoriteToggle={toggleFavorite}
             isLoggedIn={!isGuestMode && isLoggedIn}
+            filteredBlogPosts={filteredBlogPosts}
+            subjects={subjects}
+            topics={topicNodes}
+            levels={levels}
+            selectedSubject={selectedSubject}
+            selectedTopics={selectedTopics}
+            selectedLevels={selectedLevels}
+            selectedLanguages={selectedLanguages}
+            onSubjectChange={handleSubjectChange}
+            onTopicToggle={handleTopicToggle}
+            onLevelToggle={handleLevelToggle}
+            onLanguageToggle={handleLanguageToggle}
+            setSearchQuery={setSearchQuery}
           />
 
           <Footer className="mt-12" />
