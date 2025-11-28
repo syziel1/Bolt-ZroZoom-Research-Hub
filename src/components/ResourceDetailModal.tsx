@@ -9,6 +9,8 @@ import { ResourceRatingSection } from './resource-detail/ResourceRatingSection';
 import { ResourceCommentsSection } from './resource-detail/ResourceCommentsSection';
 import { X, Edit, Trash2, Video, FileText, Presentation, Beaker, Wrench, User, Globe, Calendar, Sparkles, Heart } from 'lucide-react';
 import { ConfirmationModal } from './ConfirmationModal';
+import { ExternalLinkWarningModal } from './ExternalLinkWarningModal';
+import { isTrustedDomain } from '../lib/external-links';
 
 type ResourceDetailModalProps = {
   isOpen: boolean;
@@ -38,6 +40,21 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
   const [showYouTubeModal, setShowYouTubeModal] = useState(false);
   const [youTubeVideoId, setYouTubeVideoId] = useState<string | null>(null);
   const [videoStartTime, setVideoStartTime] = useState<number>(0);
+  const [warningModalUrl, setWarningModalUrl] = useState<string | null>(null);
+
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, url: string) => {
+    if (!isTrustedDomain(url)) {
+      e.preventDefault();
+      setWarningModalUrl(url);
+    }
+  };
+
+  const handleConfirmNavigation = () => {
+    if (warningModalUrl) {
+      window.open(warningModalUrl, '_blank', 'noopener,noreferrer');
+      setWarningModalUrl(null);
+    }
+  };
 
   const loadUserData = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -170,7 +187,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
 
           <div className="p-6">
             <div className="flex flex-col md:flex-row items-start gap-6 mb-6">
-              <div className="flex-shrink-0 w-full md:w-80 aspect-video bg-gradient-to-br from-gray-100 to-gray-50 dark:from-slate-700 dark:to-slate-800 rounded-lg border border-gray-200 dark:border-slate-600 shadow-sm flex items-center justify-center overflow-hidden">
+              <div className="flex-shrink-0 w-full md:w-1/2 aspect-video bg-gradient-to-br from-gray-100 to-gray-50 dark:from-slate-700 dark:to-slate-800 rounded-lg border border-gray-200 dark:border-slate-600 shadow-sm flex items-center justify-center overflow-hidden">
                 {embedUrl ? (
                   <iframe
                     key={videoStartTime} // Force reload on seek
@@ -283,6 +300,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
                         <a
                           key={i}
                           href={part}
+                          onClick={(e) => handleLinkClick(e, part)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline break-all"
@@ -383,6 +401,13 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
           onClose={() => setShowYouTubeModal(false)}
         />
       )}
+
+      <ExternalLinkWarningModal
+        isOpen={!!warningModalUrl}
+        onClose={() => setWarningModalUrl(null)}
+        onConfirm={handleConfirmNavigation}
+        url={warningModalUrl || ''}
+      />
     </>
   );
 }
