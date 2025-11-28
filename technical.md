@@ -156,18 +156,20 @@ Minimalna dokumentacja techniczna dla repozytorium.
 
 ---
 
-## 7. TODO (MVP)
-- Endpoint / frontend do dodawania materiałów
-- UI do filtrowania: subject + topic + level + type
-- Cache średnich ocen po stronie widoku lub materialized view
+## 7. Zrealizowane Funkcje (MMP)
+- ✅ **Dodawanie materiałów:** Pełny frontend (`ResourceForm`) + backend + AI autofill.
+- ✅ **Filtrowanie:** Zaawansowane UI (Sidebar, Chips) + wyszukiwanie pełnotekstowe.
+- ✅ **Optymalizacja:** Widok `v_resources_full` agregujący oceny i metadane (zastępuje prosty cache).
+- ✅ **System Pomocy:** Kompletne Centrum Pomocy i przewodniki kontekstowe.
+- ✅ **AI:** Asystent edukacyjny i analiza treści.
 
 ---
 
-## 8. TODO (Po MVP)
-- system reputacji użytkowników
-- backendowy workflow: ekspert → review → approve/reject
-- leaderboard współpracowników
-- log aktywności (kto dodał, kto zrecenzował)
+## 8. Roadmapa (Plan Rozwoju)
+- 🔲 **Zaawansowana Reputacja:** Leaderboard współpracowników i odznaki.
+- 🔲 **Workflow Moderacji:** Panel eksperta → review → approve/reject (obecnie podstawowy status).
+- 🔲 **Log Aktywności:** Pełna historia działań (audyt).
+- 🔲 **Gamifikacja:** Wyzwania i osiągnięcia dla uczniów.
 
 ---
 
@@ -234,3 +236,16 @@ Dokument gotowy do umieszczenia w głównym repozytorium jako `technical.md`.
 ### Style
 - **Tailwind:** Globalne style w `index.css` dla scrollbarów i podstawowych elementów.
 - **Komponenty:** Wszystkie komponenty wspierają klasy `dark:` dla spójnego wyglądu.
+
+---
+
+## 11. Dokumentacja i Pomoc
+
+### Struktura
+- **Format:** Pliki Markdown (`.md`) w `src/content/help/`.
+- **Ładowanie:** Importowane jako raw stringi (`?raw`) w `HelpPage.tsx`.
+- **Routing:** Dynamiczny routing `/pomoc/:topicId`.
+
+### Komponenty
+- **HelpPage:** Główny kontener renderujący treść Markdown.
+- **Kontekstowa Pomoc:** Przyciski `[?]` w nagłówkach (Dashboard, ResourceForm) kierujące do specyficznych przewodników.

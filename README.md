@@ -2,6 +2,13 @@
 
 **Platforma zasobów edukacyjnych** - Twoja baza wiedzy dla Szkoły Przyszłości AI
 
+> 🚀 **Live Demo:** [https://szkolaprzyszlosciai.pl/](https://szkolaprzyszlosciai.pl/)
+
+## 🔗 Szybkie Linki
+- [Blog Edukacyjny](https://szkolaprzyszlosciai.pl/blog) - Artykuły i nowości
+- [Centrum Pomocy](https://szkolaprzyszlosciai.pl/pomoc) - Przewodniki i FAQ
+- [Zgłoś Błąd](https://github.com/syziel1/Szkola_Przyszlosci_AI_PL/issues) - GitHub Issues
+
 ## 📋 Spis treści
 
 - [O projekcie](#-o-projekcie)
@@ -325,5 +332,5 @@ W razie pytań skontaktuj się przez Issues na GitHubie.
 
 ---
 
-**Wersja:** 1.0.0  
-**Ostatnia aktualizacja:** 2025-11-25
+**Wersja:** 2.1.0  
+**Ostatnia aktualizacja:** 2025-11-28
