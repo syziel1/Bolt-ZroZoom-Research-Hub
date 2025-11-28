@@ -37,6 +37,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
   const [isFavorite, setIsFavorite] = useState(false);
   const [showYouTubeModal, setShowYouTubeModal] = useState(false);
   const [youTubeVideoId, setYouTubeVideoId] = useState<string | null>(null);
+  const [videoStartTime, setVideoStartTime] = useState<number>(0);
 
   const loadUserData = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -151,6 +152,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
 
   const videoId = extractYouTubeVideoId(resource.url);
   const embedUrl = videoId ? getYouTubeEmbedUrl(videoId) : null;
+  const finalEmbedUrl = embedUrl ? `${embedUrl}${embedUrl.includes('?') ? '&' : '?'}start=${videoStartTime}&autoplay=${videoStartTime > 0 ? '1' : '0'}` : undefined;
 
   return (
     <>
@@ -171,7 +173,8 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
               <div className="flex-shrink-0 w-full md:w-80 aspect-video bg-gradient-to-br from-gray-100 to-gray-50 dark:from-slate-700 dark:to-slate-800 rounded-lg border border-gray-200 dark:border-slate-600 shadow-sm flex items-center justify-center overflow-hidden">
                 {embedUrl ? (
                   <iframe
-                    src={embedUrl}
+                    key={videoStartTime} // Force reload on seek
+                    src={finalEmbedUrl}
                     title={resource.title}
                     className="w-full h-full"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -272,7 +275,53 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
             {resource.description && (
               <div className="mb-6">
                 <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Opis</h4>
-                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{resource.description}</p>
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
+                  {resource.description.split(/((?:https?:\/\/[^\s]+)|(?:\b\d{1,2}:\d{2}(?::\d{2})?\b))/g).map((part, i) => {
+                    // Handle URLs
+                    if (part.match(/^https?:\/\/[^\s]+$/)) {
+                      return (
+                        <a
+                          key={i}
+                          href={part}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline break-all"
+                        >
+                          {part}
+                        </a>
+                      );
+                    }
+
+                    // Handle timestamps (e.g., 2:30, 12:45, 1:05:20)
+                    if (part.match(/^\d{1,2}:\d{2}(?::\d{2})?$/)) {
+                      const seconds = part.split(':').reduce((acc, time) => (60 * acc) + +time, 0);
+                      return (
+                        <button
+                          key={i}
+                          onClick={() => {
+                            if (embedUrl) {
+                              const newUrl = new URL(embedUrl);
+                              newUrl.searchParams.set('start', seconds.toString());
+                              newUrl.searchParams.set('autoplay', '1');
+                              // Force iframe reload by updating key or similar, but here we just update src
+                              // A simple way to force reload is to update the state that controls the iframe
+                              // But since we don't have that state exposed easily, we might need to update the key of the iframe
+                              // For now, let's try to update the iframe src directly if possible or use a ref
+                            }
+                            // Since we can't easily update the iframe src without state, let's use a state for the start time
+                            setVideoStartTime(seconds);
+                          }}
+                          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium hover:underline cursor-pointer bg-blue-50 dark:bg-blue-900/30 px-1.5 rounded mx-0.5"
+                          title={`Przewiń do ${part}`}
+                        >
+                          {part}
+                        </button>
+                      );
+                    }
+
+                    return part;
+                  })}
+                </p>
               </div>
             )}
 

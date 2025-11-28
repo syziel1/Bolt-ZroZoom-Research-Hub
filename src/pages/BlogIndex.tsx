@@ -58,7 +58,7 @@ export function BlogIndex() {
                                 <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
                                     {post.title}
                                 </h2>
-                                <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3 flex-1">
+                                <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-5 flex-1">
                                     {post.excerpt}
                                 </p>
                                 <div className="mt-auto pt-4 border-t border-gray-100 dark:border-slate-700 flex items-center text-blue-600 dark:text-blue-400 font-medium text-sm group-hover:translate-x-1 transition-transform">
