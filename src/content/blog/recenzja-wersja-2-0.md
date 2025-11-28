@@ -64,7 +64,7 @@ Po dokładnym przetestowaniu aplikacji Szkoła Przyszłości z AI w wersji 2.0 m
 
 ### Strengths:
 
-- **Responsywny design**: Aplikacja doskonale wyglądamy na różnych rozmiarach ekranu
+- **Responsywny design**: Aplikacja doskonale wygląda na różnych rozmiarach ekranu
 - **Tryby motywu**: Obsługa jasnego (light mode) i ciemnego (dark mode) trybu + tryb systemowy
 - **Zmiany motywu działają płynnie** bez przeładowania strony
 - **Kolorowe karty zasobów**: Każdy przedmiot ma unikalny kolor (niebieski = Matematyka, purpurowy = Fizyka, itd.)
