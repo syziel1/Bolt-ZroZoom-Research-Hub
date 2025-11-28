@@ -166,7 +166,7 @@ export function AiAssistant({
     }
 
     return (
-        <div className="fixed bottom-6 right-6 w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-slate-700 z-50 flex flex-col overflow-hidden max-h-[600px] h-[80vh]">
+        <div className="fixed bottom-6 right-6 w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-slate-700 z-50 flex flex-col h-[80vh] max-h-[700px]">
             {/* Header */}
             <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-4 flex items-center justify-between text-white">
                 <div className="flex items-center gap-2">

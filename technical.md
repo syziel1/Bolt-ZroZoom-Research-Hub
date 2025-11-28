@@ -175,11 +175,24 @@ Minimalna dokumentacja techniczna dla repozytorium.
 
 ### chat-with-ai
 - **Runtime:** Deno
-- **Model:** Google Gemini 2.5 Flash
-- **Funkcja:** Edukacyjny asystent AI (AI Tutor)
-- **Input:** Historia czatu (JSON)
-- **Output:** Streaming text / Markdown + LaTeX
+- **Model:** Google Gemini 2.5 Pro (upgraded from Flash for better quality)
+- **Funkcja:** Edukacyjny asystent AI (AI Tutor) z personalizacją
+- **Input:** 
+  - `messages`: Historia czatu (JSON array)
+  - `userContext`: Opcjonalny kontekst użytkownika (userName, language)
+- **Output:** JSON `{ content: string }` (Markdown + LaTeX)
+- **System Prompt:** Ładowany z wbudowanej kopii `system-prompt.md`
+- **Token Management:**
+  - Historia: dynamiczny limit ~4000 tokenów
+  - Output: 2048 tokenów (zwiększone z 800)
+  - Fallback: zawsze przynajmniej ostatnia wiadomość
+- **Features:**
+  - Automatyczne wykrywanie języka (polski/angielski)
+  - Personalizacja odpowiedzi na podstawie nazwy użytkownika
+  - Debug logging dla monitorowania
+  - Obsługa błędów API quota i konfiguracji
 - **Security:** Weryfikacja klucza API po stronie serwera (Edge)
+- **Env:** `GEMINI_API_KEY`
 
 ### analyze-content
 - **Runtime:** Deno

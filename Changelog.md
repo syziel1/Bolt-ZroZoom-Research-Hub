@@ -9,6 +9,25 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 - `uploadResourceThumbnail` logic in the service layer.
 - Image display handling in `ResourceCard`.
 
+## [2.0.0] - 2025-11-28
+**Added**
+- **AI Chat Enhancements**: Major upgrade to AI Assistant functionality.
+  - **User Context**: AI now knows user's name and language for personalized responses.
+  - **Enhanced System Prompt**: Detailed instructions from `system-prompt.md` for better answer quality.
+  - **Debug Logging**: Server-side logging for diagnosing issues.
+  
+**Changed**
+- **Model Upgrade**: Switched from `gemini-2.5-flash` to `gemini-2.5-pro` for higher quality responses.
+- **Token Optimization**: Dynamic history limiting (4000 tokens) to prevent context overflow.
+- **Output Tokens**: Increased from 800 to 2048 to allow complete answers.
+- **UI Improvements**: Larger chat window (max-w-2xl, 80vh) for better readability.
+- **Layout Fix**: Removed conflicting height constraints causing bottom padding issues.
+
+**Fixed**
+- **Critical Bug**: Token limiting could result in empty message array, now ensures at least last message is always included.
+- **MAX_TOKENS Issue**: AI responses no longer cut off mid-sentence.
+- **Error Handling**: Better error messages for API quota and configuration issues.
+
 ## [1.9.0] - 2025-11-28
 **Added**
 - **User Home Page**: Personalized landing page for logged-in users.
