@@ -118,9 +118,35 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
   const [showOnlyMine, setShowOnlyMine] = useState(false);
   const [ratedResourceIds, setRatedResourceIds] = useState<Set<string>>(new Set());
 
-  // Parse URL query params for filters
+  // Parse URL query params for filters and resource sharing
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+
+    // Handle resource sharing (?r=RESOURCE_ID)
+    const resourceId = params.get('r');
+    if (resourceId) {
+      // First check if resource is already loaded
+      const foundResource = resources.find(r => r.id === resourceId);
+      if (foundResource) {
+        setSelectedResource(foundResource);
+        setIsDetailModalOpen(true);
+      } else {
+        // If not found (e.g. pagination), fetch it specifically
+        supabase
+          .from('v_resources_full')
+          .select('*')
+          .eq('id', resourceId)
+          .single()
+          .then(({ data, error }) => {
+            if (data && !error) {
+              setSelectedResource(data as Resource);
+              setIsDetailModalOpen(true);
+            }
+          });
+      }
+    }
+
+    // Handle filters
     if (params.get('favorites') === 'true') {
       setShowOnlyFavorites(true);
       setShowOnlyRated(false);
@@ -134,7 +160,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
       setShowOnlyFavorites(false);
       setShowOnlyRated(false);
     }
-  }, [window.location.search]);
+  }, [window.location.search, resources]); // Add resources dependency to retry if loaded later
 
   useEffect(() => {
     if (session?.user?.id) {

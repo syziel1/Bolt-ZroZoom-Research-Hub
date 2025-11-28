@@ -7,7 +7,7 @@ import { ResourceActionButton } from './ResourceActionButton';
 import { YouTubeModal } from './YouTubeModal';
 import { ResourceRatingSection } from './resource-detail/ResourceRatingSection';
 import { ResourceCommentsSection } from './resource-detail/ResourceCommentsSection';
-import { X, Edit, Trash2, Video, FileText, Presentation, Beaker, Wrench, User, Globe, Calendar, Sparkles, Heart } from 'lucide-react';
+import { X, Edit, Trash2, Video, FileText, Presentation, Beaker, Wrench, User, Globe, Calendar, Sparkles, Heart, Share2, Check } from 'lucide-react';
 import { ConfirmationModal } from './ConfirmationModal';
 import { ExternalLinkWarningModal } from './ExternalLinkWarningModal';
 import { isTrustedDomain } from '../lib/external-links';
@@ -41,6 +41,19 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
   const [youTubeVideoId, setYouTubeVideoId] = useState<string | null>(null);
   const [videoStartTime, setVideoStartTime] = useState<number>(0);
   const [warningModalUrl, setWarningModalUrl] = useState<string | null>(null);
+  const [showShareTooltip, setShowShareTooltip] = useState(false);
+
+  const handleShare = async () => {
+    if (!resource) return;
+    const url = `${window.location.origin}/zasoby?r=${resource.id}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setShowShareTooltip(true);
+      setTimeout(() => setShowShareTooltip(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy link:', err);
+    }
+  };
 
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, url: string) => {
     if (!isTrustedDomain(url)) {
@@ -176,10 +189,30 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
         <div className="bg-white dark:bg-slate-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200 dark:border-slate-700">
           <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 px-6 py-4 flex items-center justify-between z-10">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Szczegóły zasobu</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mr-auto">Szczegóły zasobu</h2>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleShare}
+                className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-md transition-colors relative"
+                title="Udostępnij link"
+              >
+                {showShareTooltip ? (
+                  <>
+                    <Check size={16} className="text-green-600 dark:text-green-400" />
+                    <span className="text-green-600 dark:text-green-400">Skopiowano!</span>
+                  </>
+                ) : (
+                  <>
+                    <Share2 size={16} />
+                    <span>Udostępnij</span>
+                  </>
+                )}
+              </button>
+            </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
+              className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors ml-4"
             >
               <X size={24} />
             </button>
