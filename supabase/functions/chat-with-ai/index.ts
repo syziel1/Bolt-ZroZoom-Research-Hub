@@ -114,7 +114,7 @@ serve(async (req) => {
         });
 
         // Convert limited messages to SDK format
-        const history = limitedMessages.slice(0, -1).map((msg: any) => ({
+        const history = limitedMessages.slice(0, -1).map((msg: { role: string; content: string }) => ({
             role: msg.role === 'user' ? 'user' : 'model',
             parts: [{ text: msg.content }]
         }));

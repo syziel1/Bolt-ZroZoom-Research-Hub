@@ -17,6 +17,28 @@ import { DashboardGrid } from './DashboardGrid';
 import { AiAssistant } from './AiAssistant';
 import { Footer } from './Footer';
 import { SEO } from './SEO';
+import type { Session } from '@supabase/supabase-js';
+
+type YouTubeVideo = {
+  title: string;
+  url: string;
+  description: string;
+  duration: string;
+  thumbnailUrl: string;
+};
+
+type WikipediaArticle = {
+  title: string;
+  url: string;
+  description: string;
+  thumbnailUrl: string | null;
+};
+
+type TopicNode = {
+  id: string;
+  name: string;
+  children?: TopicNode[];
+};
 
 type DashboardProps = {
   isGuestMode?: boolean;
@@ -26,7 +48,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
   const navigate = useNavigate();
 
   // Check auth session
-  const [session, setSession] = useState<any>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [sessionChecked, setSessionChecked] = useState(false);
   const isGuestMode = sessionChecked ? !session : propIsGuestMode;
 
@@ -213,7 +235,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
     setPrefilledResource(null);
   };
 
-  const handleYouTubeVideoAdd = (video: any) => {
+  const handleYouTubeVideoAdd = (video: YouTubeVideo) => {
     setIsYouTubeModalOpen(false);
     setPrefilledResource({
       title: video.title,
@@ -226,14 +248,14 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
     setIsModalOpen(true);
   };
 
-  const handleWikipediaArticleAdd = (article: any) => {
+  const handleWikipediaArticleAdd = (article: WikipediaArticle) => {
     setIsWikipediaModalOpen(false);
     setPrefilledResource({
       title: article.title,
       url: article.url,
       type: 'article',
       description: article.description,
-      thumbnail_url: article.thumbnailUrl,
+      thumbnail_url: article.thumbnailUrl ?? undefined,
       language: 'pl'
     });
     setIsModalOpen(true);
@@ -449,7 +471,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
         selectedSubject={subjects.find(s => s.subject_id === selectedSubject) || null}
         selectedTopics={(() => {
           // Convert topic IDs to names
-          const findTopicNames = (nodes: any[], ids: string[]): string[] => {
+          const findTopicNames = (nodes: TopicNode[], ids: string[]): string[] => {
             const names: string[] = [];
             for (const node of nodes) {
               if (ids.includes(node.id)) names.push(node.name);

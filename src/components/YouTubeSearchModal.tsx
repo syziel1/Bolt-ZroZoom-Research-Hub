@@ -57,9 +57,9 @@ export function YouTubeSearchModal({ isOpen, onClose, initialQuery, onAddVideo, 
             if (data.error) throw new Error(data.error);
 
             setResults(data.results || []);
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('YouTube search error:', err);
-            setError(err.message || 'Wystąpił błąd podczas wyszukiwania.');
+            setError((err as Error).message || 'Wystąpił błąd podczas wyszukiwania.');
         } finally {
             setLoading(false);
         }

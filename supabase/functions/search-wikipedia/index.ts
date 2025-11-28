@@ -32,7 +32,14 @@ serve(async (req) => {
 
         const pages = Object.values(data.query.pages)
 
-        const results = pages.map((page: any) => ({
+        interface WikiPage {
+            pageid: number;
+            title: string;
+            extract: string;
+            thumbnail?: { source: string };
+        }
+
+        const results = (pages as WikiPage[]).map((page) => ({
             pageId: page.pageid,
             title: page.title,
             description: page.extract,

@@ -55,9 +55,9 @@ export function WikipediaSearchModal({ isOpen, onClose, initialQuery, onAddArtic
             if (data.error) throw new Error(data.error);
 
             setResults(data.results || []);
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Wikipedia search error:', err);
-            setError(err.message || 'Wystąpił błąd podczas wyszukiwania.');
+            setError((err as Error).message || 'Wystąpił błąd podczas wyszukiwania.');
         } finally {
             setLoading(false);
         }

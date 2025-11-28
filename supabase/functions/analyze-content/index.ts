@@ -39,7 +39,7 @@ serve(async (req) => {
         }
 
         const levelsList = levelsData
-            ? levelsData.map((l: any) => l.name).join(', ')
+            ? levelsData.map((l: { name: string }) => l.name).join(', ')
             : "Szkoła podstawowa, Liceum, Matura, Studia, Dla każdego";
 
         const genAI = new GoogleGenerativeAI(geminiKey);
