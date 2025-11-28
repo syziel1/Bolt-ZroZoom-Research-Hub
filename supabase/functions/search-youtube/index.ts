@@ -30,7 +30,7 @@ function parseDuration(duration: string): string {
   }
 }
 
-serve(async (req) => {
+serve(async (req: Request) => {
   // 1. Obsługa CORS (dla zapytań z przeglądarki)
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -64,7 +64,24 @@ serve(async (req) => {
       })
     }
 
-    const videoIds = searchData.items.map((item: any) => item.id.videoId).join(',');
+    interface YouTubeItem {
+      id: { videoId: string };
+      snippet: {
+        title: string;
+        description: string;
+        thumbnails: {
+          high?: { url: string };
+          medium?: { url: string };
+          default?: { url: string };
+        };
+        channelTitle: string;
+      };
+      contentDetails: {
+        duration: string;
+      };
+    }
+
+    const videoIds = searchData.items.map((item: YouTubeItem) => item.id.videoId).join(',');
 
     // B. Videos details (for duration)
     const videosUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${videoIds}&key=${apiKey}`
@@ -76,7 +93,7 @@ serve(async (req) => {
     }
 
     // 4. Mapowanie wyników na format naszej aplikacji
-    const results = videosData.items.map((item: any) => {
+    const results = videosData.items.map((item: YouTubeItem) => {
       const duration = parseDuration(item.contentDetails.duration);
       return {
         youtubeId: item.id,
@@ -94,8 +111,9 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
 
-  } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return new Response(JSON.stringify({ error: errorMessage }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })

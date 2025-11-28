@@ -153,15 +153,18 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
         description="Zaloguj się lub zarejestruj, aby uzyskać dostęp do pełnej bazy wiedzy i funkcji społecznościowych."
       />
       <div className="max-w-md w-full bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8">
-        {(onBack || true) && (
-          <button
-            onClick={() => onBack ? onBack() : navigate('/')}
-            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 mb-6 transition-colors"
-          >
-            <ArrowLeft size={20} />
-            Powrót do strony głównej
-          </button>
-        )}
+        {/* Always show back button */
+          (
+
+            <button
+              onClick={() => onBack ? onBack() : navigate('/')}
+              className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 mb-6 transition-colors"
+            >
+              <ArrowLeft size={20} />
+              Powrót do strony głównej
+            </button>
+          )
+        }
 
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Szkoła Przyszłości z AI</h1>
