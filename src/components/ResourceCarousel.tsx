@@ -1,8 +1,8 @@
 import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Resource, ResourceTopic, ResourceLevel } from '../lib/supabase';
-import { ResourceCard } from './ResourceCard';
+import { supabase, Resource, ResourceTopic, ResourceLevel } from '../lib/supabase';
+import { ResourceCard, ResourceCardVariant } from './ResourceCard';
 
 type ResourceCarouselProps = {
     resources: Resource[];
@@ -22,6 +22,7 @@ type ResourceCarouselProps = {
         actionLabel: string;
         onAction: () => void;
     };
+    cardVariant?: ResourceCardVariant;
 };
 
 export function ResourceCarousel({
@@ -32,12 +33,20 @@ export function ResourceCarousel({
     icon,
     actionButton = null,
     loading = false,
-    emptyState
+    emptyState,
+    cardVariant = 'default'
 }: ResourceCarouselProps) {
     const navigate = useNavigate();
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [isPaused, setIsPaused] = useState(false);
     const scrollState = useRef({ direction: 1 });
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setIsLoggedIn(!!session);
+        });
+    }, []);
 
     // Auto-scroll animation
     useEffect(() => {
@@ -201,6 +210,8 @@ export function ResourceCarousel({
                             resource={resource}
                             topics={resourceTopics.get(resource.id) || []}
                             levels={resourceLevels.get(resource.id) || []}
+                            variant={cardVariant}
+                            isLoggedIn={isLoggedIn}
                             onCardClick={() => {
                                 const subjectSlug = resource.subject_slug || 'matematyka';
                                 navigate(`/zasoby/${subjectSlug}`);

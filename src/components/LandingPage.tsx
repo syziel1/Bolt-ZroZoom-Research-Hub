@@ -126,15 +126,17 @@ export function LandingPage() {
   const loadLandingPageData = async () => {
     setLoading(true);
     try {
-      const [topicsCount, subjectsData, levelsCount, allResourcesData] = await Promise.all([
+      const [topicsCount, subjectsData, levelsCount, topRatedResourcesData] = await Promise.all([
         supabase.from('topics').select('*', { count: 'exact', head: true }),
         supabase.from('v_subjects_basic').select('*').order('topics_count', { ascending: false }),
         supabase.from('levels').select('*', { count: 'exact', head: true }),
         supabase
           .from('v_resources_full')
           .select('*')
+          .not('avg_usefulness', 'is', null) // Only show resources with ratings
+          .gte('avg_usefulness', 3.5) // Only highly rated resources (≥3.5 stars)
           .order('avg_usefulness', { ascending: false })
-          .limit(4),
+          .limit(10), // Show top 10 rated resources
       ]);
 
       setStats({
@@ -145,66 +147,56 @@ export function LandingPage() {
 
       if (subjectsData.data) setSubjects(subjectsData.data);
 
-      if (allResourcesData.data) {
-        const resourcesBySubject = new Map<string, Resource>();
-        allResourcesData.data.forEach((resource: Resource) => {
-          if (!resourcesBySubject.has(resource.subject_id)) {
-            resourcesBySubject.set(resource.subject_id, resource);
-          }
-        });
-        const latestResourcesList = Array.from(resourcesBySubject.values());
+      if (topRatedResourcesData.data && topRatedResourcesData.data.length > 0) {
+        const resourceIds = topRatedResourcesData.data.map((r: Resource) => r.id);
+        const [topicsData, levelsData] = await Promise.all([
+          supabase
+            .from('v_resource_topics')
+            .select('resource_id, topic_id, topic_name, topic_slug, parent_topic_id, subject_slug')
+            .in('resource_id', resourceIds),
+          supabase
+            .from('v_resource_levels')
+            .select('resource_id, levels')
+            .in('resource_id', resourceIds),
+        ]);
 
-        if (latestResourcesList.length > 0) {
-          const resourceIds = latestResourcesList.map(r => r.id);
-          const [topicsData, levelsData] = await Promise.all([
-            supabase
-              .from('v_resource_topics')
-              .select('resource_id, topic_id, topic_name, topic_slug, parent_topic_id, subject_slug')
-              .in('resource_id', resourceIds),
-            supabase
-              .from('v_resource_levels')
-              .select('resource_id, levels')
-              .in('resource_id', resourceIds),
-          ]);
-
-          if (topicsData.data) {
-            // Define type for resource topic data
-            type ResourceTopicData = {
-              resource_id: string;
-              topic_id: string;
-              topic_name: string;
-              topic_slug: string;
-              parent_topic_id: string | null;
-              subject_slug: string;
-            };
-            const topicsMap = new Map<string, ResourceTopic[]>();
-            (topicsData.data as ResourceTopicData[]).forEach((item) => {
-              const { resource_id, ...topicData } = item;
-              if (!topicsMap.has(resource_id)) {
-                topicsMap.set(resource_id, []);
-              }
-              topicsMap.get(resource_id)!.push(topicData);
-            });
-            setResourceTopics(topicsMap);
-          }
-
-          if (levelsData.data) {
-            // Define type for resource level data
-            type ResourceLevelData = {
-              resource_id: string;
-              levels: ResourceLevel[];
-            };
-            const levelsMap = new Map<string, ResourceLevel[]>();
-            (levelsData.data as ResourceLevelData[]).forEach((item) => {
-              if (item.levels && Array.isArray(item.levels)) {
-                levelsMap.set(item.resource_id, item.levels);
-              }
-            });
-            setResourceLevels(levelsMap);
-          }
+        if (topicsData.data) {
+          // Define type for resource topic data
+          type ResourceTopicData = {
+            resource_id: string;
+            topic_id: string;
+            topic_name: string;
+            topic_slug: string;
+            parent_topic_id: string | null;
+            subject_slug: string;
+          };
+          const topicsMap = new Map<string, ResourceTopic[]>();
+          (topicsData.data as ResourceTopicData[]).forEach((item) => {
+            const { resource_id, ...topicData } = item;
+            if (!topicsMap.has(resource_id)) {
+              topicsMap.set(resource_id, []);
+            }
+            topicsMap.get(resource_id)!.push(topicData);
+          });
+          setResourceTopics(topicsMap);
         }
 
-        setLatestResources(latestResourcesList);
+        if (levelsData.data) {
+          // Define type for resource level data
+          type ResourceLevelData = {
+            resource_id: string;
+            levels: ResourceLevel[];
+          };
+          const levelsMap = new Map<string, ResourceLevel[]>();
+          (levelsData.data as ResourceLevelData[]).forEach((item) => {
+            if (item.levels && Array.isArray(item.levels)) {
+              levelsMap.set(item.resource_id, item.levels);
+            }
+          });
+          setResourceLevels(levelsMap);
+        }
+
+        setLatestResources(topRatedResourcesData.data);
       }
     } catch (error) {
       console.error('Error loading landing page data:', error);
@@ -385,6 +377,7 @@ export function LandingPage() {
               actionLabel: 'Przeglądaj przedmioty',
               onAction: scrollToSubjects
             }}
+            cardVariant="hero"
           />
         </div>
       </section>

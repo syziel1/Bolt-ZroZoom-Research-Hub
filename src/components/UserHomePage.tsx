@@ -163,6 +163,7 @@ export function UserHomePage() {
                         actionLabel: 'Przeglądaj zasoby',
                         onAction: () => navigate('/zasoby')
                     }}
+                    cardVariant="hero"
                 />
 
                 {/* Stats Section */}

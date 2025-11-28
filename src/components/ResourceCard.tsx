@@ -62,6 +62,12 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
     }
   };
 
+  const favoriteTooltip = !isLoggedIn
+    ? 'Zaloguj się, aby dodać do swoich ulubionych'
+    : isFavorite
+      ? 'Usuń z ulubionych'
+      : 'Dodaj do ulubionych';
+
   if (variant === 'hero') {
     return (
       <div
@@ -69,25 +75,7 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
         className="bg-white dark:bg-slate-800 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-slate-700 cursor-pointer flex flex-col h-full overflow-hidden group"
       >
         <div className="w-full h-48 sm:h-56 bg-gradient-to-br from-gray-100 to-gray-50 dark:from-slate-700 dark:to-slate-800 relative overflow-hidden flex items-center justify-center">
-          <button
-            onClick={handleFavoriteClick}
-            disabled={!isLoggedIn}
-            className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-200 z-10 ${isLoggedIn
-              ? 'bg-white/90 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-700 hover:scale-110 shadow-md cursor-pointer'
-              : 'bg-gray-200/50 dark:bg-slate-700/50 cursor-not-allowed'
-              }`}
-            title={!isLoggedIn ? 'Zaloguj się, aby dodać do ulubionych' : isFavorite ? 'Usuń z ulubionych' : 'Dodaj do ulubionych'}
-          >
-            <Heart
-              size={20}
-              className={`transition-colors ${isFavorite && isLoggedIn
-                ? 'fill-red-500 text-red-500'
-                : isLoggedIn
-                  ? 'text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400'
-                  : 'text-gray-400 dark:text-gray-500'
-                }`}
-            />
-          </button>
+          {/* Favorite button removed for hero variant as requested */}
           {thumbnailUrl ? (
             <img
               src={thumbnailUrl}
@@ -198,7 +186,7 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
               ? 'bg-white dark:bg-slate-800 hover:scale-110 shadow-md cursor-pointer'
               : 'bg-gray-200 dark:bg-slate-700 cursor-not-allowed'
               }`}
-            title={!isLoggedIn ? 'Zaloguj się, aby dodać do ulubionych' : isFavorite ? 'Usuń z ulubionych' : 'Dodaj do ulubionych'}
+            title={favoriteTooltip}
           >
             <Heart
               size={14}
@@ -285,7 +273,7 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
             ? 'bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-110 shadow-md cursor-pointer'
             : 'bg-gray-200 dark:bg-slate-700 cursor-not-allowed'
             }`}
-          title={!isLoggedIn ? 'Zaloguj się, aby dodać do ulubionych' : isFavorite ? 'Usuń z ulubionych' : 'Dodaj do ulubionych'}
+          title={favoriteTooltip}
         >
           <Heart
             size={18}
