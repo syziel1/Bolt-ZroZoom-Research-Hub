@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Session } from '@supabase/supabase-js';
 import { supabase, Resource, Subject, ResourceTopic, ResourceLevel } from '../lib/supabase';
-import { ResourceCard } from './ResourceCard';
+import { ResourceCarousel } from './ResourceCarousel';
 import { Navigation } from './Navigation';
 import { Footer } from './Footer';
 import { BookOpen, Layers, Award, Sparkles, ArrowRight, Calculator, Globe, Clock, Languages, Code, Palette, Dumbbell, Music, Microscope, Atom, Beaker, ChevronDown, ShieldCheck, Users, Search, LayoutDashboard, Star } from 'lucide-react';
@@ -365,40 +365,27 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section id="latest-resources" className="py-12 px-4 bg-white dark:bg-slate-900 scroll-mt-24">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center justify-center gap-3">
-              <Star size={32} className="text-yellow-500 fill-yellow-500" />
-              Najwyżej oceniane materiały
-            </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400">Odkryj najlepiej oceniane zasoby przez społeczność</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {latestResources.map((resource) => (
-              <div key={resource.id}>
-                <ResourceCard
-                  resource={resource}
-                  topics={resourceTopics.get(resource.id) || []}
-                  levels={resourceLevels.get(resource.id) || []}
-                  variant="hero"
-                  onCardClick={(res) => {
-                    const subject = subjects.find(s => s.subject_id === res.subject_id);
-                    if (subject) {
-                      navigate(`/zasoby/${subject.subject_slug}`);
-                    }
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-
-          {latestResources.length === 0 && (
-            <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-              <p>Brak dostępnych zasobów</p>
-            </div>
-          )}
+      <section id="latest-resources" className="scroll-mt-24">
+        <div className="max-w-6xl mx-auto px-4">
+          <ResourceCarousel
+            resources={latestResources}
+            resourceTopics={resourceTopics}
+            resourceLevels={resourceLevels}
+            title="Najwyżej oceniane materiały"
+            icon={<Star size={28} className="text-yellow-500 fill-yellow-500" />}
+            actionButton={{
+              label: 'Zobacz wszystkie',
+              onClick: () => navigate('/zasoby')
+            }}
+            loading={loading}
+            emptyState={{
+              icon: <BookOpen size={48} className="text-gray-300 dark:text-gray-600 mx-auto mb-4" />,
+              title: 'Brak dostępnych zasobów',
+              description: 'Wkrótce dodamy nowe materiały do platformy.',
+              actionLabel: 'Przeglądaj przedmioty',
+              onAction: scrollToSubjects
+            }}
+          />
         </div>
       </section>
 
