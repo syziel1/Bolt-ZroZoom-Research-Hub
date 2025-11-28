@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 import { Resource, Subject, Topic, TopicNode, ResourceTopic, ResourceLevel } from '../lib/supabase';
 import { useTopics } from './useTopics';
 import Fuse from 'fuse.js';
-import { blogPosts, BlogPost } from '../content/blog/posts';
+import { blogPosts } from '../content/blog/posts';
 import { useResponsiveItemsPerPage } from './useResponsiveItemsPerPage';
 
 export type SortOption = 'newest' | 'rating' | 'popular' | 'alphabetical';
