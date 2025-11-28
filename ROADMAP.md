@@ -7,7 +7,7 @@ Ten dokument opisuje plany rozwoju platformy Szkoła Przyszłości z AI. Cele po
 🟢 **Faza 1: Stabilizacja, SEO i Content (Q4 2025 – w trakcie)**
 **Cel:** Wypełnienie pustej aplikacji treścią, dopięcie techniczne MVP i ściągnięcie ruchu organicznego.
 - [x] **SEO & Meta (PRIORYTET):** Wdrożenie `react-helmet-async` (dynamiczne tytuły/opisy) i Open Graph.
-- [ ] **Sitemap.xml:** Generowanie mapy strony dla Google.
+- [x] **Sitemap.xml:** Generowanie mapy strony dla Google (Edge Function `generate-sitemap`).
 - [ ] **Blog Edukacyjny:** Uruchomienie sekcji blogowej (CMS w Supabase + Markdown) dla Content Marketingu.
 - [x] **Konfiguracja Storage:** Uruchomienie bucketu `resource-thumbnails` w Supabase.
 - [ ] **Seed Danych:** Import 50–100 quizów i kanałów YouTube.
