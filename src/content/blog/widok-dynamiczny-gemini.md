@@ -13,7 +13,7 @@ W artykule tym przeanalizuję, jak funkcja "Otwórz AI" dostępna w platformie *
 Widok Dynamiczny (Dynamic View) w Google Gemini to zaawansowana funkcja, która pozwala na:
 
 1. **Interaktywne eksplorowanie treści** - Student nie tylko czyta materiał, ale aktywnie go eksploruje
-2. **Wizualizację abstrakcyjnych pojęć** - Skomplikowane koncepty matematyczne są wyjaśnianie poprzez interaktywne diagramy i wizualizacje
+2. **Wizualizację abstrakcyjnych pojęć** - Skomplikowane koncepty matematyczne są wyjaśniane poprzez interaktywne diagramy i wizualizacje
 3. **Adaptacyjne wyjaśnianie** - AI dostosowuje poziom skomplikowania wyjaśnień do poziomu ucznia
 4. **Natychmiastowe zadawanie pytań** - Student może w każdej chwili zapytać AI o wyjaśnienie lub dodatkowy przykład
 5. **Dzielenie sesji** - Możliwość dzielenia sesji edukacyjnych z nauczycielami lub kolegami z klasy
