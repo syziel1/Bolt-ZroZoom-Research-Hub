@@ -268,6 +268,9 @@ export function DashboardGrid({
                             <div
                                 key={post.slug}
                                 onClick={() => navigate(`/blog/${post.slug}`)}
+                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/blog/${post.slug}`); }}
+                                role="link"
+                                tabIndex={0}
                                 className="bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200 dark:border-slate-700 overflow-hidden cursor-pointer group flex flex-col"
                             >
                                 {post.coverImage && (
