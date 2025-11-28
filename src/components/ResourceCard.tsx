@@ -46,13 +46,6 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
     onTopicClick?.(topicName);
   };
 
-  const handleFavoriteClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (isLoggedIn && onFavoriteToggle) {
-      onFavoriteToggle(resource.id);
-    }
-  };
-
   // YouTube modal state
   const [showYouTubeModal, setShowYouTubeModal] = useState(false);
   const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
