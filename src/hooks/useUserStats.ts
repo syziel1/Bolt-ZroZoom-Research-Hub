@@ -15,6 +15,7 @@ export function useUserStats() {
     });
     const [loading, setLoading] = useState(true);
     const [userNick, setUserNick] = useState('');
+    const [userName, setUserName] = useState('');
 
     const loadStats = useCallback(async () => {
         try {
@@ -28,14 +29,16 @@ export function useUserStats() {
             // Load user profile for nick
             const { data: profile } = await supabase
                 .from('profiles')
-                .select('nick')
+                .select('nick, name')
                 .eq('id', user.id)
                 .single();
 
             if (profile) {
                 setUserNick(profile.nick);
+                setUserName(profile.name || profile.nick);
             } else {
                 setUserNick(user.email?.split('@')[0] || 'Użytkownik');
+                setUserName(user.email?.split('@')[0] || 'Użytkownik');
             }
 
             // Load stats using RPC
@@ -58,5 +61,5 @@ export function useUserStats() {
         loadStats();
     }, [loadStats]);
 
-    return { stats, loading, userNick, refreshStats: loadStats };
+    return { stats, loading, userNick, userName, refreshStats: loadStats };
 }

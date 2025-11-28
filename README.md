@@ -43,7 +43,6 @@ Szkoła Przyszłości z AI to platforma do gromadzenia, organizowania i udostęp
 - 🔍 Wyszukiwanie pełnotekstowe (klient)
 - 🃏 Różne widoki kart (Hero, Lista, Siatka)
 - 🔗 Routing z URL parametrami
-- 🔗 Routing z URL parametrami
 - 🌓 Tryb ciemny (Dark Mode) z wykrywaniem ustawień systemowych (beta)
 - 🛡️ Ostrzeżenia przed linkami zewnętrznymi
 - 📜 Zasady korzystania z serwisu (`/zasady`)

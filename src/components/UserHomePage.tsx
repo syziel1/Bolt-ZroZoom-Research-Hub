@@ -12,7 +12,7 @@ import { SEO } from './SEO';
 
 export function UserHomePage() {
     const navigate = useNavigate();
-    const { stats, loading: statsLoading, userNick } = useUserStats();
+    const { stats, loading: statsLoading, userName } = useUserStats();
     const { recentIds } = useRecentResources();
     const [recentResources, setRecentResources] = useState<Resource[]>([]);
     const [resourceTopics, setResourceTopics] = useState<Map<string, ResourceTopic[]>>(new Map());
@@ -117,7 +117,7 @@ export function UserHomePage() {
                 {/* Greeting Section */}
                 <section className="mb-2 py-10 text-center">
                     <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-6">
-                        Cześć, <span className="text-blue-600 dark:text-blue-400">{userNick}</span>!
+                        Cześć, <span className="text-blue-600 dark:text-blue-400">{userName}</span>!
                         <br />
                         <span className="text-3xl md:text-4xl text-gray-600 dark:text-gray-400 font-normal mt-2 block">
                             Głodny wiedzy?
