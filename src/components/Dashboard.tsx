@@ -68,13 +68,10 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
     sortBy,
     setSortBy,
     currentPage,
-    totalPages,
     sortedResources,
     topicNodes,
     topicsLoading,
     hasActiveFilters,
-    indexOfFirstResource,
-    indexOfLastResource,
     handleSubjectChange,
     handleTopicToggle,
     handleLevelToggle,
@@ -149,6 +146,20 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
 
     return result;
   }, [sortedResources, showOnlyFavorites, showOnlyRated, showOnlyMine, isFavorite, session, ratedResourceIds]);
+
+  // Pagination for finalFilteredResources
+  const ITEMS_PER_PAGE = 12;
+  const totalFilteredPages = Math.ceil(finalFilteredResources.length / ITEMS_PER_PAGE);
+  const currentFilteredPage = Math.min(currentPage, Math.max(1, totalFilteredPages));
+
+  const indexOfLastFilteredResource = currentFilteredPage * ITEMS_PER_PAGE;
+  const indexOfFirstFilteredResource = indexOfLastFilteredResource - ITEMS_PER_PAGE;
+  const currentFilteredResources = finalFilteredResources.slice(indexOfFirstFilteredResource, indexOfLastFilteredResource);
+
+  // Reset page when local filters change
+  useEffect(() => {
+    handlePageChange(1);
+  }, [showOnlyFavorites, showOnlyRated, showOnlyMine]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -371,17 +382,17 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
             loading={loading}
             filteredResources={finalFilteredResources}
             sortedResources={finalFilteredResources}
-            currentResources={finalFilteredResources}
+            currentResources={currentFilteredResources}
             resourceTopics={resourceTopics}
             resourceLevels={resourceLevels}
             hasActiveFilters={hasActiveFilters || showOnlyFavorites}
             recentlyAddedResources={recentlyAddedResources}
             sortBy={sortBy}
             setSortBy={setSortBy}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            indexOfFirstResource={indexOfFirstResource}
-            indexOfLastResource={indexOfLastResource}
+            currentPage={currentFilteredPage}
+            totalPages={totalFilteredPages}
+            indexOfFirstResource={indexOfFirstFilteredResource}
+            indexOfLastResource={indexOfLastFilteredResource}
             onPageChange={handlePageChange}
             onTopicClick={handleTopicClick}
             onCardClick={handleCardClick}

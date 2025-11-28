@@ -3,7 +3,7 @@ import { Resource, ResourceTopic, ResourceLevel } from '../lib/supabase';
 import { getThumbnailUrl } from '../lib/storage';
 import { YouTubeModal } from './YouTubeModal';
 import { ResourceActionButton } from './ResourceActionButton';
-import { Video, FileText, Presentation, Beaker, Wrench, Star, ImageIcon, MessageSquare, Heart } from 'lucide-react';
+import { Star, ImageIcon, MessageSquare, Heart } from 'lucide-react';
 
 export type ResourceCardVariant = 'default' | 'hero' | 'list';
 
@@ -19,18 +19,7 @@ type ResourceCardProps = {
   isLoggedIn?: boolean;
 };
 
-const typeIcons: Record<string, React.ElementType> = {
-  video: Video,
-  article: FileText,
-  pdf: FileText,
-  presentation: Presentation,
-  quiz: FileText,
-  simulation: Beaker,
-  tool: Wrench,
-};
-
 export function ResourceCard({ resource, topics = [], levels = [], onTopicClick, onCardClick, variant = 'default', isFavorite = false, onFavoriteToggle, isLoggedIn = true }: ResourceCardProps) {
-  const Icon = typeIcons[resource.type] || FileText;
   const thumbnailUrl = getThumbnailUrl(resource.thumbnail_path) || resource.thumbnail_url;
 
   const calculateOverallRating = (): number | null => {
@@ -133,7 +122,7 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
               {resource.title}
             </h3>
             {resource.description && (
-              <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 mb-4">
+              <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-4 mb-4">
                 {resource.description}
               </p>
             )}
@@ -318,15 +307,17 @@ export function ResourceCard({ resource, topics = [], levels = [], onTopicClick,
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1 line-clamp-2">
+          <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+            {resource.subject_name}
+          </span>
+          <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 my-2 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
             {resource.title}
           </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400">{resource.subject_name}</p>
         </div>
       </div>
 
       {resource.description && (
-        <p className="text-sm text-gray-700 dark:text-gray-300 mb-4 line-clamp-2">
+        <p className="text-sm text-gray-700 dark:text-gray-300 mb-4 line-clamp-3">
           {resource.description}
         </p>
       )}
