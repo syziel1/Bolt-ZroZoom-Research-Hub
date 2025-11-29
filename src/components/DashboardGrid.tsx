@@ -265,21 +265,14 @@ export function DashboardGrid({
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {filteredBlogPosts.map((post) => (
-                            <div
+                            <button
                                 key={post.slug}
                                 onClick={() => navigate(`/blog/${post.slug}`)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' || e.key === ' ') {
-                                        e.preventDefault();
-                                        navigate(`/blog/${post.slug}`);
-                                    }
-                                }}
-                                role="button"
-                                tabIndex={0}
-                                className="bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200 dark:border-slate-700 overflow-hidden cursor-pointer group flex flex-col"
+                                type="button"
+                                className="bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200 dark:border-slate-700 overflow-hidden cursor-pointer group flex flex-col text-left w-full"
                             >
                                 {post.coverImage && (
-                                    <div className="h-40 overflow-hidden bg-gray-100 dark:bg-slate-700">
+                                    <div className="h-40 overflow-hidden bg-gray-100 dark:bg-slate-700 w-full">
                                         <img
                                             src={post.coverImage}
                                             alt={post.title}
@@ -287,7 +280,7 @@ export function DashboardGrid({
                                         />
                                     </div>
                                 )}
-                                <div className="p-4 flex flex-col flex-1">
+                                <div className="p-4 flex flex-col flex-1 w-full">
                                     <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
                                         {post.title}
                                     </h3>
@@ -298,7 +291,7 @@ export function DashboardGrid({
                                         Czytaj więcej <ArrowRight size={14} className="ml-1" />
                                     </div>
                                 </div>
-                            </div>
+                            </button>
                         ))}
                     </div>
                 </div>
