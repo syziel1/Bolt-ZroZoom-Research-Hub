@@ -16,6 +16,9 @@ export type SearchModalProps = {
     noSearchMessage: string;
     searchButtonColor?: string;
     inputFocusRingColor?: string;
+    placeholderText?: string;
+    searchButtonText?: string;
+    searchingButtonText?: string;
     children: ReactNode;
 };
 
@@ -34,6 +37,9 @@ export function SearchModal({
     noSearchMessage,
     searchButtonColor = 'bg-gray-800 hover:bg-gray-900 disabled:bg-gray-400 dark:bg-slate-700 dark:hover:bg-slate-600',
     inputFocusRingColor = 'focus:ring-gray-500',
+    placeholderText = 'Wpisz frazę wyszukiwania...',
+    searchButtonText = 'Szukaj',
+    searchingButtonText = 'Szukam...',
     children,
 }: SearchModalProps) {
     if (!isOpen) return null;
@@ -61,7 +67,7 @@ export function SearchModal({
                                 type="text"
                                 value={query}
                                 onChange={(e) => onQueryChange(e.target.value)}
-                                placeholder="Wpisz frazę wyszukiwania..."
+                                placeholder={placeholderText}
                                 className={`w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 ${inputFocusRingColor} focus:border-transparent bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400`}
                                 autoFocus
                             />
@@ -80,7 +86,7 @@ export function SearchModal({
                             disabled={loading}
                             className={`${searchButtonColor} text-white px-6 py-2 rounded-lg font-medium transition-colors`}
                         >
-                            {loading ? 'Szukam...' : 'Szukaj'}
+                            {loading ? searchingButtonText : searchButtonText}
                         </button>
                     </form>
                 </div>
