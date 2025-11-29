@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Star } from 'lucide-react';
+import { RatingSlider } from './RatingSlider';
 
 type Rating = {
     id: string;
@@ -130,45 +131,21 @@ export function ResourceRatingSection({ resourceId, isGuestMode, onRatingUpdate 
             {showRatingForm && (
                 <div className="bg-gray-50 dark:bg-slate-900 p-4 rounded-lg mb-4 border border-gray-200 dark:border-slate-700">
                     <div className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Przydatność: {ratingData.usefulness}
-                            </label>
-                            <input
-                                type="range"
-                                min="1"
-                                max="5"
-                                value={ratingData.usefulness}
-                                onChange={(e) => setRatingData({ ...ratingData, usefulness: parseInt(e.target.value) })}
-                                className="w-full accent-blue-600"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Poprawność: {ratingData.correctness}
-                            </label>
-                            <input
-                                type="range"
-                                min="1"
-                                max="5"
-                                value={ratingData.correctness}
-                                onChange={(e) => setRatingData({ ...ratingData, correctness: parseInt(e.target.value) })}
-                                className="w-full accent-blue-600"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Dopasowanie trudności: {ratingData.difficulty}
-                            </label>
-                            <input
-                                type="range"
-                                min="1"
-                                max="5"
-                                value={ratingData.difficulty}
-                                onChange={(e) => setRatingData({ ...ratingData, difficulty: parseInt(e.target.value) })}
-                                className="w-full accent-blue-600"
-                            />
-                        </div>
+                        <RatingSlider
+                            label="Przydatność"
+                            value={ratingData.usefulness}
+                            onChange={(value) => setRatingData({ ...ratingData, usefulness: value })}
+                        />
+                        <RatingSlider
+                            label="Poprawność"
+                            value={ratingData.correctness}
+                            onChange={(value) => setRatingData({ ...ratingData, correctness: value })}
+                        />
+                        <RatingSlider
+                            label="Dopasowanie trudności"
+                            value={ratingData.difficulty}
+                            onChange={(value) => setRatingData({ ...ratingData, difficulty: value })}
+                        />
                         <button
                             onClick={handleSubmitRating}
                             disabled={submitting}
