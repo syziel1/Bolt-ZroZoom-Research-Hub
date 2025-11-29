@@ -54,7 +54,6 @@ export function ThemeProvider({
             if (mediaQuery.addEventListener) {
                 mediaQuery.addEventListener('change', applySystemTheme);
             } else {
-                // @ts-ignore
                 mediaQuery.addListener(applySystemTheme);
             }
 
@@ -65,7 +64,6 @@ export function ThemeProvider({
                 if (mediaQuery.removeEventListener) {
                     mediaQuery.removeEventListener('change', applySystemTheme);
                 } else {
-                    // @ts-ignore
                     mediaQuery.removeListener(applySystemTheme);
                 }
                 window.removeEventListener('focus', applySystemTheme);

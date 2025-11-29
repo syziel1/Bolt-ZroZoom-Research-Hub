@@ -58,7 +58,7 @@ serve(async (req) => {
         })
 
         // Subject routes
-        subjects?.forEach((subject: any) => {
+        subjects?.forEach((subject: { slug: string }) => {
             sitemap += `
   <url>
     <loc>${baseUrl}/zasoby/${subject.slug}</loc>
@@ -68,7 +68,7 @@ serve(async (req) => {
         })
 
         // Topic routes
-        topics?.forEach((topic: any) => {
+        topics?.forEach((topic: { slug: string; subject: { slug: string } | null }) => {
             if (topic.subject?.slug) {
                 sitemap += `
   <url>
@@ -92,7 +92,8 @@ serve(async (req) => {
 
     } catch (error) {
         console.error(error)
-        return new Response(JSON.stringify({ error: error.message }), {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        return new Response(JSON.stringify({ error: errorMessage }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 500,
         })

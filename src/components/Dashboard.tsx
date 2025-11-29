@@ -132,7 +132,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
       setShowOnlyFavorites(false);
       setShowOnlyRated(false);
     }
-  }, [window.location.search]);
+  }, []);
 
   useEffect(() => {
     if (session?.user?.id) {
@@ -181,6 +181,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
   // Reset page when local filters change
   useEffect(() => {
     handlePageChange(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showOnlyFavorites, showOnlyRated, showOnlyMine]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);

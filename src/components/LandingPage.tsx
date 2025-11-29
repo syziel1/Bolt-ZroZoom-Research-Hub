@@ -44,6 +44,7 @@ export function LandingPage() {
     }, 4000); // Change every 4 seconds
 
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {

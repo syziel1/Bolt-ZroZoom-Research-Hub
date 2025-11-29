@@ -49,6 +49,7 @@ export function AiAssistant({
             initialQuerySent.current = initialQuery;
             handleSend(initialQuery);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialQuery, isOpen]);
 
     const scrollToBottom = () => {

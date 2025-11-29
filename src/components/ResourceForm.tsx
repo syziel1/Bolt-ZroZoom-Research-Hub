@@ -357,8 +357,7 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
         let errorMessage = error.message;
         try {
           if (error instanceof Error && 'context' in error) {
-            // @ts-ignore
-            const context = error.context as any;
+            const context = (error as Error & { context?: { json?: () => Promise<{ error?: string }> } }).context;
             if (context && context.json) {
               const body = await context.json();
               if (body.error) errorMessage = body.error;
@@ -439,9 +438,10 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
       setAiGenerated(true);
       setSuccessMessage('AI przeanalizowało treść i uzupełniło formularz! ✨');
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error('AI analysis error:', err);
-      setError(err.message || 'Nie udało się uzyskać sugestii AI.');
+      const errorMessage = err instanceof Error ? err.message : 'Nie udało się uzyskać sugestii AI.';
+      setError(errorMessage);
     } finally {
       setAnalyzing(false);
     }

@@ -64,7 +64,28 @@ serve(async (req) => {
       })
     }
 
-    const videoIds = searchData.items.map((item: any) => item.id.videoId).join(',');
+    type YouTubeSearchItem = {
+      id: { videoId: string };
+    };
+
+    type YouTubeVideoItem = {
+      id: string;
+      snippet: {
+        title: string;
+        description: string;
+        channelTitle: string;
+        thumbnails: {
+          high?: { url: string };
+          medium?: { url: string };
+          default?: { url: string };
+        };
+      };
+      contentDetails: {
+        duration: string;
+      };
+    };
+
+    const videoIds = (searchData.items as YouTubeSearchItem[]).map((item) => item.id.videoId).join(',');
 
     // B. Videos details (for duration)
     const videosUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${videoIds}&key=${apiKey}`
@@ -76,7 +97,7 @@ serve(async (req) => {
     }
 
     // 4. Mapowanie wyników na format naszej aplikacji
-    const results = videosData.items.map((item: any) => {
+    const results = (videosData.items as YouTubeVideoItem[]).map((item) => {
       const duration = parseDuration(item.contentDetails.duration);
       return {
         youtubeId: item.id,
@@ -95,7 +116,8 @@ serve(async (req) => {
     })
 
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return new Response(JSON.stringify({ error: errorMessage }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
