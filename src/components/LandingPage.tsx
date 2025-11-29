@@ -15,6 +15,13 @@ type Stats = {
   levelsCount: number;
 };
 
+const mottos = [
+  "Baza wiedzy i narzędzi",
+  "Odkrywaj świat nauki z AI",
+  "Ucz się mądrzej, nie ciężej",
+  "Wspieramy Twój rozwój"
+];
+
 export function LandingPage() {
   const navigate = useNavigate();
   const [session, setSession] = useState<Session | null>(null);
@@ -26,12 +33,6 @@ export function LandingPage() {
   const [resourceLevels, setResourceLevels] = useState<Map<string, ResourceLevel[]>>(new Map());
   const [searchQuery, setSearchQuery] = useState('');
 
-  const mottos = [
-    "Baza wiedzy i narzędzi",
-    "Odkrywaj świat nauki z AI",
-    "Ucz się mądrzej, nie ciężej",
-    "Wspieramy Twój rozwój"
-  ];
   const [currentMottoIndex, setCurrentMottoIndex] = useState(0);
   const [isMottoVisible, setIsMottoVisible] = useState(true);
 

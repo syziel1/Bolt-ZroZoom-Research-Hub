@@ -34,8 +34,8 @@ export function DashboardHeader({
 
     return (
         <header className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 px-4 md:px-8 py-4">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center">
+            <div className="flex items-center justify-between h-16">
+                <div className="flex items-center shrink-0">
                     <button
                         onClick={onOpenSidebar}
                         aria-label="Otwórz menu"
@@ -50,17 +50,29 @@ export function DashboardHeader({
                                 <Sparkles className="w-4 h-4 text-blue-500 ml-0.5 -mt-4 animate-pulse" />
                             </h1>
                         </Link>
-                        <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1 hidden sm:block">
-                            Odkrywaj i dziel się zasobami edukacyjnymi
-                        </p>
+                        {!isGuestMode && (
+                            <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1 hidden sm:block">
+                                Odkrywaj i dziel się zasobami edukacyjnymi
+                            </p>
+                        )}
                     </div>
                 </div>
-                <div className="flex items-center gap-2 md:gap-4">
+
+                {isGuestMode && (
+                    <div className="hidden lg:flex flex-col items-center text-center mx-4 flex-1">
+                        <span className="font-semibold text-blue-900 dark:text-blue-100 text-sm">Przeglądasz jako gość</span>
+                        <span className="text-xs text-blue-700 dark:text-blue-300 max-w-xl truncate">
+                            Zaloguj się, aby dodawać własne materiały, oceniać zasoby i mieć dostęp do dodatkowych funkcji.
+                        </span>
+                    </div>
+                )}
+
+                <div className="flex items-center gap-2 md:gap-4 shrink-0">
                     {isGuestMode ? (
                         <>
                             <button
                                 onClick={() => navigate('/auth')}
-                                className="bg-blue-600 text-white px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
+                                className="bg-blue-600 text-white px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-blue-700 flex items-center gap-2 shadow-sm"
                             >
                                 <span>Zaloguj się</span>
                             </button>
