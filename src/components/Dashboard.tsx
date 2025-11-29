@@ -12,7 +12,6 @@ import { DashboardGrid } from './DashboardGrid';
 import { Footer } from './Footer';
 import { SEO } from './SEO';
 
-import { AdminView } from './dashboard/AdminView';
 import { DashboardModals } from './dashboard/DashboardModals';
 import type { Session } from '@supabase/supabase-js';
 
@@ -285,34 +284,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
     return Array.from(langs) as string[];
   }, [resources]);
 
-  const isAdmin = userRole === 'admin';
 
-  if (showAdminPanel && isAdmin) {
-    return (
-      <AdminView
-        userRole={userRole}
-        onClose={() => setShowAdminPanel(false)}
-        onSignOut={handleSignOut}
-        refreshData={refreshData}
-        isModalOpen={isModalOpen}
-        handleCloseAddModal={handleCloseAddModal}
-        subjects={subjects}
-        allTopics={allTopics}
-        levels={levels}
-        editingResource={editingResource}
-        prefilledResource={prefilledResource}
-        isDetailModalOpen={isDetailModalOpen}
-        handleCloseDetailModal={handleCloseDetailModal}
-        selectedResource={selectedResource}
-        isGuestMode={isGuestMode}
-        handleEditResource={handleEditResource}
-        isYouTubeModalOpen={isYouTubeModalOpen}
-        setIsYouTubeModalOpen={setIsYouTubeModalOpen}
-        searchQuery={searchQuery}
-        handleYouTubeVideoAdd={handleYouTubeVideoAdd}
-      />
-    );
-  }
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-slate-900">
@@ -434,6 +406,9 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
         topicNodes={topicNodes}
         selectedLevels={selectedLevels}
         selectedLanguages={selectedLanguages}
+        showAdminPanel={showAdminPanel}
+        setShowAdminPanel={setShowAdminPanel}
+        userRole={userRole}
       />
     </div>
   );

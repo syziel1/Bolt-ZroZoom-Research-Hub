@@ -3,6 +3,7 @@ import { ResourceDetailModal } from '../ResourceDetailModal';
 import { YouTubeSearchModal } from '../YouTubeSearchModal';
 import { WikipediaSearchModal } from '../WikipediaSearchModal';
 import { AiAssistant } from '../AiAssistant';
+import { AdminPanelModal } from './AdminPanelModal';
 import { Resource, Subject, Topic, Level } from '../../lib/supabase';
 
 type TopicNode = {
@@ -40,6 +41,9 @@ type DashboardModalsProps = {
     topicNodes: TopicNode[];
     selectedLevels: string[];
     selectedLanguages: string[];
+    showAdminPanel: boolean;
+    setShowAdminPanel: (isOpen: boolean) => void;
+    userRole: string | null;
 };
 
 export function DashboardModals({
@@ -70,7 +74,10 @@ export function DashboardModals({
     selectedTopics,
     topicNodes,
     selectedLevels,
-    selectedLanguages
+    selectedLanguages,
+    showAdminPanel,
+    setShowAdminPanel,
+    userRole
 }: DashboardModalsProps) {
 
     const findTopicNames = (nodes: TopicNode[], ids: string[]): string[] => {
@@ -134,6 +141,13 @@ export function DashboardModals({
                 })}
                 selectedLanguages={selectedLanguages}
                 currentResource={selectedResource}
+            />
+
+            <AdminPanelModal
+                isOpen={showAdminPanel}
+                onClose={() => setShowAdminPanel(false)}
+                userRole={userRole || ''}
+                onDataChange={refreshData}
             />
         </>
     );
