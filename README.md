@@ -84,6 +84,16 @@ Szkoła Przyszłości z AI to platforma do gromadzenia, organizowania i udostęp
   - Real-time subscriptions - aktualizacje na żywo
 - **Supabase Edge Functions** - serverless functions (Deno)
 
+### AI Agents & Tools
+- **Google Antigravity IDE** - z Gemini 3 Pro i Claude Sonnet 4.5
+- **GitHub Copilot** - wsparcie kodowania
+- **Codex** - generowanie kodu
+- **Role Agentów:**
+  - *Architekt:* Projektowanie struktury bazy danych i relacji.
+  - *Frontend Dev:* Implementacja komponentów React i stylowanie Tailwind.
+  - *Backend Dev:* Pisanie polityk RLS i funkcji Edge w Deno.
+  - *QA:* Generowanie testów jednostkowych i weryfikacja typów.
+
 ## 📦 Instalacja
 
 ### Wymagania
