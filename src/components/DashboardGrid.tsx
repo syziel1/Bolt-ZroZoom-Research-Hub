@@ -20,7 +20,6 @@ type DashboardGridProps = {
     indexOfFirstResource: number;
     indexOfLastResource: number;
     onPageChange: (page: number) => void;
-    onTopicClick: (topicName: string) => void;
     onCardClick: (resource: Resource) => void;
     searchQuery: string;
     onAskAi: (query: string) => void;
@@ -54,7 +53,6 @@ export function DashboardGrid({
     currentPage,
     totalPages,
     onPageChange,
-    onTopicClick,
     onCardClick,
     searchQuery,
     onAskAi,
@@ -197,7 +195,6 @@ export function DashboardGrid({
                         resource={resource}
                         topics={resourceTopics.get(resource.id) || []}
                         levels={resourceLevels.get(resource.id) || []}
-                        onTopicClick={onTopicClick}
                         onCardClick={onCardClick}
                         isFavorite={isFavorite?.(resource.id)}
                         onFavoriteToggle={onFavoriteToggle}
