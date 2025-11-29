@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Star, Plus, Clock, BookOpen } from 'lucide-react';
+import { Star, Plus, Clock, BookOpen } from 'lucide-react';
 import { useUserStats } from '../hooks/useUserStats';
 import { useRecentResources } from '../hooks/useRecentResources';
 import { Session } from '@supabase/supabase-js';
@@ -9,6 +9,7 @@ import { ResourceCarousel } from './ResourceCarousel';
 import { Navigation } from './Navigation';
 import { Footer } from './Footer';
 import { SEO } from './SEO';
+import { UnifiedSearchInput } from './UnifiedSearchInput';
 
 export function UserHomePage() {
     const navigate = useNavigate();
@@ -93,11 +94,29 @@ export function UserHomePage() {
         loadRecentResources();
     }, [recentIds]);
 
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
+    const [allResources, setAllResources] = useState<{ id: string; title: string }[]>([]);
+
+    useEffect(() => {
+        const loadResourceTitles = async () => {
+            const { data } = await supabase
+                .from('v_resources_full')
+                .select('id, title');
+            if (data) {
+                setAllResources(data);
+            }
+        };
+        loadResourceTitles();
+    }, []);
+
+    const handleSearch = (e?: React.FormEvent) => {
+        e?.preventDefault();
         if (searchQuery.trim()) {
             navigate(`/zasoby?q=${encodeURIComponent(searchQuery.trim())}`);
         }
+    };
+
+    const handleResourceSelect = (resource: { id: string; title: string }) => {
+        navigate(`/zasoby?r=${resource.id}`);
     };
 
     const handleLogout = async () => {
@@ -133,22 +152,20 @@ export function UserHomePage() {
                 </section>
 
                 <section className="mb-10 py-10 text-center">
-                    <form onSubmit={handleSearch} className="max-w-2xl mx-auto relative">
-                        <input
-                            type="text"
+                    <div className="max-w-2xl mx-auto relative">
+                        <UnifiedSearchInput
+                            searchQuery={searchQuery}
+                            setSearchQuery={setSearchQuery}
+                            onSearch={handleSearch}
+                            items={allResources}
+                            onItemSelect={handleResourceSelect}
                             placeholder="Czego chcesz się dzisiaj nauczyć?"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full px-6 py-4 rounded-full text-gray-900 dark:text-gray-100 bg-white dark:bg-slate-800 text-lg shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-400/50 pl-14 placeholder-gray-500 dark:placeholder-gray-400 border border-gray-100 dark:border-slate-700"
+                            inputClassName="w-full px-6 py-4 rounded-full text-gray-900 dark:text-gray-100 bg-white dark:bg-slate-800 text-lg shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-400/50 pl-14 placeholder-gray-500 dark:placeholder-gray-400 border border-gray-100 dark:border-slate-700"
+                            searchIconClassName="!left-5 text-gray-400"
+                            showSearchButton={true}
+                            searchButtonClassName="bg-blue-600 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-700 transition-colors"
                         />
-                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" size={24} />
-                        <button
-                            type="submit"
-                            className="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-600 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-700 transition-colors"
-                        >
-                            Szukaj
-                        </button>
-                    </form>
+                    </div>
                 </section>
 
                 {/* Recently Opened Section */}

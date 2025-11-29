@@ -1,14 +1,14 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { Resource } from '../lib/supabase';
+
 import { blogPosts } from '../content/blog/posts';
 
 type SearchAutocompleteProps = {
-    resources: Resource[];
+    items: { id?: string; title: string }[];  // id is optional for backwards compatibility with blog posts
     searchQuery: string;
     onSelectSuggestion: (suggestion: string) => void;
 };
 
-export function SearchAutocomplete({ resources, searchQuery, onSelectSuggestion }: SearchAutocompleteProps) {
+export function SearchAutocomplete({ items, searchQuery, onSelectSuggestion }: SearchAutocompleteProps) {
     const [selectedIndex, setSelectedIndex] = useState(-1);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -16,11 +16,11 @@ export function SearchAutocomplete({ resources, searchQuery, onSelectSuggestion 
     const uniqueSuggestions = useMemo(() => {
         return searchQuery.length >= 2
             ? Array.from(new Set([
-                ...resources
-                    .filter(resource =>
-                        resource.title.toLowerCase().includes(searchQuery.toLowerCase())
+                ...items
+                    .filter(item =>
+                        item.title.toLowerCase().includes(searchQuery.toLowerCase())
                     )
-                    .map(resource => resource.title),
+                    .map(item => item.title),
                 ...blogPosts
                     .filter(post =>
                         post.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -28,7 +28,7 @@ export function SearchAutocomplete({ resources, searchQuery, onSelectSuggestion 
                     .map(post => post.title)
             ])).slice(0, 5) // Deduplicate first, then limit to 5 unique suggestions
             : [];
-    }, [searchQuery, resources]);
+    }, [searchQuery, items]);
 
     // Handle keyboard navigation
     useEffect(() => {

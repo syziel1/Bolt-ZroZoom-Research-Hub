@@ -1,8 +1,8 @@
 import { Subject, Level, TopicNode, Resource } from '../lib/supabase';
-import { ChevronDown, ChevronRight, X, Search, Video, BookOpen } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { ChevronDown, ChevronRight, X, Video, BookOpen } from 'lucide-react';
+import { useState } from 'react';
 import { TopicTree } from './TopicTree';
-import { SearchAutocomplete } from './SearchAutocomplete';
+import { UnifiedSearchInput } from './UnifiedSearchInput';
 
 type SidebarProps = {
   subjects: Subject[];
@@ -25,6 +25,7 @@ type SidebarProps = {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   resources: Resource[];
+  onResourceSelect?: (resource: { id: string; title: string }) => void;
   onOpenYouTube: () => void;
   onOpenWikipedia: () => void;
 };
@@ -50,26 +51,16 @@ export function Sidebar({
   searchQuery,
   setSearchQuery,
   resources,
+  onResourceSelect,
   onOpenYouTube,
   onOpenWikipedia,
 }: SidebarProps) {
   const [topicsExpanded, setTopicsExpanded] = useState(true);
   const [levelsExpanded, setLevelsExpanded] = useState(false);
   const [languagesExpanded, setLanguagesExpanded] = useState(false);
-  const [showAutocomplete, setShowAutocomplete] = useState(false);
-  const searchRef = useRef<HTMLDivElement>(null);
 
-  // Close autocomplete when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setShowAutocomplete(false);
-      }
-    };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+
 
   // Map language codes to full names
   const getLanguageName = (code: string): string => {
@@ -111,43 +102,13 @@ export function Sidebar({
 
           {/* Search field */}
           <div className="mb-6">
-            <div ref={searchRef} className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-              <input
-                type="text"
-                placeholder="Szukaj w tytułach i opisach..."
-                aria-label="Szukaj zasobów"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setShowAutocomplete(true);
-                }}
-                onFocus={() => setShowAutocomplete(true)}
-                className="w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => {
-                    setSearchQuery('');
-                    setShowAutocomplete(false);
-                  }}
-                  aria-label="Wyczyść wyszukiwanie"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-                >
-                  <X size={16} />
-                </button>
-              )}
-              {showAutocomplete && (
-                <SearchAutocomplete
-                  resources={resources}
-                  searchQuery={searchQuery}
-                  onSelectSuggestion={(suggestion) => {
-                    setSearchQuery(suggestion);
-                    setShowAutocomplete(false);
-                  }}
-                />
-              )}
-            </div>
+            <UnifiedSearchInput
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              items={resources.map(r => ({ id: r.id, title: r.title }))}
+              onItemSelect={onResourceSelect}
+              placeholder="Szukaj w tytułach i opisach..."
+            />
           </div>
 
           <div className="mb-6">

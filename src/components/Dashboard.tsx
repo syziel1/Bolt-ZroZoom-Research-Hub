@@ -381,6 +381,9 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         resources={resources}
+        onResourceSelect={(resource: { id: string; title: string }) => {
+          navigate(`/zasoby?r=${resource.id}`);
+        }}
         onOpenYouTube={() => setIsYouTubeModalOpen(true)}
         onOpenWikipedia={() => setIsWikipediaModalOpen(true)}
       />

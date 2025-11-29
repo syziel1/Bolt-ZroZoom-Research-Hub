@@ -87,6 +87,8 @@ Szkoła Przyszłości z AI to platforma do gromadzenia, organizowania i udostęp
 ### AI Agents & Tools
 - **Google Antigravity IDE** - z Gemini 3 Pro i Claude Sonnet 4.5
 - **GitHub Copilot**, **OpenAI Codex** - przegląd (review) kodu w PR-ach
+- **ChatGPT-5.1**, **Grok Code Fast 1**, **Claude Haiku 4.5**, **Claude Opus 4.5**
+- **Perplexity Comet** - testowanie interfejsu użytkownika UI/UX
 - **Role Agentów AI:**
   - *Architekt:* Projektowanie struktury bazy danych i relacji.
   - *Frontend Dev:* Implementacja komponentów React i stylowanie Tailwind.
