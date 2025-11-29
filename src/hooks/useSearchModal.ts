@@ -18,6 +18,14 @@ type UseSearchModalResult<T> = {
     handleSubmit: (e: React.FormEvent) => void;
 };
 
+/**
+ * Custom hook for managing search modal state and behavior
+ * Features:
+ * - State management for query, results, loading, error, and search status
+ * - Automatic search execution on modal open with initial query
+ * - State reset on modal close
+ * - Supabase function invocation for search
+ */
 export function useSearchModal<T>({
     isOpen,
     initialQuery,
@@ -58,9 +66,7 @@ export function useSearchModal<T>({
         if (isOpen && initialQuery) {
             setQuery(initialQuery);
             handleSearch(initialQuery);
-        } else if (isOpen) {
-            // Focus input if no query
-        } else {
+        } else if (!isOpen) {
             // Reset state on close
             setResults([]);
             setHasSearched(false);
