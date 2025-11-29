@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Star, Plus, Clock, BookOpen } from 'lucide-react';
+import { Star, Plus, Clock, BookOpen, Gamepad2 } from 'lucide-react';
 import { useUserStats } from '../hooks/useUserStats';
 import { useRecentResources } from '../hooks/useRecentResources';
 import { Session } from '@supabase/supabase-js';
@@ -228,6 +228,28 @@ export function UserHomePage() {
                                 <div className="text-gray-600 dark:text-gray-400 font-medium">Dodanych przez Ciebie</div>
                             </div>
                         </div>
+                    </div>
+                </section>
+
+                {/* Games Section */}
+                <section className="mb-16">
+                    <div className="flex items-center gap-3 mb-6">
+                        <Gamepad2 size={28} className="text-green-600 dark:text-green-400" />
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Gry edukacyjne</h2>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <button
+                            onClick={() => navigate('/gry/matematyczna-dzungla')}
+                            className="bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/20 dark:to-emerald-900/30 rounded-xl p-6 shadow-sm border border-green-200 dark:border-green-800 hover:shadow-lg hover:scale-[1.02] transition-all text-left group"
+                        >
+                            <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">🌴🦁</div>
+                            <h3 className="text-xl font-bold text-green-800 dark:text-green-200 mb-2">
+                                Matematyczna Dżungla
+                            </h3>
+                            <p className="text-green-600 dark:text-green-400 text-sm">
+                                Rozwiązuj zadania matematyczne i zdobywaj punkty! Wybierz poziom trudności i sprawdź swoje umiejętności.
+                            </p>
+                        </button>
                     </div>
                 </section>
             </main>
