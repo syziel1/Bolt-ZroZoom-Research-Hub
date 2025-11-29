@@ -3,21 +3,17 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase, Resource } from '../lib/supabase';
 import { logger } from '../lib/logger';
 import { Sidebar } from './Sidebar';
-import { AddResourceModal } from './AddResourceModal';
-import { ResourceDetailModal } from './ResourceDetailModal';
-import { AdminPanel } from './AdminPanel';
-import { LogOut } from 'lucide-react';
-import { YouTubeSearchModal } from './YouTubeSearchModal';
-import { WikipediaSearchModal } from './WikipediaSearchModal';
 import { useDashboardData } from '../hooks/useDashboardData';
 import { useDashboardFilters } from '../hooks/useDashboardFilters';
 import { useFavorites } from '../hooks/useFavorites';
 import { useResponsiveItemsPerPage } from '../hooks/useResponsiveItemsPerPage';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardGrid } from './DashboardGrid';
-import { AiAssistant } from './AiAssistant';
 import { Footer } from './Footer';
 import { SEO } from './SEO';
+
+import { AdminView } from './dashboard/AdminView';
+import { DashboardModals } from './dashboard/DashboardModals';
 import type { Session } from '@supabase/supabase-js';
 
 type YouTubeVideo = {
@@ -35,11 +31,7 @@ type WikipediaArticle = {
   thumbnailUrl: string | null;
 };
 
-type TopicNode = {
-  id: string;
-  name: string;
-  children?: TopicNode[];
-};
+
 
 type DashboardProps = {
   isGuestMode?: boolean;
@@ -297,58 +289,28 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
 
   if (showAdminPanel && isAdmin) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
-        <div className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 px-4 md:px-8 py-4">
-          <div className="flex items-center justify-between max-w-7xl mx-auto">
-            <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100">Szkoła Przyszłości z AI</h1>
-            <div className="flex items-center gap-2 md:gap-4">
-              <button
-                onClick={() => setShowAdminPanel(false)}
-                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex items-center gap-2 text-sm md:text-base"
-              >
-                <span className="hidden md:inline">Powrót do pulpitu</span>
-                <span className="md:hidden">Powrót</span>
-              </button>
-              <button
-                onClick={handleSignOut}
-                className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 flex items-center gap-2 text-sm md:text-base"
-              >
-                <LogOut size={20} />
-                <span className="hidden md:inline">Wyloguj się</span>
-              </button>
-            </div>
-          </div>
-        </div>
-        <AdminPanel userRole={userRole} requireAdmin={true} onDataChange={refreshData} />
-        <AddResourceModal
-          isOpen={isModalOpen}
-          onClose={handleCloseAddModal}
-          onSuccess={() => {
-            handleCloseAddModal();
-            refreshData();
-          }}
-          subjects={subjects}
-          topics={allTopics}
-          levels={levels}
-          initialData={editingResource}
-          prefillData={prefilledResource}
-        />
-        <ResourceDetailModal
-          isOpen={isDetailModalOpen}
-          onClose={handleCloseDetailModal}
-          resource={selectedResource}
-          onResourceUpdated={refreshData}
-          isGuestMode={isGuestMode}
-          onEdit={handleEditResource}
-        />
-        <YouTubeSearchModal
-          isOpen={isYouTubeModalOpen}
-          onClose={() => setIsYouTubeModalOpen(false)}
-          initialQuery={searchQuery}
-          onAddVideo={handleYouTubeVideoAdd}
-          isGuestMode={isGuestMode}
-        />
-      </div>
+      <AdminView
+        userRole={userRole}
+        onClose={() => setShowAdminPanel(false)}
+        onSignOut={handleSignOut}
+        refreshData={refreshData}
+        isModalOpen={isModalOpen}
+        handleCloseAddModal={handleCloseAddModal}
+        subjects={subjects}
+        allTopics={allTopics}
+        levels={levels}
+        editingResource={editingResource}
+        prefilledResource={prefilledResource}
+        isDetailModalOpen={isDetailModalOpen}
+        handleCloseDetailModal={handleCloseDetailModal}
+        selectedResource={selectedResource}
+        isGuestMode={isGuestMode}
+        handleEditResource={handleEditResource}
+        isYouTubeModalOpen={isYouTubeModalOpen}
+        setIsYouTubeModalOpen={setIsYouTubeModalOpen}
+        searchQuery={searchQuery}
+        handleYouTubeVideoAdd={handleYouTubeVideoAdd}
+      />
     );
   }
 
@@ -400,24 +362,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
         />
 
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
-          {isGuestMode && (
-            <div className="mb-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <div className="flex-1">
-                  <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">Przeglądasz jako gość</h3>
-                  <p className="text-sm text-blue-700 dark:text-blue-300">
-                    Zaloguj się, aby dodawać własne materiały, oceniać zasoby i mieć dostęp do dodatkowych funkcji.
-                  </p>
-                </div>
-                <button
-                  onClick={() => navigate('/auth')}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm whitespace-nowrap"
-                >
-                  Zarejestruj się
-                </button>
-              </div>
-            </div>
-          )}
+
 
           <DashboardGrid
             loading={loading}
@@ -460,64 +405,35 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
         </main>
       </div>
 
-      {!isGuestMode && (
-        <AddResourceModal
-          isOpen={isModalOpen}
-          onClose={handleCloseAddModal}
-          onSuccess={refreshData}
-          subjects={subjects}
-          topics={allTopics}
-          levels={levels}
-          initialData={editingResource}
-          prefillData={prefilledResource}
-        />
-      )}
-
-      <ResourceDetailModal
-        isOpen={isDetailModalOpen}
-        onClose={handleCloseDetailModal}
-        resource={selectedResource}
-        onResourceUpdated={refreshData}
+      <DashboardModals
         isGuestMode={isGuestMode}
-        onEdit={handleEditResource}
-      />
-      <YouTubeSearchModal
-        isOpen={isYouTubeModalOpen}
-        onClose={() => setIsYouTubeModalOpen(false)}
-        initialQuery={searchQuery}
-        onAddVideo={handleYouTubeVideoAdd}
-        isGuestMode={isGuestMode}
-      />
-      <WikipediaSearchModal
-        isOpen={isWikipediaModalOpen}
-        onClose={() => setIsWikipediaModalOpen(false)}
-        initialQuery={searchQuery}
-        onAddArticle={handleWikipediaArticleAdd}
-        isGuestMode={isGuestMode}
-      />
-      <AiAssistant
-        isOpen={isAiAssistantOpen}
-        onToggle={setIsAiAssistantOpen}
-        initialQuery={aiInitialQuery}
-        selectedSubject={subjects.find(s => s.subject_id === selectedSubject) || null}
-        selectedTopics={(() => {
-          // Convert topic IDs to names
-          const findTopicNames = (nodes: TopicNode[], ids: string[]): string[] => {
-            const names: string[] = [];
-            for (const node of nodes) {
-              if (ids.includes(node.id)) names.push(node.name);
-              if (node.children) names.push(...findTopicNames(node.children, ids));
-            }
-            return names;
-          };
-          return findTopicNames(topicNodes, selectedTopics);
-        })()}
-        selectedLevels={selectedLevels.map(levelId => {
-          const level = levels.find(l => l.id === levelId);
-          return level ? level.name : levelId;
-        })}
+        isModalOpen={isModalOpen}
+        handleCloseAddModal={handleCloseAddModal}
+        refreshData={refreshData}
+        subjects={subjects}
+        allTopics={allTopics}
+        levels={levels}
+        editingResource={editingResource}
+        prefilledResource={prefilledResource}
+        isDetailModalOpen={isDetailModalOpen}
+        handleCloseDetailModal={handleCloseDetailModal}
+        selectedResource={selectedResource}
+        handleEditResource={handleEditResource}
+        isYouTubeModalOpen={isYouTubeModalOpen}
+        setIsYouTubeModalOpen={setIsYouTubeModalOpen}
+        searchQuery={searchQuery}
+        handleYouTubeVideoAdd={handleYouTubeVideoAdd}
+        isWikipediaModalOpen={isWikipediaModalOpen}
+        setIsWikipediaModalOpen={setIsWikipediaModalOpen}
+        handleWikipediaArticleAdd={handleWikipediaArticleAdd}
+        isAiAssistantOpen={isAiAssistantOpen}
+        setIsAiAssistantOpen={setIsAiAssistantOpen}
+        aiInitialQuery={aiInitialQuery}
+        selectedSubject={selectedSubject}
+        selectedTopics={selectedTopics}
+        topicNodes={topicNodes}
+        selectedLevels={selectedLevels}
         selectedLanguages={selectedLanguages}
-        currentResource={selectedResource}
       />
     </div>
   );
