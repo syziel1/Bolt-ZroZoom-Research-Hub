@@ -26,9 +26,9 @@ export function isTrustedDomain(url: string): boolean {
         return TRUSTED_DOMAINS.some(domain =>
             hostname === domain || hostname.endsWith('.' + domain)
         );
-    } catch (error) {
-        // Log the error for debugging - helps identify malformed URLs being passed
-        logger.warn('isTrustedDomain: Invalid URL provided:', url, error);
+    } catch {
+        // Log for debugging - only log a sanitized version to avoid exposing sensitive URL parameters
+        logger.warn('isTrustedDomain: Invalid URL format provided');
         return false;
     }
 }
