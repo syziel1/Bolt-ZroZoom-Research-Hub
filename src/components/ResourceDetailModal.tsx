@@ -345,7 +345,52 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
 
                     // Handle timestamps (e.g., 2:30, 12:45, 1:05:20)
                     if (part.match(/^\d{1,2}:\d{2}(?::\d{2})?$/)) {
-                      const seconds = part.split(':').reduce((acc, time) => (60 * acc) + +time, 0);
+                      // Parse timestamp with validation
+                      const parseTimestamp = (timestamp: string): number | null => {
+                        try {
+                          const parts = timestamp.split(':');
+                          if (parts.length < 2 || parts.length > 3) {
+                            return null;
+                          }
+                          
+                          const parsedParts = parts.map(p => {
+                            const num = parseInt(p, 10);
+                            if (isNaN(num) || num < 0) {
+                              return null;
+                            }
+                            return num;
+                          });
+                          
+                          if (parsedParts.some(p => p === null)) {
+                            return null;
+                          }
+                          
+                          const validParts = parsedParts as number[];
+                          
+                          // Validate ranges: minutes and seconds should be 0-59
+                          if (parts.length === 2) {
+                            // Format: mm:ss
+                            const [minutes, seconds] = validParts;
+                            if (seconds > 59) return null;
+                            return minutes * 60 + seconds;
+                          } else {
+                            // Format: hh:mm:ss
+                            const [hours, minutes, seconds] = validParts;
+                            if (minutes > 59 || seconds > 59) return null;
+                            return hours * 3600 + minutes * 60 + seconds;
+                          }
+                        } catch {
+                          return null;
+                        }
+                      };
+                      
+                      const seconds = parseTimestamp(part);
+                      
+                      // If parsing fails, render as plain text
+                      if (seconds === null) {
+                        return part;
+                      }
+                      
                       return (
                         <button
                           key={i}
