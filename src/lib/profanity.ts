@@ -27,21 +27,20 @@ const PROFANITY_LIST = [
 export function containsProfanity(text: string): boolean {
     if (!text) return false;
 
-    const lowerText = text.toLowerCase();
-    return PROFANITY_LIST.some(word => lowerText.includes(word));
+    return PROFANITY_LIST.some(word => {
+        const regex = new RegExp(`\\b${word}\\b`, 'gi');
+        return regex.test(text);
+    });
 }
 
 export function filterProfanity(text: string): string {
     if (!text) return text;
 
     let filteredText = text;
-    const lowerText = text.toLowerCase();
 
     PROFANITY_LIST.forEach(word => {
-        if (lowerText.includes(word)) {
-            const regex = new RegExp(word, 'gi');
-            filteredText = filteredText.replace(regex, '*'.repeat(word.length));
-        }
+        const regex = new RegExp(`\\b${word}\\b`, 'gi');
+        filteredText = filteredText.replace(regex, '*'.repeat(word.length));
     });
 
     return filteredText;
