@@ -29,10 +29,10 @@ type DashboardModalsProps = {
     isYouTubeModalOpen: boolean;
     setIsYouTubeModalOpen: (isOpen: boolean) => void;
     searchQuery: string;
-    handleYouTubeVideoAdd: (video: any) => void;
+    handleYouTubeVideoAdd: (video: { youtubeId: string; title: string; description: string; thumbnailUrl: string; channelTitle: string; duration: string; url: string }) => void;
     isWikipediaModalOpen: boolean;
     setIsWikipediaModalOpen: (isOpen: boolean) => void;
-    handleWikipediaArticleAdd: (article: any) => void;
+    handleWikipediaArticleAdd: (article: { pageId: number; title: string; description: string; thumbnailUrl: string | null; url: string }) => void;
     isAiAssistantOpen: boolean;
     setIsAiAssistantOpen: (isOpen: boolean) => void;
     aiInitialQuery: string;
@@ -133,10 +133,10 @@ export function DashboardModals({
                 isOpen={isAiAssistantOpen}
                 onToggle={setIsAiAssistantOpen}
                 initialQuery={aiInitialQuery}
-                selectedSubject={subjects.find(s => s.subject_id === selectedSubject) || null}
+                selectedSubject={subjects.find((s: Subject) => s.subject_id === selectedSubject) || null}
                 selectedTopics={findTopicNames(topicNodes, selectedTopics)}
                 selectedLevels={selectedLevels.map(levelId => {
-                    const level = levels.find(l => l.id === levelId);
+                    const level = levels.find((l: Level) => l.id === levelId);
                     return level ? level.name : levelId;
                 })}
                 selectedLanguages={selectedLanguages}
