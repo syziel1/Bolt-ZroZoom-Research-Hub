@@ -11,7 +11,6 @@ type ResourceCardProps = {
   resource: Resource;
   topics?: ResourceTopic[];
   levels?: ResourceLevel[];
-  onTopicClick?: (topicName: string) => void;
   onCardClick?: (resource: Resource) => void;
   variant?: ResourceCardVariant;
   isFavorite?: boolean;
