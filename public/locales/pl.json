@@ -1,0 +1,46 @@
+{
+  "common": {
+    "loading": "Ładowanie...",
+    "error": "Wystąpił błąd",
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "close": "Zamknij",
+    "confirm": "Potwierdź",
+    "delete": "Usuń",
+    "edit": "Edytuj",
+    "add": "Dodaj",
+    "search": "Szukaj"
+  },
+  "nav": {
+    "home": "Strona główna",
+    "resources": "Zasoby",
+    "login": "Zaloguj się",
+    "logout": "Wyloguj się",
+    "register": "Zarejestruj się",
+    "browseAsGuest": "Przeglądaj jako gość",
+    "resourcePanel": "Panel zasobów",
+    "selectSubject": "Wybierz przedmiot",
+    "openMenu": "Otwórz menu",
+    "closeMenu": "Zamknij menu"
+  },
+  "footer": {
+    "description": "Szkoła Przyszłości z AI - Twoja baza wiedzy edukacyjnej",
+    "aboutUs": "O nas",
+    "blog": "Blog",
+    "help": "Pomoc",
+    "rules": "Zasady",
+    "privacy": "Polityka Prywatności",
+    "copyright": "Wszystkie prawa zastrzeżone"
+  },
+  "theme": {
+    "light": "Jasny motyw",
+    "dark": "Ciemny motyw",
+    "system": "Systemowy",
+    "changeTheme": "Zmień motyw"
+  },
+  "language": {
+    "switch": "Zmień język",
+    "pl": "Polski",
+    "en": "English"
+  }
+}
