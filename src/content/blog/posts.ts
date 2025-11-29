@@ -5,7 +5,7 @@ export interface BlogPost {
     date: string;
     author: string;
     coverImage?: string;
-    content: () => Promise<typeof import('*.md?raw')>;
+    content: () => Promise<{ default: string }>;
 }
 
 export const blogPosts: BlogPost[] = [

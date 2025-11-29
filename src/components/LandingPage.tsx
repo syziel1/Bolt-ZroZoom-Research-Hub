@@ -484,7 +484,8 @@ export function LandingPage() {
             )}
           </div>
         </section>
-      </main><Footer theme="dark" />
+      </main>
+      <Footer theme="dark" />
     </div >
   );
 }
