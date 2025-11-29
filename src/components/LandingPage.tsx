@@ -45,7 +45,7 @@ export function LandingPage() {
     }, 4000); // Change every 4 seconds
 
     return () => clearInterval(interval);
-  }, [mottos.length]);
+  }, []);
 
   const [allResources, setAllResources] = useState<{ id: string; title: string }[]>([]);
 

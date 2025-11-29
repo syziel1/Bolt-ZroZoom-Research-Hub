@@ -269,14 +269,12 @@ export function DashboardGrid({
                                 key={post.slug}
                                 onClick={() => navigate(`/blog/${post.slug}`)}
                                 onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                        navigate(`/blog/${post.slug}`);
-                                    } else if (e.key === ' ') {
+                                    if (e.key === 'Enter' || e.key === ' ') {
                                         e.preventDefault();
                                         navigate(`/blog/${post.slug}`);
                                     }
                                 }}
-                                role="link"
+                                role="button"
                                 tabIndex={0}
                                 className="bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200 dark:border-slate-700 overflow-hidden cursor-pointer group flex flex-col"
                             >
