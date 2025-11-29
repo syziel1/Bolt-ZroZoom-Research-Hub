@@ -100,6 +100,11 @@ export function UserHomePage() {
         }
     };
 
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+        navigate('/');
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex flex-col">
             <SEO
@@ -110,7 +115,9 @@ export function UserHomePage() {
                 onNavigateToAuth={() => navigate('/auth')}
                 onScrollToSubjects={() => navigate('/zasoby')}
                 onBrowseAsGuest={() => navigate('/zasoby')}
+                onLogout={handleLogout}
                 session={session}
+                forceScrolled={true}
             />
 
             <main className="flex-1 max-w-7xl w-full mx-auto px-4 pt-20 md:pt-20">

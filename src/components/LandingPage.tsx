@@ -226,6 +226,11 @@ export function LandingPage() {
     );
   }
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setSession(null);
+  };
+
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900">
       <SEO
@@ -236,6 +241,7 @@ export function LandingPage() {
         onNavigateToAuth={() => navigate('/auth')}
         onScrollToSubjects={scrollToSubjects}
         onBrowseAsGuest={() => navigate('/zasoby')}
+        onLogout={handleLogout}
         session={session}
       />
       <main>
