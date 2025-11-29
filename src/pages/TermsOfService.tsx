@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Shield, AlertTriangle, MessageSquare, UserCheck, Scale } from 'lucide-react';
 import { Footer } from '../components/Footer';
+import { LEGAL_DATES } from '../lib/constants';
 
 export function TermsOfService() {
     const navigate = useNavigate();
@@ -27,7 +28,7 @@ export function TermsOfService() {
                                     Zasady korzystania z serwisu
                                 </h1>
                                 <p className="text-gray-500 dark:text-gray-400 mt-1">
-                                    Obowiązują od dnia 29.11.2025
+                                    Obowiązują od dnia {LEGAL_DATES.TERMS_OF_SERVICE_EFFECTIVE_DATE}
                                 </p>
                             </div>
                         </div>
