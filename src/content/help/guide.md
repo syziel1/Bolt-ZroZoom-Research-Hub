@@ -34,7 +34,7 @@ Możesz filtrować zasoby według:
 Platforma łączy zasoby z wielu źródeł:
 - **YouTube**: Oglądaj filmy edukacyjne bezpośrednio w aplikacji.
 - **Wikipedia**: Wyszukuj i dodawaj artykuły encyklopedyczne.
-- **Google Gemini**: Korzystaj z "Odtwórz AI" dla interaktywnej nauki.
+- **Google Gemini**: Korzystaj z "Otwórz AI" dla interaktywnej nauki.
 
 ### 3. Personalizacja
 - **Tryb Ciemny**: Dostosuj wygląd aplikacji do swoich preferencji (ikona księżyca w nagłówku).

@@ -35,7 +35,7 @@ Po dokładnym przetestowaniu aplikacji Szkoła Przyszłości z AI w wersji 2.0.0
 
 - Integracja z YouTube - zasoby wideo edukacyjne
 - Integracja z Wikipedia - artykuły encyklopedyczne
-- Integracja z Google Gemini - możliwość otwierania dzielonych sesji AI ("Odtwórz AI")
+- Integracja z Google Gemini - możliwość otwierania dzielonych sesji AI ("Otwórz AI")
 - Zasoby zawierają linki do dodatkowych materiałów
 
 
@@ -89,7 +89,7 @@ Po dokładnym przetestowaniu aplikacji Szkoła Przyszłości z AI w wersji 2.0.0
 2. ✅ **Wyszukiwanie**: Wyszukanie "funkcja liniowa" zwróciło 2 trafne wyniki
 3. ✅ **Filtrowanie**: Kliknięcie na "Matematyka" wyfiltrował 17 zasobów
 4. ✅ **Podgląd zasobów**: Kliknięcie na zasób otwiera modal z szczegółami
-5. ✅ **Integracja AI**: Przycisk "Odtwórz AI" otwiera dzieloną sesję Google Gemini
+5. ✅ **Integracja AI**: Przycisk "Otwórz AI" otwiera dzieloną sesję Google Gemini
 6. ✅ **Uluubione**: System ulubionych pokazuje 5 uluubonych zasobów
 7. ✅ **Tryby motywu**: Bezproblemowa zmiana między trybem jasnym i ciemnym
 8. ✅ **Scrollowanie**: Płynne scrollowanie i ładowanie zasobów
