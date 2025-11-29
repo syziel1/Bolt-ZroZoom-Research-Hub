@@ -1,3 +1,5 @@
+import { logger } from './logger';
+
 export const TRUSTED_DOMAINS = [
     'cke.gov.pl',
     'commons.wikimedia.org',
@@ -24,7 +26,9 @@ export function isTrustedDomain(url: string): boolean {
         return TRUSTED_DOMAINS.some(domain =>
             hostname === domain || hostname.endsWith('.' + domain)
         );
-    } catch {
+    } catch (error) {
+        // Log the error for debugging - helps identify malformed URLs being passed
+        logger.warn('isTrustedDomain: Invalid URL provided:', url, error);
         return false;
     }
 }
