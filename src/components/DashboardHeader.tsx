@@ -74,7 +74,7 @@ export function DashboardHeader({
                                 onClick={() => navigate('/auth')}
                                 className="bg-blue-600 text-white px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-blue-700 flex items-center gap-2 shadow-sm"
                             >
-                                <span>Zarejestruj się</span>
+                                <span>Zaloguj się</span>
                             </button>
                         </>
                     ) : (
