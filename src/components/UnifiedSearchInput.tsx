@@ -84,7 +84,7 @@ export function UnifiedSearchInput({
                         setShowAutocomplete(false);
                     }}
                     aria-label="Wyczyść wyszukiwanie"
-                    className={`absolute top-1/2 transform -translate-y-1/2 ${clearButtonClassName} ${showSearchButton ? 'right-24' : 'right-3'}`}
+                    className={`absolute top-1/2 transform -translate-y-1/2 ${clearButtonClassName} ${showSearchButton ? 'right-28' : 'right-3'}`}
                 >
                     <X size={16} />
                 </button>
