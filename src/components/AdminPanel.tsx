@@ -4,9 +4,11 @@ import { TopicTreeManager } from './TopicTreeManager';
 import { LevelsManager } from './LevelsManager';
 import { CommentsManager } from './CommentsManager';
 import { ResourceStatsManager } from './ResourceStatsManager';
-import { BookOpen, Tag, BarChart3, MessageSquare, PieChart } from 'lucide-react';
+import { AutoSeedManager } from './AutoSeedManager';
+import { UserStatsManager } from './UserStatsManager';
+import { BookOpen, Tag, BarChart3, MessageSquare, PieChart, Bot, Users } from 'lucide-react';
 
-type Tab = 'subjects' | 'topics' | 'levels' | 'comments' | 'stats';
+type Tab = 'subjects' | 'topics' | 'levels' | 'comments' | 'stats' | 'tools' | 'users';
 
 type AdminPanelProps = {
     userRole: string;
@@ -26,7 +28,9 @@ export function AdminPanel({ userRole, requireAdmin, onDataChange }: AdminPanelP
         { id: 'topics' as Tab, name: 'Tematy', icon: Tag },
         { id: 'levels' as Tab, name: 'Poziomy', icon: BarChart3 },
         { id: 'comments' as Tab, name: 'Komentarze', icon: MessageSquare },
+        { id: 'users' as Tab, name: 'Użytkownicy', icon: Users },
         { id: 'stats' as Tab, name: 'Statystyki', icon: PieChart },
+        { id: 'tools' as Tab, name: 'Narzędzia AI', icon: Bot },
     ];
 
     return (
@@ -60,7 +64,9 @@ export function AdminPanel({ userRole, requireAdmin, onDataChange }: AdminPanelP
                 {activeTab === 'topics' && <TopicTreeManager />}
                 {activeTab === 'levels' && <LevelsManager />}
                 {activeTab === 'comments' && <CommentsManager onCommentDeleted={onDataChange} />}
+                {activeTab === 'users' && <UserStatsManager />}
                 {activeTab === 'stats' && <ResourceStatsManager />}
+                {activeTab === 'tools' && <AutoSeedManager />}
             </div>
         </div>
     );
