@@ -84,22 +84,12 @@ export function UnifiedSearchInput({
                         setShowAutocomplete(false);
                     }}
                     aria-label="Wyczyść wyszukiwanie"
-                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${clearButtonClassName} ${showSearchButton ? 'right-20' : 'right-3'}`}
-                    style={showSearchButton ? { right: 'auto', left: 'calc(100% - 100px)' } : {}} // Adjust if button is present, this is tricky with absolute positioning. 
-                // Better approach: if showSearchButton is true, maybe the clear button should be inside the input wrapper but the search button outside?
-                // Or just let the parent handle the search button if it's completely separate.
-                // But here I'm trying to unify.
-                // Let's stick to the Sidebar design first (icon inside).
-                // For UserHome, the button is absolute right.
+                    className={`absolute top-1/2 transform -translate-y-1/2 ${clearButtonClassName} ${showSearchButton ? 'right-24' : 'right-3'}`}
                 >
                     <X size={16} />
                 </button>
             )}
 
-            {/* 
-                For UserHomePage, the button is inside the form but absolutely positioned to the right.
-                If showSearchButton is true, we render it.
-            */}
             {showSearchButton && (
                 <button
                     type="button"
