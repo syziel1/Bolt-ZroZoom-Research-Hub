@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { LogOut } from 'lucide-react';
 import { supabase, Resource } from '../lib/supabase';
 import { logger } from '../lib/logger';
 import { Sidebar } from './Sidebar';
@@ -13,6 +14,10 @@ import { Footer } from './Footer';
 import { SEO } from './SEO';
 
 import { DashboardModals } from './dashboard/DashboardModals';
+import { AdminPanel } from './AdminPanel';
+import { AddResourceModal } from './AddResourceModal';
+import { ResourceDetailModal } from './ResourceDetailModal';
+import { YouTubeSearchModal } from './YouTubeSearchModal';
 import type { Session } from '@supabase/supabase-js';
 
 type YouTubeVideo = {

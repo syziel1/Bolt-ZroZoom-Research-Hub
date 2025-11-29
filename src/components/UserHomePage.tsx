@@ -108,10 +108,34 @@ export function UserHomePage() {
         loadResourceTitles();
     }, []);
 
+    const [subjects, setSubjects] = useState<{ name: string; slug: string }[]>([]);
+
+    useEffect(() => {
+        const loadSubjects = async () => {
+            const { data } = await supabase
+                .from('subjects')
+                .select('name, slug');
+            if (data) {
+                setSubjects(data);
+            }
+        };
+        loadSubjects();
+    }, []);
+
     const handleSearch = (e?: React.FormEvent) => {
         e?.preventDefault();
-        if (searchQuery.trim()) {
-            navigate(`/zasoby?q=${encodeURIComponent(searchQuery.trim())}`);
+        const trimmedQuery = searchQuery.trim();
+        if (trimmedQuery) {
+            // Check for exact subject match (case-insensitive)
+            const matchedSubject = subjects.find(
+                s => s.name.toLowerCase() === trimmedQuery.toLowerCase()
+            );
+
+            if (matchedSubject) {
+                navigate(`/zasoby/${matchedSubject.slug}`);
+            } else {
+                navigate(`/zasoby?q=${encodeURIComponent(trimmedQuery)}`);
+            }
         }
     };
 
