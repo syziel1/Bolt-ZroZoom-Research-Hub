@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
 import { X, Search, Loader, Plus, Play } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { useSearchModal } from '../hooks/useSearchModal';
 
 type YouTubeVideo = {
     youtubeId: string;
@@ -21,54 +20,20 @@ type YouTubeSearchModalProps = {
 };
 
 export function YouTubeSearchModal({ isOpen, onClose, initialQuery, onAddVideo, isGuestMode = false }: YouTubeSearchModalProps) {
-    const [query, setQuery] = useState(initialQuery);
-    const [results, setResults] = useState<YouTubeVideo[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-    const [hasSearched, setHasSearched] = useState(false);
-
-    useEffect(() => {
-        if (isOpen && initialQuery) {
-            setQuery(initialQuery);
-            handleSearch(initialQuery);
-        } else if (isOpen) {
-            // Focus input if no query
-        } else {
-            // Reset state on close
-            setResults([]);
-            setHasSearched(false);
-            setError('');
-        }
-    }, [isOpen, initialQuery]);
-
-    const handleSearch = async (searchQuery: string) => {
-        if (!searchQuery.trim()) return;
-
-        setLoading(true);
-        setError('');
-        setHasSearched(true);
-
-        try {
-            const { data, error } = await supabase.functions.invoke('search-youtube', {
-                body: { query: searchQuery },
-            });
-
-            if (error) throw error;
-            if (data.error) throw new Error(data.error);
-
-            setResults(data.results || []);
-        } catch (err: unknown) {
-            console.error('YouTube search error:', err);
-            setError((err as Error).message || 'Wystąpił błąd podczas wyszukiwania.');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        handleSearch(query);
-    };
+    const {
+        query,
+        setQuery,
+        results,
+        loading,
+        error,
+        hasSearched,
+        handleSubmit,
+    } = useSearchModal<YouTubeVideo>({
+        isOpen,
+        initialQuery,
+        searchFunctionName: 'search-youtube',
+        errorLogPrefix: 'YouTube',
+    });
 
     if (!isOpen) return null;
 
