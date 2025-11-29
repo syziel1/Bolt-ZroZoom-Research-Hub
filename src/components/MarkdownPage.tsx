@@ -85,7 +85,7 @@ export function MarkdownPage({ fileName, onBack }: MarkdownPageProps) {
 
     return (
         <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-md p-8">
+            <main className="max-w-3xl mx-auto bg-white rounded-lg shadow-md p-8">
                 <button
                     onClick={() => onBack ? onBack() : navigate('/')}
                     className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8 transition-colors"
@@ -103,7 +103,7 @@ export function MarkdownPage({ fileName, onBack }: MarkdownPageProps) {
                         {renderMarkdown(content)}
                     </div>
                 )}
-            </div>
+            </main>
             <Footer className="mt-12" />
         </div>
     );

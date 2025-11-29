@@ -7,7 +7,7 @@ export function TermsOfService() {
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex flex-col">
-            <div className="flex-1 max-w-4xl mx-auto px-4 py-8 md:py-12 w-full">
+            <main className="flex-1 max-w-4xl mx-auto px-4 py-8 md:py-12 w-full">
                 <button
                     onClick={() => navigate(-1)}
                     className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 mb-8 transition-colors"
@@ -109,7 +109,7 @@ export function TermsOfService() {
                         </div>
                     </div>
                 </div>
-            </div>
+            </main>
             <Footer />
         </div>
     );
