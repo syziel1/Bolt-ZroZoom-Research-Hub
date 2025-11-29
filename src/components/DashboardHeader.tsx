@@ -1,6 +1,7 @@
 import { Menu, LogOut, Settings, Plus, Heart, BookOpen, Sparkles, HelpCircle } from 'lucide-react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { ThemeToggle } from './ThemeToggle';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 type DashboardHeaderProps = {
     isGuestMode: boolean;
@@ -70,6 +71,7 @@ export function DashboardHeader({
                 <div className="flex items-center gap-2 md:gap-4 shrink-0">
                     {isGuestMode ? (
                         <>
+                            <LanguageSwitcher />
                             <button
                                 onClick={() => navigate('/auth')}
                                 className="bg-blue-600 text-white px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-blue-700 flex items-center gap-2 shadow-sm"
@@ -79,6 +81,7 @@ export function DashboardHeader({
                         </>
                     ) : (
                         <>
+                            <LanguageSwitcher />
                             <ThemeToggle />
                             {isAdmin && (
                                 <button

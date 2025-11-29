@@ -1,0 +1,46 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search"
+  },
+  "nav": {
+    "home": "Home",
+    "resources": "Resources",
+    "login": "Log in",
+    "logout": "Log out",
+    "register": "Register",
+    "browseAsGuest": "Browse as guest",
+    "resourcePanel": "Resource panel",
+    "selectSubject": "Select subject",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "footer": {
+    "description": "School of the Future with AI - Your educational knowledge base",
+    "aboutUs": "About us",
+    "blog": "Blog",
+    "help": "Help",
+    "rules": "Terms of service",
+    "privacy": "Privacy Policy",
+    "copyright": "All rights reserved"
+  },
+  "theme": {
+    "light": "Light theme",
+    "dark": "Dark theme",
+    "system": "System",
+    "changeTheme": "Change theme"
+  },
+  "language": {
+    "switch": "Change language",
+    "pl": "Polski",
+    "en": "English"
+  }
+}
