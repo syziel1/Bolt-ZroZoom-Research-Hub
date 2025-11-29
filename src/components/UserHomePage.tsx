@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Star, Plus, Clock, BookOpen } from 'lucide-react';
+import { Star, Plus, Clock, BookOpen, Heart } from 'lucide-react';
 import { useUserStats } from '../hooks/useUserStats';
 import { useRecentResources } from '../hooks/useRecentResources';
 import { Session } from '@supabase/supabase-js';
@@ -195,7 +195,7 @@ export function UserHomePage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-slate-700 flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/zasoby?favorites=true')}>
                             <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-full">
-                                <Star size={24} className="text-red-500 fill-red-500" />
+                                <Heart size={24} className="text-red-500 fill-red-500" />
                             </div>
                             <div>
                                 <div className="text-3xl font-bold text-gray-900 dark:text-gray-100">
