@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { supabase, Resource, ResourceTopic } from '../lib/supabase';
+import { supabase, Resource, ResourceTopic, ResourceLevel } from '../lib/supabase';
 import { useRecentResources } from '../hooks/useRecentResources';
 import { getThumbnailUrl } from '../lib/storage';
 import { getYouTubeEmbedUrl, extractYouTubeVideoId } from '../lib/youtube';
@@ -36,6 +36,7 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
   const [currentUserRole, setCurrentUserRole] = useState<string>('student');
   const [deleteResourceConfirm, setDeleteResourceConfirm] = useState(false);
   const [topics, setTopics] = useState<ResourceTopic[]>([]);
+  const [levels, setLevels] = useState<ResourceLevel[]>([]);
   const [isFavorite, setIsFavorite] = useState(false);
   const [showYouTubeModal, setShowYouTubeModal] = useState(false);
   const [youTubeVideoId, setYouTubeVideoId] = useState<string | null>(null);
@@ -133,6 +134,21 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
     }
   }, [resource]);
 
+  const loadLevels = useCallback(async () => {
+    if (!resource) return;
+    const { data } = await supabase
+      .from('v_resource_levels')
+      .select('levels')
+      .eq('resource_id', resource.id)
+      .single();
+
+    if (data && data.levels) {
+      setLevels(data.levels);
+    } else {
+      setLevels([]);
+    }
+  }, [resource]);
+
   const { addRecent } = useRecentResources();
 
   useEffect(() => {
@@ -143,8 +159,9 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
         addRecent(resource.id);
       }
       loadTopics();
+      loadLevels();
     }
-  }, [isOpen, resource, isGuestMode, loadUserData, checkFavoriteStatus, loadTopics, addRecent]);
+  }, [isOpen, resource, isGuestMode, loadUserData, checkFavoriteStatus, loadTopics, loadLevels, addRecent]);
 
   const handleDeleteResourceClick = () => {
     setDeleteResourceConfirm(true);
@@ -378,12 +395,12 @@ export function ResourceDetailModal({ isOpen, onClose, resource, onResourceUpdat
 
             <div className="mb-6">
               <div className="flex flex-wrap gap-2 mb-2">
-                {resource.level_names?.map((level, idx) => (
+                {levels.map((level, idx) => (
                   <span
                     key={idx}
                     className="px-3 py-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 text-sm rounded-full border border-gray-200 dark:border-slate-600"
                   >
-                    {level}
+                    {level.name}
                   </span>
                 ))}
               </div>
