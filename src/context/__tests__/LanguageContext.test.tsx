@@ -34,6 +34,9 @@ beforeEach(() => {
     }));
 });
 
+afterEach(() => {
+    vi.unstubAllGlobals();
+});
 function TestComponent() {
     const { language, setLanguage } = useLanguage();
     const { t, isLoading } = useTranslation();
