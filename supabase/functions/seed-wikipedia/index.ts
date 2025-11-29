@@ -22,7 +22,7 @@ serve(async (req) => {
 
         // 3. Get or Create Bot User
         const getOrCreateBotUser = async () => {
-            const BOT_EMAIL = 'bot@szkolaprzyszlosci.ai'
+            const BOT_EMAIL = 'wikipedia-bot@szkolaprzyszlosci.ai'
 
             const { data: { users }, error: listError } = await supabase.auth.admin.listUsers()
             const existingUser = users?.find(u => u.email === BOT_EMAIL)
@@ -35,9 +35,9 @@ serve(async (req) => {
                 password: crypto.randomUUID(),
                 email_confirm: true,
                 user_metadata: {
-                    full_name: 'AI Bot',
-                    nickname: 'AI Bot',
-                    avatar_url: 'https://api.dicebear.com/7.x/bottts/svg?seed=ProfessorBot'
+                    full_name: 'Wikipedia Search AI Bot',
+                    nickname: 'Wikipedia Search AI Bot',
+                    avatar_url: 'https://api.dicebear.com/7.x/bottts/svg?seed=WikipediaBot'
                 }
             })
 
@@ -49,8 +49,8 @@ serve(async (req) => {
                 .from('profiles')
                 .upsert({
                     id: newUser.user.id,
-                    nick: 'AI Bot',
-                    name: 'AI Bot',
+                    nick: 'Wikipedia Search AI Bot',
+                    name: 'Wikipedia Search AI Bot',
                     role: 'user'
                 }, { onConflict: 'id' })
 
@@ -64,9 +64,9 @@ serve(async (req) => {
         // Ensure bot profile exists even if user already existed (migration fix)
         await supabase.from('profiles').upsert({
             id: botUserId,
-            nick: 'AI Bot',
-            name: 'AI Bot',
-            avatar_url: 'https://api.dicebear.com/7.x/bottts/svg?seed=ProfessorBot'
+            nick: 'Wikipedia Search AI Bot',
+            name: 'Wikipedia Search AI Bot',
+            avatar_url: 'https://api.dicebear.com/7.x/bottts/svg?seed=WikipediaBot'
         }, { onConflict: 'id' })
 
         // 4. Fetch Topic(s) to Seed
@@ -133,9 +133,15 @@ serve(async (req) => {
                 console.log(`[DEBUG] GEMINI_API_KEY present: ${!!geminiApiKey}`)
 
                 if (!geminiApiKey) {
-                    console.error('[ERROR] Missing GEMINI_API_KEY')
-                    results.push({ topic: topic.name, title: page.title, status: 'skipped_ai_error', details: 'Missing API Key' })
-                    continue
+                    console.error('[ERROR] Missing GEMINI_API_KEY - KRYTYCZNY BŁĄD, PRZERYWAM')
+                    results.push({ topic: topic.name, title: page.title, status: 'skipped_ai_error', details: 'Missing API Key - bot przerwany' })
+                    // Critical error - stop all processing
+                    return new Response(JSON.stringify({
+                        results,
+                        error: 'Brak klucza API Gemini. Bot przerwany.'
+                    }), {
+                        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                    })
                 }
 
                 const prompt = `
@@ -160,7 +166,7 @@ serve(async (req) => {
                     // Rate limiting: Wait 4 seconds before request (increased from 2s)
                     await sleep(4000);
 
-                    let aiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${geminiApiKey}`, {
+                    let aiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${geminiApiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -173,7 +179,7 @@ serve(async (req) => {
                     if (aiRes.status === 429) {
                         console.warn('[WARN] Rate limit hit (429). Waiting 10 seconds and retrying...')
                         await sleep(10000); // Increased wait to 10s
-                        aiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${geminiApiKey}`, {
+                        aiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${geminiApiKey}`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
@@ -181,11 +187,37 @@ serve(async (req) => {
                                 generationConfig: { response_mime_type: "application/json" }
                             })
                         })
+
+                        // If still 429 after retry - critical error, stop processing
+                        if (aiRes.status === 429) {
+                            console.error('[ERROR] Rate limit persists after retry - KRYTYCZNY BŁĄD, PRZERYWAM')
+                            results.push({ topic: topic.name, title: page.title, status: 'skipped_ai_error', details: 'Rate limit (429) - bot przerwany' })
+                            return new Response(JSON.stringify({
+                                results,
+                                error: 'Limit zapytań API Gemini został przekroczony. Spróbuj ponownie za kilka minut.'
+                            }), {
+                                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                            })
+                        }
                     }
 
                     if (!aiRes.ok) {
                         const errorText = await aiRes.text()
                         console.error(`[ERROR] Gemini API failed: ${aiRes.status} ${aiRes.statusText}`, errorText)
+
+                        // Critical API errors (401, 403, 500, etc.) - stop processing
+                        if (aiRes.status === 401 || aiRes.status === 403 || aiRes.status >= 500) {
+                            console.error('[ERROR] Critical API error - PRZERYWAM')
+                            results.push({ topic: topic.name, title: page.title, status: 'skipped_ai_error', details: `API Error: ${aiRes.status} - bot przerwany` })
+                            return new Response(JSON.stringify({
+                                results,
+                                error: `Błąd API Gemini (${aiRes.status}). Bot przerwany.`
+                            }), {
+                                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                            })
+                        }
+
+                        // Non-critical errors (400, 404, etc.) - skip this article, try next
                         results.push({ topic: topic.name, title: page.title, status: 'skipped_ai_error', details: `API Error: ${aiRes.status}` })
                         continue
                     }
