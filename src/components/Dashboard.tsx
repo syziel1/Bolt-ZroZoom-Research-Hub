@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase, Resource } from '../lib/supabase';
 import { logger } from '../lib/logger';
 import { Sidebar } from './Sidebar';
@@ -47,6 +47,7 @@ type DashboardProps = {
 
 export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardProps) {
   const navigate = useNavigate();
+  const routerLocation = useLocation();
 
   // Check auth session
   const [session, setSession] = useState<Session | null>(null);
@@ -116,9 +117,35 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
   const [showOnlyMine, setShowOnlyMine] = useState(false);
   const [ratedResourceIds, setRatedResourceIds] = useState<Set<string>>(new Set());
 
-  // Parse URL query params for filters
+  // Parse URL query params for filters and resource sharing
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(routerLocation.search);
+
+    // Handle resource sharing (?r=RESOURCE_ID)
+    const resourceId = params.get('r');
+    if (resourceId) {
+      // First check if resource is already loaded
+      const foundResource = resources.find(r => r.id === resourceId);
+      if (foundResource) {
+        setSelectedResource(foundResource);
+        setIsDetailModalOpen(true);
+      } else {
+        // If not found (e.g. pagination), fetch it specifically
+        supabase
+          .from('v_resources_full')
+          .select('*')
+          .eq('id', resourceId)
+          .single()
+          .then(({ data, error }) => {
+            if (data && !error) {
+              setSelectedResource(data as Resource);
+              setIsDetailModalOpen(true);
+            }
+          });
+      }
+    }
+
+    // Handle filters
     if (params.get('favorites') === 'true') {
       setShowOnlyFavorites(true);
       setShowOnlyRated(false);
@@ -132,7 +159,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
       setShowOnlyFavorites(false);
       setShowOnlyRated(false);
     }
-  }, [window.location.search]);
+  }, [routerLocation.search, resources]); // Add resources dependency to retry if loaded later
 
   useEffect(() => {
     if (session?.user?.id) {
@@ -181,7 +208,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
   // Reset page when local filters change
   useEffect(() => {
     handlePageChange(1);
-  }, [showOnlyFavorites, showOnlyRated, showOnlyMine]);
+  }, [showOnlyFavorites, showOnlyRated, showOnlyMine, handlePageChange]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);

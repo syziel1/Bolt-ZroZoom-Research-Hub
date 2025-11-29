@@ -42,8 +42,8 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
 
         const { data: existingProfile } = await supabase
           .from('profiles')
-          .select('user_id')
-          .eq('user_id', user.id)
+          .select('id')
+          .eq('id', user.id)
           .maybeSingle();
 
         if (!existingProfile && user.user_metadata) {
@@ -61,7 +61,7 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
           const generatedNick = generateNickFromString(baseNick);
 
           await supabase.from('profiles').insert({
-            user_id: user.id,
+            id: user.id,
             nick: generatedNick,
             name: user.user_metadata.full_name || null,
           });
@@ -147,7 +147,7 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900">
+    <main className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900">
       <SEO
         title={isLogin ? "Logowanie" : "Rejestracja"}
         description="Zaloguj się lub zarejestruj, aby uzyskać dostęp do pełnej bazy wiedzy i funkcji społecznościowych."
@@ -377,6 +377,6 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
           )}
         </form >
       </div >
-    </div >
+    </main >
   );
 }

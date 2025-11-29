@@ -38,6 +38,7 @@ export function DashboardHeader({
                 <div className="flex items-center">
                     <button
                         onClick={onOpenSidebar}
+                        aria-label="Otwórz menu"
                         className="md:hidden mr-4 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
                     >
                         <Menu size={24} />

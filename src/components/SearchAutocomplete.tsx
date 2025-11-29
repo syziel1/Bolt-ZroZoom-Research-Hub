@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { Resource } from '../lib/supabase';
 import { blogPosts } from '../content/blog/posts';
 
@@ -13,20 +13,22 @@ export function SearchAutocomplete({ resources, searchQuery, onSelectSuggestion 
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     // Generate suggestions based on search query
-    const uniqueSuggestions = searchQuery.length >= 2
-        ? Array.from(new Set([
-            ...resources
-                .filter(resource =>
-                    resource.title.toLowerCase().includes(searchQuery.toLowerCase())
-                )
-                .map(resource => resource.title),
-            ...blogPosts
-                .filter(post =>
-                    post.title.toLowerCase().includes(searchQuery.toLowerCase())
-                )
-                .map(post => post.title)
-        ])).slice(0, 5) // Deduplicate first, then limit to 5 unique suggestions
-        : [];
+    const uniqueSuggestions = useMemo(() => {
+        return searchQuery.length >= 2
+            ? Array.from(new Set([
+                ...resources
+                    .filter(resource =>
+                        resource.title.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                    .map(resource => resource.title),
+                ...blogPosts
+                    .filter(post =>
+                        post.title.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                    .map(post => post.title)
+            ])).slice(0, 5) // Deduplicate first, then limit to 5 unique suggestions
+            : [];
+    }, [searchQuery, resources]);
 
     // Handle keyboard navigation
     useEffect(() => {

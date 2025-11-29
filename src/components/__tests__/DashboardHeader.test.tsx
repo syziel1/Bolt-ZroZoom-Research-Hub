@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect } from 'vitest';
 
 describe('DashboardHeader', () => {
-    it('renders header correctly for logged in user', () => {
+    it('renders logged in state correctly', () => {
         render(
             <BrowserRouter>
                 <DashboardHeader
@@ -18,7 +18,7 @@ describe('DashboardHeader', () => {
             </BrowserRouter>
         );
 
-        expect(screen.getByText(/Szkoła Przyszłości z AI/i)).toBeInTheDocument();
+        expect(screen.getByText(/Wyloguj się/i)).toBeInTheDocument();
     });
 
     it('renders guest mode correctly', () => {

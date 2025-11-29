@@ -162,6 +162,7 @@ Minimalna dokumentacja techniczna dla repozytorium.
 - ✅ **Optymalizacja:** Widok `v_resources_full` agregujący oceny i metadane (zastępuje prosty cache).
 - ✅ **System Pomocy:** Kompletne Centrum Pomocy i przewodniki kontekstowe.
 - ✅ **AI:** Asystent edukacyjny i analiza treści.
+- ✅ **Integracja z Wikipedią:** Wyszukiwanie artykułów i dodawanie ich jako zasoby (Edge Function).
 
 ---
 

@@ -53,3 +53,9 @@ Jeśli nie znalazłeś tego, czego szukasz:
 1. Spróbuj użyć ogólniejszych słów kluczowych.
 2. Usuń niektóre filtry (np. poziom).
 3. Skorzystaj z przycisku **"Zapytaj AI"**, który pojawia się na dole - nasz asystent pomoże Ci znaleźć odpowiedź lub wygeneruje materiał dla Ciebie.
+
+## 4. Dodatkowe Źródła
+
+W pasku bocznym znajdziesz również przyciski do przeszukiwania zewnętrznych baz wiedzy:
+- **YouTube**: Wyszukaj filmy edukacyjne i dodaj je bezpośrednio do naszej bazy.
+- **Wikipedia**: Znajdź artykuły encyklopedyczne i dołącz je jako materiały.

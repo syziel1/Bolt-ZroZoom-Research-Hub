@@ -8,7 +8,7 @@ export function WhatsNew() {
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-gray-100 p-4 md:p-8">
-            <div className="max-w-4xl mx-auto">
+            <main className="max-w-4xl mx-auto">
                 <button
                     onClick={() => navigate(-1)}
                     className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-6 transition-colors"
@@ -22,7 +22,7 @@ export function WhatsNew() {
                         <ReactMarkdown>{changelog}</ReactMarkdown>
                     </article>
                 </div>
-            </div>
+            </main>
         </div>
     );
 }

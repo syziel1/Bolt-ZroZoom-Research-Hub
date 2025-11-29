@@ -14,6 +14,7 @@ Ten dokument opisuje plany rozwoju platformy Szkoła Przyszłości z AI. Cele po
 - [/] **Deployment:** Podpięcie własnej domeny `szkolaprzyszlosciai.pl` (Instrukcja w `docs/DEPLOYMENT.md`).
 - [x] **Wyszukiwanie (MVP):** Implementacja wyszukiwania po stronie klienta (Fuse.js).
 - [x] **Dark Mode:** Wdrożenie trybu ciemnego (Tailwind).
+- [x] **Integracja z Wikipedią:** Wyszukiwanie i dodawanie artykułów (Edge Function).
 - [ ] **Refaktoryzacja (Dług Techniczny):**
   - [ ] Dekompozycja `Dashboard.tsx` (wydzielenie modali i logiki filtrów).
   - [ ] Nowe formularze: Wdrożenie `React Hook Form` + `Zod` w `ResourceForm.tsx`.

@@ -28,6 +28,7 @@ export function Footer({ className = '', theme }: FooterProps) {
                     <button onClick={() => navigate('/o-nas')} className={linkClasses}>O nas</button>
                     <button onClick={() => navigate('/blog')} className={linkClasses}>Blog</button>
                     <button onClick={() => navigate('/pomoc')} className={linkClasses}>Pomoc</button>
+                    <button onClick={() => navigate('/zasady')} className={linkClasses}>Zasady</button>
                     <button onClick={() => navigate('/polityka-prywatnosci')} className={linkClasses}>Polityka Prywatności</button>
                 </div>
                 <p className="text-xs text-gray-400 dark:text-gray-500">
