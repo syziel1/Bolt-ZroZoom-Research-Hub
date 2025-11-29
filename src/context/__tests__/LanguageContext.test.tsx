@@ -8,18 +8,24 @@ const mockTranslations = {
     pl: {
         common: { loading: 'Ładowanie...' },
         nav: { login: 'Zaloguj się' },
-        language: { switch: 'Zmień język', pl: 'Polski', en: 'English' }
+        language: { switch: 'Zmień język', pl: 'Polski', en: 'English' },
+        deep: { nested: { key: { value: 'Głęboko zagnieżdżony' } } }
     },
     en: {
         common: { loading: 'Loading...' },
         nav: { login: 'Log in' },
-        language: { switch: 'Change language', pl: 'Polski', en: 'English' }
+        language: { switch: 'Change language', pl: 'Polski', en: 'English' },
+        deep: { nested: { key: { value: 'Deeply nested' } } }
     }
 };
 
+let fetchCallCount = 0;
+
 beforeEach(() => {
     localStorage.clear();
+    fetchCallCount = 0;
     vi.stubGlobal('fetch', vi.fn((url: string) => {
+        fetchCallCount++;
         const lang = url.includes('pl.json') ? 'pl' : 'en';
         return Promise.resolve({
             ok: true,
@@ -147,5 +153,60 @@ describe('LanguageContext', () => {
         await waitFor(() => {
             expect(screen.getByTestId('unknown')).toHaveTextContent('unknown.key');
         });
+    });
+
+    it('supports deeply nested translation keys', async () => {
+        function DeepKeyComponent() {
+            const { t, isLoading } = useTranslation();
+            if (isLoading) return <div>Loading...</div>;
+            return <span data-testid="deep">{t('deep.nested.key.value')}</span>;
+        }
+
+        render(
+            <LanguageProvider>
+                <DeepKeyComponent />
+            </LanguageProvider>
+        );
+
+        await waitFor(() => {
+            expect(screen.getByTestId('deep')).toHaveTextContent('Głęboko zagnieżdżony');
+        });
+    });
+
+    it('caches translations to avoid redundant fetches', async () => {
+        const user = userEvent.setup();
+
+        render(
+            <LanguageProvider>
+                <TestComponent />
+            </LanguageProvider>
+        );
+
+        await waitFor(() => {
+            expect(screen.getByTestId('current-lang')).toHaveTextContent('pl');
+        });
+
+        const initialFetchCount = fetchCallCount;
+
+        // Switch to English
+        await act(async () => {
+            await user.click(screen.getByText('Switch'));
+        });
+
+        await waitFor(() => {
+            expect(screen.getByTestId('current-lang')).toHaveTextContent('en');
+        });
+
+        // Switch back to Polish (should use cache)
+        await act(async () => {
+            await user.click(screen.getByText('Switch'));
+        });
+
+        await waitFor(() => {
+            expect(screen.getByTestId('current-lang')).toHaveTextContent('pl');
+        });
+
+        // Should have only made 2 fetches total (pl + en), not 3
+        expect(fetchCallCount).toBe(initialFetchCount + 1);
     });
 });

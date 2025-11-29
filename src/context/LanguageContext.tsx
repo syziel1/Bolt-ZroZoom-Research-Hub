@@ -1,8 +1,9 @@
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode, useRef } from 'react';
 
 export type Language = 'pl' | 'en';
 
-type Translations = Record<string, Record<string, string>>;
+type TranslationValue = string | { [key: string]: TranslationValue };
+type Translations = Record<string, TranslationValue>;
 
 type LanguageContextType = {
     language: Language;
@@ -34,8 +35,17 @@ export function LanguageProvider({ children, defaultLanguage = 'pl' }: LanguageP
     });
     const [translations, setTranslations] = useState<Translations>({});
     const [isLoading, setIsLoading] = useState(true);
+    const translationsCache = useRef<Map<Language, Translations>>(new Map());
 
     const loadTranslations = useCallback(async (lang: Language) => {
+        // Check cache first
+        const cached = translationsCache.current.get(lang);
+        if (cached) {
+            setTranslations(cached);
+            setIsLoading(false);
+            return;
+        }
+
         setIsLoading(true);
         try {
             const response = await fetch(`/locales/${lang}.json`);
@@ -43,6 +53,8 @@ export function LanguageProvider({ children, defaultLanguage = 'pl' }: LanguageP
                 throw new Error(`Failed to load translations for ${lang}`);
             }
             const data = await response.json();
+            // Cache the loaded translations
+            translationsCache.current.set(lang, data);
             setTranslations(data);
         } catch (error) {
             console.error('Failed to load translations:', error);
@@ -63,11 +75,20 @@ export function LanguageProvider({ children, defaultLanguage = 'pl' }: LanguageP
 
     const t = useCallback((key: string): string => {
         const keys = key.split('.');
-        if (keys.length !== 2) {
+        if (keys.length === 0) {
             return key;
         }
-        const [namespace, translationKey] = keys;
-        return translations[namespace]?.[translationKey] || key;
+
+        let result: TranslationValue | undefined = translations;
+        for (const k of keys) {
+            if (result && typeof result === 'object' && k in result) {
+                result = result[k];
+            } else {
+                return key;
+            }
+        }
+
+        return typeof result === 'string' ? result : key;
     }, [translations]);
 
     const value: LanguageContextType = {
