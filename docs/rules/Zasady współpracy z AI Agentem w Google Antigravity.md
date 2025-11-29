@@ -1,7 +1,3 @@
----
-trigger: always_on
----
-
 # Zasady współpracy z AI Agentem w Google Antigravity
 
 ## Wersjonowanie (Semantic Versioning)

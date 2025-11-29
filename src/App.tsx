@@ -8,6 +8,10 @@ import { AuthForm } from './components/AuthForm';
 import { Dashboard } from './components/Dashboard';
 import { MarkdownPage } from './components/MarkdownPage';
 import { HelpPage } from './pages/HelpPage';
+import { WhatsNew } from './pages/WhatsNew';
+import { BlogIndex } from './pages/BlogIndex';
+import { BlogPost } from './pages/BlogPost';
+import { TermsOfService } from './pages/TermsOfService';
 import { Loader } from 'lucide-react';
 
 function AppRoutes({ session }: { session: Session | null }) {
@@ -30,6 +34,12 @@ function AppRoutes({ session }: { session: Session | null }) {
       {/* Static pages */}
       <Route path="/o-nas" element={<MarkdownPage fileName="about.md" />} />
       <Route path="/polityka-prywatnosci" element={<MarkdownPage fileName="privacy.md" />} />
+      <Route path="/zasady" element={<TermsOfService />} />
+      <Route path="/co-nowego" element={<WhatsNew />} />
+
+      {/* Blog routes */}
+      <Route path="/blog" element={<BlogIndex />} />
+      <Route path="/blog/:slug" element={<BlogPost />} />
 
       {/* Catch all - redirect to home */}
       <Route path="*" element={<Navigate to="/" replace />} />

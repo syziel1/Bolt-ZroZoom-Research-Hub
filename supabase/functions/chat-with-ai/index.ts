@@ -65,6 +65,10 @@ serve(async (req) => {
 
     try {
         const { messages, userContext } = await req.json()
+
+        if (!messages || !Array.isArray(messages)) {
+            throw new Error('Invalid messages format')
+        }
         const geminiKey = Deno.env.get('GEMINI_API_KEY')
 
         if (!geminiKey) {

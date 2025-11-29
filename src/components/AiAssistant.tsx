@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Bot, Send, X, Sparkles, RotateCcw } from 'lucide-react';
 import { supabase, Resource, Subject } from '../lib/supabase';
 import { logger } from '../lib/logger';
@@ -44,38 +44,7 @@ export function AiAssistant({
     const initialQuerySent = useRef<string>('');
 
     // Handle initial query (e.g. "Explain [search term]")
-    useEffect(() => {
-        if (initialQuery && isOpen && initialQuery !== initialQuerySent.current) {
-            initialQuerySent.current = initialQuery;
-            handleSend(initialQuery);
-        }
-    }, [initialQuery, isOpen]);
-
-    const scrollToBottom = () => {
-        setTimeout(() => {
-            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
-    };
-
-    useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
-
-    const handleToggle = (newState: boolean) => {
-        if (onToggle) {
-            onToggle(newState);
-        } else {
-            setInternalIsOpen(newState);
-        }
-    };
-
-    const handleClearChat = () => {
-        setMessages([initialMessage]);
-        setInput('');
-        scrollToBottom();
-    };
-
-    const handleSend = async (text: string = input) => {
+    const handleSend = useCallback(async (text: string = input) => {
         if (!text.trim()) return;
 
         const userMessage: Message = { role: 'user', content: text };
@@ -150,7 +119,41 @@ export function AiAssistant({
         } finally {
             setIsLoading(false);
         }
+    }, [input, messages, currentResource, selectedSubject, selectedTopics, selectedLevels]);
+
+
+    useEffect(() => {
+        if (initialQuery && isOpen && initialQuery !== initialQuerySent.current) {
+            initialQuerySent.current = initialQuery;
+            handleSend(initialQuery);
+        }
+    }, [initialQuery, isOpen, handleSend]);
+
+    const scrollToBottom = () => {
+        setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
     };
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
+    const handleToggle = (newState: boolean) => {
+        if (onToggle) {
+            onToggle(newState);
+        } else {
+            setInternalIsOpen(newState);
+        }
+    };
+
+    const handleClearChat = () => {
+        setMessages([initialMessage]);
+        setInput('');
+        scrollToBottom();
+    };
+
+
 
     if (!isOpen) {
         return (

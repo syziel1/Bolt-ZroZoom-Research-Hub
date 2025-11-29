@@ -5,6 +5,7 @@ Aby dodać nowy zasób, musisz być zalogowanym użytkownikiem.
 1. Kliknij przycisk **"Dodaj zasób"** w prawym górnym rogu panelu głównego.
 2. Wypełnij formularz, podając tytuł, link, opis oraz wybierając odpowiedni przedmiot, temat i poziom.
 3. Kliknij **"Zapisz"**.
+4. **Wskazówka**: Użyj przycisku **"Wypełnij z AI"**, aby automatycznie uzupełnić tytuł, opis i tagi na podstawie linku!
 
 ## 2. Czym jest reputacja?
 Reputacja to system punktowy, który nagradza aktywnych użytkowników.

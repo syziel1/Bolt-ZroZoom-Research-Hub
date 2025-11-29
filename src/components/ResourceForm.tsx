@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { X } from 'lucide-react';
+import { X, HelpCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { ConfirmationModal } from './ConfirmationModal';
 import { supabase, Subject, Topic, Level, Resource } from '../lib/supabase';
 import { uploadResourceThumbnail, getThumbnailUrl } from '../lib/storage';
@@ -7,6 +8,7 @@ import { logger } from '../lib/logger';
 import { ThumbnailUploader } from './ThumbnailUploader';
 import { buildTopicTree } from '../utils/topicTree';
 import { TopicTree } from './TopicTree';
+import { containsProfanity } from '../lib/profanity';
 
 type ResourceFormProps = {
   subjects: Subject[];
@@ -211,6 +213,12 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
     setError('');
     setSuccessMessage('');
 
+    if (containsProfanity(title) || containsProfanity(description)) {
+      setError('Tytuł lub opis zawiera niedozwolone słowa. Proszę, popraw treść.');
+      setLoading(false);
+      return;
+    }
+
     try {
       const {
         data: { user },
@@ -357,8 +365,7 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
         let errorMessage = error.message;
         try {
           if (error instanceof Error && 'context' in error) {
-            // @ts-ignore
-            const context = error.context as any;
+            const context = error.context as { json?: () => Promise<{ error?: string }> };
             if (context && context.json) {
               const body = await context.json();
               if (body.error) errorMessage = body.error;
@@ -436,12 +443,13 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
         }
       }
 
-      setAiGenerated(true);
+
       setSuccessMessage('AI przeanalizowało treść i uzupełniło formularz! ✨');
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error('AI analysis error:', err);
-      setError(err.message || 'Nie udało się uzyskać sugestii AI.');
+      const errorMessage = err instanceof Error ? err.message : 'Nie udało się uzyskać sugestii AI.';
+      setError(errorMessage);
     } finally {
       setAnalyzing(false);
     }
@@ -452,7 +460,16 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
       <form onSubmit={handleSubmit} className="p-6 space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{initialData ? 'Edytuj zasób' : 'Dodaj nowy zasób'}</h2>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            <Link
+              to="/pomoc/resource-form"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 mr-2"
+              title="Pomoc do formularza"
+            >
+              <HelpCircle size={24} />
+            </Link>
             <button
               type="button"
               onClick={handleAiAnalysis}

@@ -1,28 +1,34 @@
-import { useState, useRef, useEffect } from 'react';
-import { Resource } from '../lib/supabase';
+import { useState, useRef, useEffect, useMemo } from 'react';
+
+import { blogPosts } from '../content/blog/posts';
 
 type SearchAutocompleteProps = {
-    resources: Resource[];
+    items: { id?: string; title: string }[];  // id is optional for backwards compatibility with blog posts
     searchQuery: string;
     onSelectSuggestion: (suggestion: string) => void;
 };
 
-export function SearchAutocomplete({ resources, searchQuery, onSelectSuggestion }: SearchAutocompleteProps) {
+export function SearchAutocomplete({ items, searchQuery, onSelectSuggestion }: SearchAutocompleteProps) {
     const [selectedIndex, setSelectedIndex] = useState(-1);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     // Generate suggestions based on search query
-    const suggestions = searchQuery.length >= 2
-        ? resources
-            .filter(resource =>
-                resource.title.toLowerCase().includes(searchQuery.toLowerCase())
-            )
-            .slice(0, 5) // Limit to 5 suggestions
-            .map(resource => resource.title)
-        : [];
-
-    // Remove duplicates
-    const uniqueSuggestions = Array.from(new Set(suggestions));
+    const uniqueSuggestions = useMemo(() => {
+        return searchQuery.length >= 2
+            ? Array.from(new Set([
+                ...items
+                    .filter(item =>
+                        item.title.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                    .map(item => item.title),
+                ...blogPosts
+                    .filter(post =>
+                        post.title.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                    .map(post => post.title)
+            ])).slice(0, 5) // Deduplicate first, then limit to 5 unique suggestions
+            : [];
+    }, [searchQuery, items]);
 
     // Handle keyboard navigation
     useEffect(() => {
@@ -37,9 +43,12 @@ export function SearchAutocomplete({ resources, searchQuery, onSelectSuggestion 
             } else if (e.key === 'ArrowUp') {
                 e.preventDefault();
                 setSelectedIndex(prev => (prev > 0 ? prev - 1 : -1));
-            } else if (e.key === 'Enter' && selectedIndex >= 0) {
+            } else if (e.key === 'Enter') {
                 e.preventDefault();
-                onSelectSuggestion(uniqueSuggestions[selectedIndex]);
+                // If user pressed Enter with a selected suggestion, use it
+                // Otherwise, use the first suggestion
+                const indexToUse = selectedIndex >= 0 ? selectedIndex : 0;
+                onSelectSuggestion(uniqueSuggestions[indexToUse]);
                 setSelectedIndex(-1);
             } else if (e.key === 'Escape') {
                 setSelectedIndex(-1);

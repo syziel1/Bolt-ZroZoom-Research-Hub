@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { ArrowLeft, Book, HelpCircle } from 'lucide-react';
+import { ArrowLeft, Book, HelpCircle, LayoutDashboard, FileEdit } from 'lucide-react';
 import { Footer } from '../components/Footer';
 import faqContent from '../content/help/faq.md?raw';
 import guideContent from '../content/help/guide.md?raw';
+import dashboardGuideContent from '../content/help/dashboard-guide.md?raw';
+import resourceFormGuideContent from '../content/help/resource-form-guide.md?raw';
 
 const TOPICS = [
     { id: 'guide', title: 'Przewodnik Użytkownika', icon: Book, content: guideContent },
+    { id: 'dashboard', title: 'Panel Zasobów', icon: LayoutDashboard, content: dashboardGuideContent },
+    { id: 'resource-form', title: 'Dodawanie Zasobów', icon: FileEdit, content: resourceFormGuideContent },
     { id: 'faq', title: 'Często Zadawane Pytania', icon: HelpCircle, content: faqContent },
 ];
 

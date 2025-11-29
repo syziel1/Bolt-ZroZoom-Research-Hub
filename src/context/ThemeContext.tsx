@@ -40,7 +40,7 @@ export function ThemeProvider({
 
             const applySystemTheme = () => {
                 const systemTheme = mediaQuery.matches ? 'dark' : 'light';
-                console.log('ThemeContext: System theme detected:', systemTheme, 'Matches dark:', mediaQuery.matches);
+
                 cleanClasses();
                 root.classList.add(systemTheme);
             };
@@ -54,7 +54,6 @@ export function ThemeProvider({
             if (mediaQuery.addEventListener) {
                 mediaQuery.addEventListener('change', applySystemTheme);
             } else {
-                // @ts-ignore
                 mediaQuery.addListener(applySystemTheme);
             }
 
@@ -65,14 +64,13 @@ export function ThemeProvider({
                 if (mediaQuery.removeEventListener) {
                     mediaQuery.removeEventListener('change', applySystemTheme);
                 } else {
-                    // @ts-ignore
                     mediaQuery.removeListener(applySystemTheme);
                 }
                 window.removeEventListener('focus', applySystemTheme);
             };
         }
 
-        console.log('ThemeContext: Manual theme set:', theme);
+
         cleanClasses();
         root.classList.add(theme);
     }, [theme]);
@@ -92,6 +90,7 @@ export function ThemeProvider({
     );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useTheme = () => {
     const context = useContext(ThemeContext);
 

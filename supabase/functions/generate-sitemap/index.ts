@@ -6,7 +6,7 @@ const corsHeaders = {
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-serve(async (req) => {
+serve(async (req: Request) => {
     if (req.method === 'OPTIONS') {
         return new Response('ok', { headers: corsHeaders })
     }
@@ -28,6 +28,9 @@ serve(async (req) => {
         ]
 
         // 1. Pobierz przedmioty
+        interface Subject {
+            slug: string;
+        }
         const { data: subjects, error: subjectsError } = await supabaseClient
             .from('subjects')
             .select('slug')
@@ -36,6 +39,10 @@ serve(async (req) => {
         if (subjectsError) throw subjectsError
 
         // 2. Pobierz tematy (z relacją do przedmiotów)
+        interface Topic {
+            slug: string;
+            subject: { slug: string } | null;
+        }
         const { data: topics, error: topicsError } = await supabaseClient
             .from('topics')
             .select('slug, subject:subjects(slug)')
@@ -58,7 +65,7 @@ serve(async (req) => {
         })
 
         // Subject routes
-        subjects?.forEach((subject: any) => {
+        subjects?.forEach((subject: Subject) => {
             sitemap += `
   <url>
     <loc>${baseUrl}/zasoby/${subject.slug}</loc>
@@ -68,7 +75,7 @@ serve(async (req) => {
         })
 
         // Topic routes
-        topics?.forEach((topic: any) => {
+        topics?.forEach((topic: Topic) => {
             if (topic.subject?.slug) {
                 sitemap += `
   <url>
@@ -90,9 +97,10 @@ serve(async (req) => {
             },
         })
 
-    } catch (error) {
+    } catch (error: unknown) {
         console.error(error)
-        return new Response(JSON.stringify({ error: error.message }), {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        return new Response(JSON.stringify({ error: errorMessage }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 500,
         })

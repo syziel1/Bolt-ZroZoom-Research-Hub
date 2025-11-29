@@ -2,6 +2,13 @@
 
 **Platforma zasobów edukacyjnych** - Twoja baza wiedzy dla Szkoły Przyszłości AI
 
+> 🚀 **Live Demo:** [https://szkolaprzyszlosciai.pl/](https://szkolaprzyszlosciai.pl/)
+
+## 🔗 Szybkie Linki
+- [Blog Edukacyjny](https://szkolaprzyszlosciai.pl/blog) - Artykuły i nowości
+- [Centrum Pomocy](https://szkolaprzyszlosciai.pl/pomoc) - Przewodniki i FAQ
+- [Zgłoś Błąd](https://github.com/syziel1/Szkola_Przyszlosci_AI_PL/issues) - GitHub Issues
+
 ## 📋 Spis treści
 
 - [O projekcie](#-o-projekcie)
@@ -37,6 +44,8 @@ Szkoła Przyszłości z AI to platforma do gromadzenia, organizowania i udostęp
 - 🃏 Różne widoki kart (Hero, Lista, Siatka)
 - 🔗 Routing z URL parametrami
 - 🌓 Tryb ciemny (Dark Mode) z wykrywaniem ustawień systemowych (beta)
+- 🛡️ Ostrzeżenia przed linkami zewnętrznymi
+- 📜 Zasady korzystania z serwisu (`/zasady`)
 
 ### Dla zalogowanych użytkowników
 - ➕ Dodawanie nowych zasobów
@@ -50,7 +59,9 @@ Szkoła Przyszłości z AI to platforma do gromadzenia, organizowania i udostęp
 ### Dla administratorów
 - ⚙️ Panel administracyjny
 - 📝 Zarządzanie przedmiotami, tematami i poziomami
-- 🔍 Moderacja treści
+- ⚙️ Panel administracyjny
+- 📝 Zarządzanie przedmiotami, tematami i poziomami
+- 🔍 Moderacja treści (automatyczny filtr wulgaryzmów)
 - 🌐 Integracja z Wikipedią (wyszukiwanie i dodawanie artykułów)
 
 ## 🛠 Stack technologiczny
@@ -72,6 +83,17 @@ Szkoła Przyszłości z AI to platforma do gromadzenia, organizowania i udostęp
   - Row Level Security (RLS) - bezpieczeństwo
   - Real-time subscriptions - aktualizacje na żywo
 - **Supabase Edge Functions** - serverless functions (Deno)
+
+### AI Agents & Tools
+- **Google Antigravity IDE** - z Gemini 3 Pro i Claude Sonnet 4.5
+- **GitHub Copilot**, **OpenAI Codex** - przegląd (review) kodu w PR-ach
+- **ChatGPT-5.1**, **Grok Code Fast 1**, **Claude Haiku 4.5**, **Claude Opus 4.5**
+- **Perplexity Comet** - testowanie interfejsu użytkownika UI/UX
+- **Role Agentów AI:**
+  - *Architekt:* Projektowanie struktury bazy danych i relacji.
+  - *Frontend Dev:* Implementacja komponentów React i stylowanie Tailwind.
+  - *Backend Dev:* Pisanie polityk RLS i funkcji Edge w Deno.
+  - *QA:* Generowanie testów jednostkowych i weryfikacja typów.
 
 ## 📦 Instalacja
 
@@ -345,5 +367,5 @@ W razie pytań skontaktuj się przez Issues na GitHubie.
 
 ---
 
-**Wersja:** 1.0.0  
-**Ostatnia aktualizacja:** 2025-11-29
+**Wersja:** 2.2.0  
+**Ostatnia aktualizacja:** 2025-11-28

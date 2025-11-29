@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import pkg from '../../package.json';
 
 type FooterProps = {
     className?: string;
@@ -25,10 +26,18 @@ export function Footer({ className = '', theme }: FooterProps) {
                 <p className="mb-2 text-sm">Szkoła Przyszłości z AI - Twoja baza wiedzy edukacyjnej</p>
                 <div className="flex justify-center gap-4 mb-2 text-xs md:text-sm">
                     <button onClick={() => navigate('/o-nas')} className={linkClasses}>O nas</button>
+                    <button onClick={() => navigate('/blog')} className={linkClasses}>Blog</button>
                     <button onClick={() => navigate('/pomoc')} className={linkClasses}>Pomoc</button>
+                    <button onClick={() => navigate('/zasady')} className={linkClasses}>Zasady</button>
                     <button onClick={() => navigate('/polityka-prywatnosci')} className={linkClasses}>Polityka Prywatności</button>
                 </div>
-                <p className="text-xs">&copy; {currentYear} Sylwester Zieliński. All rights reserved</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">
+                    &copy; {currentYear} Sylwester Zieliński. All rights reserved
+                    <span className="mx-2">•</span>
+                    <button onClick={() => navigate('/co-nowego')} className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                        v{pkg.version}
+                    </button>
+                </p>
             </div>
         </footer>
     );

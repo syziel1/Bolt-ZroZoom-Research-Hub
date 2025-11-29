@@ -42,8 +42,8 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
 
         const { data: existingProfile } = await supabase
           .from('profiles')
-          .select('user_id')
-          .eq('user_id', user.id)
+          .select('id')
+          .eq('id', user.id)
           .maybeSingle();
 
         if (!existingProfile && user.user_metadata) {
@@ -61,7 +61,7 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
           const generatedNick = generateNickFromString(baseNick);
 
           await supabase.from('profiles').insert({
-            user_id: user.id,
+            id: user.id,
             nick: generatedNick,
             name: user.user_metadata.full_name || null,
           });
@@ -147,21 +147,19 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900">
+    <main className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900">
       <SEO
         title={isLogin ? "Logowanie" : "Rejestracja"}
         description="Zaloguj się lub zarejestruj, aby uzyskać dostęp do pełnej bazy wiedzy i funkcji społecznościowych."
       />
       <div className="max-w-md w-full bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8">
-        {(onBack || true) && (
-          <button
-            onClick={() => onBack ? onBack() : navigate('/')}
-            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 mb-6 transition-colors"
-          >
-            <ArrowLeft size={20} />
-            Powrót do strony głównej
-          </button>
-        )}
+        <button
+          onClick={() => onBack ? onBack() : navigate('/')}
+          className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 mb-6 transition-colors"
+        >
+          <ArrowLeft size={20} />
+          Powrót do strony głównej
+        </button>
 
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Szkoła Przyszłości z AI</h1>
@@ -379,6 +377,6 @@ export function AuthForm({ onSuccess, onBack }: AuthFormProps) {
           )}
         </form >
       </div >
-    </div >
+    </main >
   );
 }

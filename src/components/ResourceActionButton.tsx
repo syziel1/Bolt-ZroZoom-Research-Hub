@@ -1,6 +1,9 @@
 import { Play, ExternalLink, BookOpen, Sparkles, Calculator } from 'lucide-react';
 import { detectPlatform, getPlatformInfo } from '../lib/platforms';
 import { extractYouTubeVideoId } from '../lib/youtube';
+import { isTrustedDomain } from '../lib/external-links';
+import { ExternalLinkWarningModal } from './ExternalLinkWarningModal';
+import { useState } from 'react';
 
 type ResourceActionButtonProps = {
     url: string;
@@ -20,6 +23,12 @@ export function ResourceActionButton({ url, variant = 'default', onYouTubePlay }
     const platform = detectPlatform(url);
     const platformInfo = getPlatformInfo(platform);
     const Icon = platformIcons[platform];
+    const [showWarningModal, setShowWarningModal] = useState(false);
+
+    const handleConfirmNavigation = () => {
+        setShowWarningModal(false);
+        window.open(url, '_blank', 'noopener,noreferrer');
+    };
 
     const handleClick = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -32,8 +41,11 @@ export function ResourceActionButton({ url, variant = 'default', onYouTubePlay }
             }
         }
 
-        // For non-YouTube or if YouTube modal handler not provided, open in new tab
-        window.open(url, '_blank', 'noopener,noreferrer');
+        if (isTrustedDomain(url)) {
+            window.open(url, '_blank', 'noopener,noreferrer');
+        } else {
+            setShowWarningModal(true);
+        }
     };
 
     const sizeClasses = variant === 'large'
@@ -43,13 +55,22 @@ export function ResourceActionButton({ url, variant = 'default', onYouTubePlay }
     const iconSize = variant === 'large' ? 18 : 16;
 
     return (
-        <button
-            onClick={handleClick}
-            className={`flex items-center gap-2 ${platformInfo.color} text-white rounded-lg ${platformInfo.hoverColor} transition-colors font-medium ${sizeClasses}`}
-        >
-            <Icon size={iconSize} className={platform === 'youtube' ? 'fill-current' : ''} />
-            {platformInfo.label}
-            {platform !== 'youtube' && <ExternalLink size={14} />}
-        </button>
+        <>
+            <button
+                onClick={handleClick}
+                className={`flex items-center gap-2 ${platformInfo.color} text-white rounded-lg ${platformInfo.hoverColor} transition-colors font-medium ${sizeClasses}`}
+            >
+                <Icon size={iconSize} className={platform === 'youtube' ? 'fill-current' : ''} />
+                {platformInfo.label}
+                {platform !== 'youtube' && <ExternalLink size={14} />}
+            </button>
+
+            <ExternalLinkWarningModal
+                isOpen={showWarningModal}
+                onClose={() => setShowWarningModal(false)}
+                onConfirm={handleConfirmNavigation}
+                url={url}
+            />
+        </>
     );
 }

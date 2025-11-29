@@ -19,6 +19,7 @@ export type Resource = {
   avg_correctness?: number | null;
   avg_difficulty?: number | null;
   ratings_count?: number;
+  rating_count?: number; // From v_resources_full view - why not use ratings_count?
   comments_count?: number;
   thumbnail_path?: string | null;
 };
