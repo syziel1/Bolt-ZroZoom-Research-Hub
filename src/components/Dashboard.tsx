@@ -153,7 +153,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
             }
           });
       }
-      // If resources.length === 0, we wait for resources to load (effect will re-run)
+      // Wait for resources to load before processing - effect will re-run when resources become available
     } else {
       // Reset the processed ID when there's no resource ID in URL
       processedResourceIdRef.current = null;
@@ -173,6 +173,8 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
       setShowOnlyFavorites(false);
       setShowOnlyRated(false);
     }
+    // resources dependency is needed to retry loading once resources become available,
+    // but processedResourceIdRef prevents reopening the modal on subsequent updates
   }, [routerLocation.search, resources]);
 
   useEffect(() => {
