@@ -9,8 +9,6 @@ describe('DashboardHeader', () => {
             <BrowserRouter>
                 <DashboardHeader
                     isGuestMode={false}
-                    userNick="TestUser"
-                    userName="Jan Testowy"
                     userRole="user"
                     onOpenSidebar={() => { }}
                     onSignOut={() => { }}
@@ -28,8 +26,6 @@ describe('DashboardHeader', () => {
             <BrowserRouter>
                 <DashboardHeader
                     isGuestMode={true}
-                    userNick=""
-                    userName=""
                     userRole=""
                     onOpenSidebar={() => { }}
                     onSignOut={() => { }}
