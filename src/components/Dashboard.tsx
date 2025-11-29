@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase, Resource } from '../lib/supabase';
 import { logger } from '../lib/logger';
@@ -117,20 +117,29 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
   const [showOnlyMine, setShowOnlyMine] = useState(false);
   const [ratedResourceIds, setRatedResourceIds] = useState<Set<string>>(new Set());
 
+  // Track processed resource ID to prevent modal from re-opening on resource list updates
+  const processedResourceIdRef = useRef<string | null>(null);
+
   // Parse URL query params for filters and resource sharing
   useEffect(() => {
     const params = new URLSearchParams(routerLocation.search);
 
     // Handle resource sharing (?r=RESOURCE_ID)
     const resourceId = params.get('r');
-    if (resourceId) {
+    
+    // Only process if this is a new resource ID (URL changed) to prevent
+    // modal from opening/closing unexpectedly during data loading
+    if (resourceId && resourceId !== processedResourceIdRef.current) {
       // First check if resource is already loaded
       const foundResource = resources.find(r => r.id === resourceId);
       if (foundResource) {
+        processedResourceIdRef.current = resourceId;
         setSelectedResource(foundResource);
         setIsDetailModalOpen(true);
-      } else {
-        // If not found (e.g. pagination), fetch it specifically
+      } else if (resources.length > 0) {
+        // Only fetch from API if resources have loaded but resource not found
+        // This handles cases like pagination where resource isn't in current list
+        processedResourceIdRef.current = resourceId;
         supabase
           .from('v_resources_full')
           .select('*')
@@ -143,6 +152,10 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
             }
           });
       }
+      // If resources.length === 0, wait for resources to load (effect will re-run)
+    } else if (!resourceId) {
+      // Reset the ref when ?r= parameter is removed from URL
+      processedResourceIdRef.current = null;
     }
 
     // Handle filters
@@ -159,7 +172,7 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
       setShowOnlyFavorites(false);
       setShowOnlyRated(false);
     }
-  }, [routerLocation.search, resources]); // Add resources dependency to retry if loaded later
+  }, [routerLocation.search, resources]); // resources dependency needed to retry when resources load
 
   useEffect(() => {
     if (session?.user?.id) {
