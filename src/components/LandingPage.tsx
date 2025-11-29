@@ -44,7 +44,7 @@ export function LandingPage() {
     }, 4000); // Change every 4 seconds
 
     return () => clearInterval(interval);
-  }, [mottos.length]);
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
