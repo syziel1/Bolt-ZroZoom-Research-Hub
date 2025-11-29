@@ -12,6 +12,7 @@ import { WhatsNew } from './pages/WhatsNew';
 import { BlogIndex } from './pages/BlogIndex';
 import { BlogPost } from './pages/BlogPost';
 import { TermsOfService } from './pages/TermsOfService';
+import { JungleGamePage } from './features/jungle';
 import { Loader } from 'lucide-react';
 
 function AppRoutes({ session }: { session: Session | null }) {
@@ -40,6 +41,9 @@ function AppRoutes({ session }: { session: Session | null }) {
       {/* Blog routes */}
       <Route path="/blog" element={<BlogIndex />} />
       <Route path="/blog/:slug" element={<BlogPost />} />
+
+      {/* Games routes */}
+      <Route path="/gry/matematyczna-dzungla" element={<JungleGamePage />} />
 
       {/* Catch all - redirect to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
