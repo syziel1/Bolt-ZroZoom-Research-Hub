@@ -212,4 +212,57 @@ describe('LanguageContext', () => {
         // Should have only made 2 fetches total (pl + en), not 3
         expect(fetchCallCount).toBe(initialFetchCount + 1);
     });
+
+    it('handles fetch errors gracefully', async () => {
+        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        
+        // Override fetch to return error
+        vi.stubGlobal('fetch', vi.fn(() => {
+            return Promise.resolve({
+                ok: false,
+                status: 500
+            });
+        }));
+
+        function ErrorTestComponent() {
+            const { t, isLoading } = useTranslation();
+            if (isLoading) return <div>Loading...</div>;
+            return <span data-testid="fallback">{t('nav.login')}</span>;
+        }
+
+        render(
+            <LanguageProvider>
+                <ErrorTestComponent />
+            </LanguageProvider>
+        );
+
+        await waitFor(() => {
+            // Should fall back to returning the key
+            expect(screen.getByTestId('fallback')).toHaveTextContent('nav.login');
+        });
+
+        // Error should be logged
+        expect(consoleSpy).toHaveBeenCalled();
+        
+        consoleSpy.mockRestore();
+    });
+
+    it('handles empty translation key', async () => {
+        function EmptyKeyComponent() {
+            const { t, isLoading } = useTranslation();
+            if (isLoading) return <div>Loading...</div>;
+            return <span data-testid="empty">{t('')}</span>;
+        }
+
+        render(
+            <LanguageProvider>
+                <EmptyKeyComponent />
+            </LanguageProvider>
+        );
+
+        await waitFor(() => {
+            // Should return empty string for empty key
+            expect(screen.getByTestId('empty')).toHaveTextContent('');
+        });
+    });
 });

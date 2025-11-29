@@ -30,14 +30,26 @@ type LanguageProviderProps = {
 
 export function LanguageProvider({ children, defaultLanguage = 'pl' }: LanguageProviderProps) {
     const [language, setLanguageState] = useState<Language>(() => {
-        const stored = localStorage.getItem(STORAGE_KEY) as Language | null;
+        const stored = (() => {
+            try {
+                return localStorage.getItem(STORAGE_KEY) as Language | null;
+            } catch {
+                return null;
+            }
+        })();
         return stored || defaultLanguage;
     });
     const [translations, setTranslations] = useState<Translations>({});
     const [isLoading, setIsLoading] = useState(true);
     const translationsCache = useRef<Map<Language, Translations>>(new Map());
+    const abortControllerRef = useRef<AbortController | null>(null);
 
     const loadTranslations = useCallback(async (lang: Language) => {
+        // Cancel any in-flight request
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+        }
+
         // Check cache first
         const cached = translationsCache.current.get(lang);
         if (cached) {
@@ -46,21 +58,36 @@ export function LanguageProvider({ children, defaultLanguage = 'pl' }: LanguageP
             return;
         }
 
+        // Create new AbortController for this request
+        const abortController = new AbortController();
+        abortControllerRef.current = abortController;
+
         setIsLoading(true);
         try {
-            const response = await fetch(`/locales/${lang}.json`);
+            const response = await fetch(`/locales/${lang}.json`, {
+                signal: abortController.signal
+            });
             if (!response.ok) {
                 throw new Error(`Failed to load translations for ${lang}`);
             }
             const data = await response.json();
-            // Cache the loaded translations
-            translationsCache.current.set(lang, data);
-            setTranslations(data);
+            // Only update if this request wasn't aborted
+            if (!abortController.signal.aborted) {
+                // Cache the loaded translations
+                translationsCache.current.set(lang, data);
+                setTranslations(data);
+            }
         } catch (error) {
+            // Ignore abort errors
+            if (error instanceof Error && error.name === 'AbortError') {
+                return;
+            }
             console.error('Failed to load translations:', error);
             setTranslations({});
         } finally {
-            setIsLoading(false);
+            if (!abortController.signal.aborted) {
+                setIsLoading(false);
+            }
         }
     }, []);
 
@@ -78,10 +105,11 @@ export function LanguageProvider({ children, defaultLanguage = 'pl' }: LanguageP
     }, []);
 
     const t = useCallback((key: string): string => {
-        const keys = key.split('.');
-        if (keys.length === 0) {
+        if (!key) {
             return key;
         }
+        
+        const keys = key.split('.');
 
         let result: TranslationValue | undefined = translations;
         for (const k of keys) {
