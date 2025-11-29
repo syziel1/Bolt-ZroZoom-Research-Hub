@@ -8,6 +8,13 @@ import { ThumbnailUploader } from './ThumbnailUploader';
 import { buildTopicTree } from '../utils/topicTree';
 import { TopicTree } from './TopicTree';
 
+// Type for Supabase function errors with additional context
+type SupabaseFunctionError = Error & {
+  context?: {
+    json?: () => Promise<{ error?: string }>;
+  };
+};
+
 type ResourceFormProps = {
   subjects: Subject[];
   topics: Topic[];
@@ -357,9 +364,9 @@ export function ResourceForm({ subjects, topics, levels, onSuccess, onCancel, in
         let errorMessage = error.message;
         try {
           if (error instanceof Error && 'context' in error) {
-            const context = (error as Error & { context?: { json?: () => Promise<{ error?: string }> } }).context;
-            if (context && context.json) {
-              const body = await context.json();
+            const supabaseError = error as SupabaseFunctionError;
+            if (supabaseError.context?.json) {
+              const body = await supabaseError.context.json();
               if (body.error) errorMessage = body.error;
             }
           }

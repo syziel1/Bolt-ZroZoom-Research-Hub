@@ -5,6 +5,28 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
+// YouTube API response types
+type YouTubeSearchItem = {
+  id: { videoId: string };
+};
+
+type YouTubeVideoItem = {
+  id: string;
+  snippet: {
+    title: string;
+    description: string;
+    channelTitle: string;
+    thumbnails: {
+      high?: { url: string };
+      medium?: { url: string };
+      default?: { url: string };
+    };
+  };
+  contentDetails: {
+    duration: string;
+  };
+};
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -63,27 +85,6 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
-
-    type YouTubeSearchItem = {
-      id: { videoId: string };
-    };
-
-    type YouTubeVideoItem = {
-      id: string;
-      snippet: {
-        title: string;
-        description: string;
-        channelTitle: string;
-        thumbnails: {
-          high?: { url: string };
-          medium?: { url: string };
-          default?: { url: string };
-        };
-      };
-      contentDetails: {
-        duration: string;
-      };
-    };
 
     const videoIds = (searchData.items as YouTubeSearchItem[]).map((item) => item.id.videoId).join(',');
 
