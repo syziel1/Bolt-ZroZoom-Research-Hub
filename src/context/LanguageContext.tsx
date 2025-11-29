@@ -69,7 +69,11 @@ export function LanguageProvider({ children, defaultLanguage = 'pl' }: LanguageP
     }, [language, loadTranslations]);
 
     const setLanguage = useCallback((lang: Language) => {
-        localStorage.setItem(STORAGE_KEY, lang);
+        try {
+            localStorage.setItem(STORAGE_KEY, lang);
+        } catch (error) {
+            console.warn('Failed to persist language preference:', error);
+        }
         setLanguageState(lang);
     }, []);
 
