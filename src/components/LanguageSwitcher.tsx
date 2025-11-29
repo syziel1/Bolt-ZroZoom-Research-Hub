@@ -17,7 +17,6 @@ export function LanguageSwitcher() {
         <button
             onClick={toggleLanguage}
             className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-600 dark:text-gray-300 transition-colors flex items-center gap-1"
-            title={t('language.switch')}
             aria-label={t('language.switch')}
         >
             <Globe size={20} />
