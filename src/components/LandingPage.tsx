@@ -5,8 +5,9 @@ import { supabase, Resource, Subject, ResourceTopic, ResourceLevel } from '../li
 import { ResourceCarousel } from './ResourceCarousel';
 import { Navigation } from './Navigation';
 import { Footer } from './Footer';
-import { BookOpen, Layers, Award, Sparkles, ArrowRight, Calculator, Globe, Clock, Languages, Code, Palette, Dumbbell, Music, Microscope, Atom, Beaker, ChevronDown, ShieldCheck, Users, Search, LayoutDashboard, Star } from 'lucide-react';
+import { BookOpen, Layers, Award, Sparkles, ArrowRight, Calculator, Globe, Clock, Languages, Code, Palette, Dumbbell, Music, Microscope, Atom, Beaker, ChevronDown, ShieldCheck, Users, LayoutDashboard, Star } from 'lucide-react';
 import { SEO } from './SEO';
+import { UnifiedSearchInput } from './UnifiedSearchInput';
 
 type Stats = {
   topicsCount: number;
@@ -46,8 +47,22 @@ export function LandingPage() {
     return () => clearInterval(interval);
   }, [mottos.length]);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+  const [allResources, setAllResources] = useState<{ id: string; title: string }[]>([]);
+
+  useEffect(() => {
+    const loadResourceTitles = async () => {
+      const { data } = await supabase
+        .from('v_resources_full')
+        .select('id, title');
+      if (data) {
+        setAllResources(data);
+      }
+    };
+    loadResourceTitles();
+  }, []);
+
+  const handleSearch = (e?: React.FormEvent) => {
+    e?.preventDefault();
     const query = searchQuery.trim();
     if (query) {
       // Check if query matches a subject name
@@ -61,6 +76,10 @@ export function LandingPage() {
         navigate(`/zasoby?q=${encodeURIComponent(query)}`);
       }
     }
+  };
+
+  const handleResourceSelect = (resource: { id: string; title: string }) => {
+    navigate(`/zasoby?r=${resource.id}`);
   };
 
   useEffect(() => {
@@ -264,24 +283,21 @@ export function LandingPage() {
                 Ucz się efektywniej z zasobów polecanych przez społeczność.
               </p>
 
-              <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-12 animate-fade-in-up relative z-20" style={{ animationDelay: '0.6s', opacity: 0 }}>
-                <div className="relative flex items-center">
-                  <input
-                    type="text"
-                    placeholder="Czego chcesz się dzisiaj nauczyć?"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full px-6 py-4 rounded-full text-gray-900 dark:text-gray-100 bg-white dark:bg-slate-800 text-lg shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-400/50 pl-14 placeholder-gray-500 dark:placeholder-gray-400"
-                  />
-                  <Search className="absolute left-5 text-gray-400" size={24} />
-                  <button
-                    type="submit"
-                    className="absolute right-2 bg-blue-600 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-700 transition-colors"
-                  >
-                    Szukaj
-                  </button>
-                </div>
-              </form>
+              <div className="max-w-2xl mx-auto mb-12 animate-fade-in-up relative z-20" style={{ animationDelay: '0.6s', opacity: 0 }}>
+                <UnifiedSearchInput
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  onSearch={handleSearch}
+                  items={allResources}
+                  onItemSelect={handleResourceSelect}
+                  placeholder="Czego chcesz się dzisiaj nauczyć?"
+                  inputClassName="w-full px-6 py-4 rounded-full text-gray-900 dark:text-gray-100 bg-white dark:bg-slate-800 text-lg shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-400/50 pl-14 placeholder-gray-500 dark:placeholder-gray-400"
+                  searchIconClassName="!left-5 text-gray-400"
+                  showSearchButton={true}
+                  searchButtonClassName="bg-blue-600 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-700 transition-colors"
+                  searchButtonContent="Szukaj"
+                />
+              </div>
 
               <button
                 onClick={scrollToResources}

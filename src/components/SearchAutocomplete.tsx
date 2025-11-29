@@ -43,9 +43,12 @@ export function SearchAutocomplete({ items, searchQuery, onSelectSuggestion }: S
             } else if (e.key === 'ArrowUp') {
                 e.preventDefault();
                 setSelectedIndex(prev => (prev > 0 ? prev - 1 : -1));
-            } else if (e.key === 'Enter' && selectedIndex >= 0) {
+            } else if (e.key === 'Enter') {
                 e.preventDefault();
-                onSelectSuggestion(uniqueSuggestions[selectedIndex]);
+                // If user pressed Enter with a selected suggestion, use it
+                // Otherwise, use the first suggestion
+                const indexToUse = selectedIndex >= 0 ? selectedIndex : 0;
+                onSelectSuggestion(uniqueSuggestions[indexToUse]);
                 setSelectedIndex(-1);
             } else if (e.key === 'Escape') {
                 setSelectedIndex(-1);
