@@ -80,7 +80,7 @@ export function JungleGame() {
           >
             <div className="text-5xl mb-3 group-hover:scale-110 transition-transform">🦁</div>
             <h3 className="text-xl font-bold text-yellow-800 dark:text-yellow-200 mb-1">Średni</h3>
-            <p className="text-sm text-yellow-600 dark:text-yellow-400">Większe liczby i ułamki</p>
+            <p className="text-sm text-yellow-600 dark:text-yellow-400">Większe liczby i dzielenie</p>
           </button>
 
           <button

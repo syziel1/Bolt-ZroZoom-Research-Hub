@@ -6,6 +6,16 @@ const corsHeaders = {
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Fisher-Yates shuffle algorithm for proper randomization
+function shuffleArray<T>(array: T[]): T[] {
+    const shuffled = [...array]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+    return shuffled
+}
+
 // Question templates by difficulty level
 const questionTemplates = {
     1: [ // Easy - basic operations with small numbers
@@ -74,10 +84,9 @@ function generateQuestion(level: Difficulty): Question {
 
     // Generate wrong answers (close to correct answer)
     const wrongAnswers: string[] = []
-    const offsets = [-2, -1, 1, 2, 3, -3, 5, -5]
-    const shuffledOffsets = offsets.sort(() => Math.random() - 0.5)
+    const offsets = shuffleArray([-2, -1, 1, 2, 3, -3, 5, -5])
 
-    for (const offset of shuffledOffsets) {
+    for (const offset of offsets) {
         const wrongAnswer = (result + offset).toString()
         if (wrongAnswer !== correctAnswer && !wrongAnswers.includes(wrongAnswer) && parseInt(wrongAnswer) >= 0) {
             wrongAnswers.push(wrongAnswer)
@@ -93,8 +102,8 @@ function generateQuestion(level: Difficulty): Question {
         }
     }
 
-    // Shuffle all options
-    const options = [correctAnswer, ...wrongAnswers].sort(() => Math.random() - 0.5)
+    // Shuffle all options using Fisher-Yates
+    const options = shuffleArray([correctAnswer, ...wrongAnswers])
 
     return {
         id: crypto.randomUUID(),
@@ -110,10 +119,18 @@ serve(async (req) => {
     }
 
     try {
+        const authHeader = req.headers.get('Authorization')
+        if (!authHeader) {
+            return new Response(JSON.stringify({ error: 'Unauthorized - missing authorization header' }), {
+                status: 401,
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            })
+        }
+
         const supabaseClient = createClient(
             Deno.env.get('SUPABASE_URL') ?? '',
             Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-            { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
+            { global: { headers: { Authorization: authHeader } } }
         )
 
         // Get user from auth
