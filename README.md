@@ -174,22 +174,42 @@ npm test
 
 ```text
 Szkola-Przyszlosci-AI/
-├── src/
-│   ├── components/          # Komponenty React
-│   │   ├── AuthForm.tsx     # Formularz logowania/rejestracji
-│   │   ├── UserHomePage.tsx # Pulpit użytkownika (zalogowany)
-│   │   ├── Dashboard.tsx    # Główny widok (kontener)
-│   │   ├── DashboardHeader.tsx # Nagłówek dashboardu
-│   │   ├── DashboardGrid.tsx   # Siatka zasobów
-│   │   ├── Sidebar.tsx      # Boczne menu z filtrami
-│   │   └── setup.ts         # Setup Vitest
-│   ├── App.tsx              # Główny komponent aplikacji
-│   ├── main.tsx             # Entry point
-│   └── index.css            # Globalne style
-├── docs/                    # Dokumentacja
+├── src/                         # Kod źródłowy aplikacji
+│   ├── components/              # Komponenty React
+│   │   ├── __tests__/           # Testy komponentów
+│   │   ├── resource-detail/     # Komponenty szczegółów zasobu
+│   │   └── shared/              # Współdzielone komponenty UI
+│   ├── content/                 # Treści statyczne
+│   │   └── help/                # Pliki pomocy (FAQ, przewodnik)
+│   ├── context/                 # React Context (ThemeContext)
+│   ├── hooks/                   # Custom React hooks
+│   ├── lib/                     # Biblioteki i konfiguracja (Supabase, utils)
+│   ├── pages/                   # Komponenty stron
+│   ├── test/                    # Konfiguracja testów (Vitest setup)
+│   ├── types/                   # Definicje typów TypeScript
+│   ├── utils/                   # Funkcje pomocnicze
+│   ├── App.tsx                  # Główny komponent aplikacji
+│   ├── main.tsx                 # Entry point
+│   └── index.css                # Globalne style
+├── public/                      # Zasoby statyczne
+│   └── content/                 # Statyczne treści (about, privacy)
+├── supabase/                    # Konfiguracja Supabase
+│   ├── functions/               # Edge Functions (Deno)
+│   │   ├── analyze-content/     # Analiza treści
+│   │   ├── chat-with-ai/        # Chat z AI
+│   │   ├── generate-sitemap/    # Generator sitemapy
+│   │   ├── search-wikipedia/    # Wyszukiwanie Wikipedia
+│   │   └── search-youtube/      # Wyszukiwanie YouTube
+│   └── migrations/              # Migracje SQL
+├── docs/                        # Dokumentacja
+│   ├── DEPLOYMENT.md            # Instrukcje wdrożenia
 │   ├── specyfikacja_bazy_szkola_przyszlosci.md
 │   └── prompt_codex_resource_thumbnails.md
-├── technical.md             # Dokumentacja techniczna
+├── .github/                     # Konfiguracja GitHub
+│   └── workflows/               # GitHub Actions
+├── technical.md                 # Dokumentacja techniczna
+├── Changelog.md                 # Historia zmian
+├── ROADMAP.md                   # Plan rozwoju
 ├── package.json
 ├── tsconfig.json
 ├── vite.config.ts
@@ -326,4 +346,4 @@ W razie pytań skontaktuj się przez Issues na GitHubie.
 ---
 
 **Wersja:** 1.0.0  
-**Ostatnia aktualizacja:** 2025-11-25
+**Ostatnia aktualizacja:** 2025-11-29
