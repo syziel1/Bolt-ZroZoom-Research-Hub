@@ -116,6 +116,7 @@ export function Sidebar({
               <input
                 type="text"
                 placeholder="Szukaj w tytułach i opisach..."
+                aria-label="Szukaj zasobów"
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
@@ -130,6 +131,7 @@ export function Sidebar({
                     setSearchQuery('');
                     setShowAutocomplete(false);
                   }}
+                  aria-label="Wyczyść wyszukiwanie"
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                 >
                   <X size={16} />
@@ -168,6 +170,7 @@ export function Sidebar({
               </button>
               <button
                 onClick={onClose}
+                aria-label="Zamknij pasek boczny"
                 className="md:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
               >
                 <X size={24} />
