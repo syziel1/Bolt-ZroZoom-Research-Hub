@@ -42,22 +42,18 @@ function parseTimestamp(timestamp: string): number | null {
       return null;
     }
     
-    const parsedParts = parts.map(p => {
+    // Parse all parts and validate they are valid non-negative integers
+    const validParts: number[] = [];
+    for (const p of parts) {
       const num = parseInt(p, 10);
       if (isNaN(num) || num < 0) {
         return null;
       }
-      return num;
-    });
-    
-    if (parsedParts.some(p => p === null)) {
-      return null;
+      validParts.push(num);
     }
     
-    const validParts = parsedParts as number[];
-    
     // Validate ranges: seconds should be 0-59, minutes 0-59 for hh:mm:ss format
-    if (parts.length === 2) {
+    if (validParts.length === 2) {
       // Format: mm:ss - minutes can be any non-negative number for video timestamps
       const [minutes, seconds] = validParts;
       if (seconds > 59) return null;
