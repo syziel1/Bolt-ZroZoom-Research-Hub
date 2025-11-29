@@ -2,6 +2,11 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 
 import { blogPosts } from '../content/blog/posts';
 
+type SuggestionItem = {
+    title: string;
+    type: 'resource' | 'blog';
+};
+
 type SearchAutocompleteProps = {
     items: { id?: string; title: string }[];  // id is optional for backwards compatibility with blog posts
     searchQuery: string;
@@ -12,33 +17,41 @@ export function SearchAutocomplete({ items, searchQuery, onSelectSuggestion }: S
     const [selectedIndex, setSelectedIndex] = useState(-1);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    // Generate suggestions based on search query
-    const uniqueSuggestions = useMemo(() => {
-        return searchQuery.length >= 2
-            ? Array.from(new Set([
-                ...items
-                    .filter(item =>
-                        item.title.toLowerCase().includes(searchQuery.toLowerCase())
-                    )
-                    .map(item => item.title),
-                ...blogPosts
-                    .filter(post =>
-                        post.title.toLowerCase().includes(searchQuery.toLowerCase())
-                    )
-                    .map(post => post.title)
-            ])).slice(0, 5) // Deduplicate first, then limit to 5 unique suggestions
-            : [];
+    // Generate suggestions based on search query with type information
+    const suggestions = useMemo((): SuggestionItem[] => {
+        if (searchQuery.length < 2) return [];
+
+        const seen = new Set<string>();
+        const result: SuggestionItem[] = [];
+
+        // Add resource suggestions
+        items.forEach(item => {
+            if (item.title.toLowerCase().includes(searchQuery.toLowerCase()) && !seen.has(item.title)) {
+                seen.add(item.title);
+                result.push({ title: item.title, type: 'resource' });
+            }
+        });
+
+        // Add blog post suggestions
+        blogPosts.forEach(post => {
+            if (post.title.toLowerCase().includes(searchQuery.toLowerCase()) && !seen.has(post.title)) {
+                seen.add(post.title);
+                result.push({ title: post.title, type: 'blog' });
+            }
+        });
+
+        return result.slice(0, 5); // Limit to 5 suggestions
     }, [searchQuery, items]);
 
     // Handle keyboard navigation
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (uniqueSuggestions.length === 0) return;
+            if (suggestions.length === 0) return;
 
             if (e.key === 'ArrowDown') {
                 e.preventDefault();
                 setSelectedIndex(prev =>
-                    prev < uniqueSuggestions.length - 1 ? prev + 1 : prev
+                    prev < suggestions.length - 1 ? prev + 1 : prev
                 );
             } else if (e.key === 'ArrowUp') {
                 e.preventDefault();
@@ -48,7 +61,7 @@ export function SearchAutocomplete({ items, searchQuery, onSelectSuggestion }: S
                 // If user pressed Enter with a selected suggestion, use it
                 // Otherwise, use the first suggestion
                 const indexToUse = selectedIndex >= 0 ? selectedIndex : 0;
-                onSelectSuggestion(uniqueSuggestions[indexToUse]);
+                onSelectSuggestion(suggestions[indexToUse].title);
                 setSelectedIndex(-1);
             } else if (e.key === 'Escape') {
                 setSelectedIndex(-1);
@@ -57,14 +70,14 @@ export function SearchAutocomplete({ items, searchQuery, onSelectSuggestion }: S
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [uniqueSuggestions, selectedIndex, onSelectSuggestion]);
+    }, [suggestions, selectedIndex, onSelectSuggestion]);
 
     // Reset selected index when suggestions change
     useEffect(() => {
         setSelectedIndex(-1);
     }, [searchQuery]);
 
-    if (uniqueSuggestions.length === 0) {
+    if (suggestions.length === 0) {
         return null;
     }
 
@@ -73,12 +86,12 @@ export function SearchAutocomplete({ items, searchQuery, onSelectSuggestion }: S
             ref={dropdownRef}
             className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto"
         >
-            {uniqueSuggestions.map((suggestion, index) => (
+            {suggestions.map((suggestion, index) => (
                 <button
                     key={index}
                     type="button"
                     onClick={() => {
-                        onSelectSuggestion(suggestion);
+                        onSelectSuggestion(suggestion.title);
                         setSelectedIndex(-1);
                     }}
                     onMouseEnter={() => setSelectedIndex(index)}
@@ -86,8 +99,13 @@ export function SearchAutocomplete({ items, searchQuery, onSelectSuggestion }: S
                         }`}
                 >
                     <div className="flex items-center gap-2">
-                        <span className="text-gray-400">🔍</span>
-                        <span className="text-sm text-gray-900 truncate">{suggestion}</span>
+                        <span className="text-gray-400" title={suggestion.type === 'blog' ? 'Blog Post' : 'Resource'}>
+                            {suggestion.type === 'blog' ? '📝' : '📚'}
+                        </span>
+                        <span className="text-sm text-gray-900 truncate">{suggestion.title}</span>
+                        <span className="text-xs text-gray-400 ml-auto shrink-0">
+                            {suggestion.type === 'blog' ? 'Blog' : 'Zasób'}
+                        </span>
                     </div>
                 </button>
             ))}
