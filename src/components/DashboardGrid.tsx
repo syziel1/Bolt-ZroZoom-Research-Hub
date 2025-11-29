@@ -269,9 +269,7 @@ export function DashboardGrid({
                                 key={post.slug}
                                 onClick={() => navigate(`/blog/${post.slug}`)}
                                 onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                        navigate(`/blog/${post.slug}`);
-                                    } else if (e.key === ' ') {
+                                    if (e.key === 'Enter' || e.key === ' ') {
                                         e.preventDefault();
                                         navigate(`/blog/${post.slug}`);
                                     }
