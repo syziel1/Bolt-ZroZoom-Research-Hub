@@ -24,24 +24,33 @@ const PROFANITY_LIST = [
     'ciota'
 ];
 
+// Escape special regex characters in a string
+function escapeRegExp(str: string): string {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Pre-compile regex patterns for better performance
+const PROFANITY_PATTERNS = PROFANITY_LIST.map(word => ({
+    regex: new RegExp(`\\b${escapeRegExp(word)}\\b`, 'gi'),
+    replacement: '*'.repeat(word.length)
+}));
+
 export function containsProfanity(text: string): boolean {
     if (!text) return false;
 
-    const lowerText = text.toLowerCase();
-    return PROFANITY_LIST.some(word => lowerText.includes(word));
+    return PROFANITY_PATTERNS.some(({ regex }) => {
+        regex.lastIndex = 0; // Reset lastIndex for stateful regex
+        return regex.test(text);
+    });
 }
 
 export function filterProfanity(text: string): string {
     if (!text) return text;
 
     let filteredText = text;
-    const lowerText = text.toLowerCase();
 
-    PROFANITY_LIST.forEach(word => {
-        if (lowerText.includes(word)) {
-            const regex = new RegExp(word, 'gi');
-            filteredText = filteredText.replace(regex, '*'.repeat(word.length));
-        }
+    PROFANITY_PATTERNS.forEach(({ regex, replacement }) => {
+        filteredText = filteredText.replace(regex, replacement);
     });
 
     return filteredText;
