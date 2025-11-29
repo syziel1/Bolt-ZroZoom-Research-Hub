@@ -11,6 +11,30 @@ export type CommentData = {
     resource_id: string;
 };
 
+type RatingsStats = Map<string, { count: number; sumUsefulness: number; sumCorrectness: number }>;
+type CommentsCounts = Map<string, number>;
+
+function attachResourceStats(
+    resourcesData: Resource[],
+    ratingsStats: RatingsStats,
+    commentsCounts: CommentsCounts,
+    nickMap?: Map<string, string>
+): Resource[] {
+    return resourcesData.map(r => {
+        const stats = ratingsStats.get(r.id);
+        const commentsCount = commentsCounts.get(r.id) || 0;
+
+        return {
+            ...r,
+            ...(nickMap && { contributor_nick: r.contributor_nick || nickMap.get(r.contributor_id!) || 'Anonim' }),
+            ratings_count: stats ? stats.count : 0,
+            avg_usefulness: stats ? stats.sumUsefulness / stats.count : null,
+            avg_correctness: stats ? stats.sumCorrectness / stats.count : null,
+            comments_count: commentsCount
+        };
+    });
+}
+
 export type ResourceTopicData = {
     resource_id: string;
     topic_id: string;
@@ -102,48 +126,14 @@ export function useDashboardData(isGuestMode: boolean) {
 
                     if (profiles) {
                         const nickMap = new Map(profiles.map(p => [p.id, p.nick]));
-                        resourcesData = resourcesData.map(r => {
-                            const stats = ratingsStats.get(r.id);
-                            const commentsCount = commentsCounts.get(r.id) || 0;
-
-                            return {
-                                ...r,
-                                contributor_nick: r.contributor_nick || nickMap.get(r.contributor_id!) || 'Anonim',
-                                ratings_count: stats ? stats.count : 0,
-                                avg_usefulness: stats ? stats.sumUsefulness / stats.count : null,
-                                avg_correctness: stats ? stats.sumCorrectness / stats.count : null,
-                                comments_count: commentsCount
-                            };
-                        });
+                        resourcesData = attachResourceStats(resourcesData, ratingsStats, commentsCounts, nickMap);
                     } else {
                         // Even if profiles fail, we still want to attach stats
-                        resourcesData = resourcesData.map(r => {
-                            const stats = ratingsStats.get(r.id);
-                            const commentsCount = commentsCounts.get(r.id) || 0;
-
-                            return {
-                                ...r,
-                                ratings_count: stats ? stats.count : 0,
-                                avg_usefulness: stats ? stats.sumUsefulness / stats.count : null,
-                                avg_correctness: stats ? stats.sumCorrectness / stats.count : null,
-                                comments_count: commentsCount
-                            };
-                        });
+                        resourcesData = attachResourceStats(resourcesData, ratingsStats, commentsCounts);
                     }
                 } else {
                     // No contributors to fetch, but still attach stats
-                    resourcesData = resourcesData.map(r => {
-                        const stats = ratingsStats.get(r.id);
-                        const commentsCount = commentsCounts.get(r.id) || 0;
-
-                        return {
-                            ...r,
-                            ratings_count: stats ? stats.count : 0,
-                            avg_usefulness: stats ? stats.sumUsefulness / stats.count : null,
-                            avg_correctness: stats ? stats.sumCorrectness / stats.count : null,
-                            comments_count: commentsCount
-                        };
-                    });
+                    resourcesData = attachResourceStats(resourcesData, ratingsStats, commentsCounts);
                 }
 
                 setResources(resourcesData);
