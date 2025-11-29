@@ -227,10 +227,6 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
     window.location.reload();
   };
 
-  const handleTopicClick = (topicName: string) => {
-    logger.log('Topic clicked:', topicName);
-  };
-
   const handleCardClick = (resource: Resource) => {
     setSelectedResource(resource);
     setIsDetailModalOpen(true);
@@ -409,7 +405,6 @@ export function Dashboard({ isGuestMode: propIsGuestMode = false }: DashboardPro
             indexOfFirstResource={indexOfFirstFilteredResource}
             indexOfLastResource={indexOfLastFilteredResource}
             onPageChange={handlePageChange}
-            onTopicClick={handleTopicClick}
             onCardClick={handleCardClick}
             searchQuery={searchQuery}
             onAskAi={handleAskAi}
